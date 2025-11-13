@@ -39,7 +39,8 @@ class MapScreen extends StatelessWidget {
             right: 24,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
+              children: [/*
+              // Restaurant detailScreen
                 // TikTok Button
                 Expanded(
                   child: ElevatedButton.icon(
@@ -74,7 +75,7 @@ class MapScreen extends StatelessWidget {
                     ),
                     onPressed: () => viewModel.openInstagramTag(tag),
                   ),
-                ),
+                ),*/
               ],
             ),
           ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../service/locationService.dart';
 
 class MapViewModel extends ChangeNotifier {
@@ -36,7 +35,8 @@ class MapViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> openTikTok(String restaurantName) async {
+  // Restaurant detailScreen
+/*  Future<void> openTikTok(String restaurantName) async {
     final query = Uri.encodeComponent(restaurantName);
     final url = 'https://www.tiktok.com/tag/$query';
     final uri = Uri.parse(url);
@@ -58,5 +58,5 @@ class MapViewModel extends ChangeNotifier {
     } else {
       throw 'Could not open Instagram tag';
     }
-  }
+  }*/
 }

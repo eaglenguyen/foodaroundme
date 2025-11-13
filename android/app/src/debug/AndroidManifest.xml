@@ -13,12 +13,9 @@
     <application
         android:label="foodaroundme">
 
-        <!-- Google Maps API Key -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAr4_7ZnryayQY-7q9XAhLRlmGpGo-j0yU" />
 
-        
+
+
 
     </application>
 
