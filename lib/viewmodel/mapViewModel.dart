@@ -4,7 +4,8 @@ import '../service/locationService.dart';
 
 class MapViewModel extends ChangeNotifier {
 
-  // current layout is variables -> methods/functions
+  // current layout is state objects -> methods/functions
+  // state (in android) is value that changes over time
   final LocationService _locationService = LocationService();
   bool isLoading = false;
   LatLng center = const LatLng(42.3104, -71.0575);
