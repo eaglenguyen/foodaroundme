@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
+import 'package:foodaroundme/widgets/expandable_fab.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -41,50 +42,55 @@ class _MapScreenState extends State<MapScreen> {
               ),
             },
           ),
-
-          /// ---- Floating Menu (only FAB and menu widgets rebuild) ----
           Positioned(
-            bottom: 20,
-            left: 20,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                if (isMenuOpen) ...[
-                  FloatingActionButton.extended(
-                    onPressed: () {},
-                    label: const Text("New"),
-                    icon: const Icon(Icons.place),
-                  ),
-                  const SizedBox(height: 10),
-                  FloatingActionButton.extended(
-                    onPressed: () {},
-                    label: const Text("Popular"),
-                    icon: const Icon(Icons.restaurant),
-                  ),
-                  const SizedBox(height: 10),
-                  FloatingActionButton.extended(
-                    onPressed: () {},
-                    label: const Text("All Around Me"),
-                    icon: const Icon(Icons.map),
-                  ),
-                  const SizedBox(height: 15),
-                ],
-
-                FloatingActionButton.extended(
-                  onPressed: () {
-                    setState(() {
-                      isMenuOpen = !isMenuOpen;
-                    });
-                  },
-                  label: Text(isMenuOpen ? "Close" : "FoodAroundMe"),
-                  icon: Icon(isMenuOpen ? Icons.close : Icons.menu),
-                  backgroundColor: Colors.green,
-                ),
+            right: 0,
+            left: 0,
+            bottom: 100, // position under FAB
+            child: Center(
+            child: ToggleButtons(
+              borderRadius: const BorderRadius.all(Radius.circular(30)),
+              constraints: const BoxConstraints(minHeight: 50, minWidth: 50),
+              fillColor: Colors.green,
+              selectedColor: Colors.white,
+              color: Colors.black,
+              selectedBorderColor: Colors.green,
+              borderColor: Colors.grey,
+              isSelected: viewModel.selectedButtons,
+              onPressed: (index) {
+                viewModel.toggleButton(index);  // update your viewmodel
+              },
+              children: const [
+                Icon(Icons.location_on),
+                Icon(Icons.restaurant),
+                Icon(Icons.local_pizza),
+                Icon(Icons.local_cafe),
               ],
             ),
           ),
+          )
         ],
       ),
+        // ⭐ ADD THE EXPANDABLE FAB HERE
+        floatingActionButton: ExpandableFab(
+            distance: 112,
+          children: [
+            ActionButton(icon: const Icon(Icons.restaurant),
+            onPressed: () {
+              //
+            },
+            ),
+            ActionButton(icon: const Icon(Icons.local_offer),
+            onPressed: () {
+              //
+            },
+            ),
+            ActionButton(icon: const Icon(Icons.favorite),
+            onPressed: () {
+              //
+            },)
+          ],
+        ),
+
     );
   }
 }

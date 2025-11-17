@@ -9,7 +9,15 @@ class MapViewModel extends ChangeNotifier {
   final LocationService _locationService = LocationService();
   bool isLoading = false;
   LatLng center = const LatLng(42.3104, -71.0575);
+  List<bool> selectedButtons = [true, false, false, false];
   GoogleMapController? mapController;
+
+  void toggleButton(int index) {
+    for (int i = 0; i < selectedButtons.length; i++) {
+      selectedButtons[i] = i == index;
+    }
+    notifyListeners();
+  }
 
   void onMapCreated(GoogleMapController controller) {
     mapController = controller;
