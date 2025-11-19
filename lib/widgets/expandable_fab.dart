@@ -3,17 +3,24 @@ import 'package:flutter/material.dart';
 
 @immutable
 class ExpandableFab extends StatefulWidget {
-  const ExpandableFab({
-    super.key,
-    this.initialOpen,
-    required this.distance,
-    required this.children,
-  });
-
+  // Fields aka properties
+  // Properties are empty/null by default
   final bool? initialOpen;
   final double distance;
   final List<Widget> children;
 
+  // Constructor
+  // fills the fields with value
+  const ExpandableFab({
+    super.key,
+    this.initialOpen, // connects to fields above
+    required this.distance,
+    required this.children,
+  });
+
+
+
+  // object from ExpandableFabState
   @override
   State<ExpandableFab> createState() => _ExpandableFabState();
 }
@@ -98,9 +105,11 @@ class _ExpandableFabState extends State<ExpandableFab>
     final count = widget.children.length;
     final step = 90.0 / (count - 1);
 
-    for (var i = 0, angleInDegrees = 0.0;
+    for (
+    var i = 0, angleInDegrees = 0.0;
     i < count;
-    i++, angleInDegrees += step) {
+    i++, angleInDegrees += step
+    ) {
       children.add(
         _ExpandingActionButton(
           directionInDegrees: angleInDegrees,
@@ -144,6 +153,12 @@ class _ExpandableFabState extends State<ExpandableFab>
 
 @immutable
 class _ExpandingActionButton extends StatelessWidget {
+
+  final double directionInDegrees;
+  final double maxDistance;
+  final Animation<double> progress;
+  final Widget child;
+
   const _ExpandingActionButton({
     required this.directionInDegrees,
     required this.maxDistance,
@@ -151,10 +166,6 @@ class _ExpandingActionButton extends StatelessWidget {
     required this.child,
   });
 
-  final double directionInDegrees;
-  final double maxDistance;
-  final Animation<double> progress;
-  final Widget child;
 
   @override
   Widget build(BuildContext context) {

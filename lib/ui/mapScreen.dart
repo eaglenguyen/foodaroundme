@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
-import 'package:foodaroundme/widgets/expandable_fab.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+
+import '../widgets/expandable_fab.dart';
 
 
 class MapScreen extends StatefulWidget {
@@ -40,12 +41,14 @@ class _MapScreenState extends State<MapScreen> {
                 position: viewModel.center,
                 infoWindow: const InfoWindow(title: "You're here"),
               ),
+              ...viewModel.markers,
             },
           ),
+          // togglebuttons
           Positioned(
             right: 0,
             left: 0,
-            bottom: 100, // position under FAB
+            bottom: 40, // position under FAB
             child: Center(
             child: ToggleButtons(
               borderRadius: const BorderRadius.all(Radius.circular(30)),
@@ -60,24 +63,23 @@ class _MapScreenState extends State<MapScreen> {
                 viewModel.toggleButton(index);  // update your viewmodel
               },
               children: const [
-                Icon(Icons.location_on),
-                Icon(Icons.restaurant),
-                Icon(Icons.local_pizza),
-                Icon(Icons.local_cafe),
+                Icon(Icons.home),
+                Icon(Icons.map),
+                Icon(Icons.person),
+                Icon(Icons.search),
               ],
             ),
           ),
           )
         ],
       ),
+        //////////////////
         // ⭐ ADD THE EXPANDABLE FAB HERE
         floatingActionButton: ExpandableFab(
             distance: 112,
           children: [
             ActionButton(icon: const Icon(Icons.restaurant),
-            onPressed: () {
-              //
-            },
+            onPressed: () => viewModel.loadNearbyRestaurants(),
             ),
             ActionButton(icon: const Icon(Icons.local_offer),
             onPressed: () {
@@ -90,7 +92,7 @@ class _MapScreenState extends State<MapScreen> {
             },)
           ],
         ),
-
+        /////////////////
     );
   }
 }
