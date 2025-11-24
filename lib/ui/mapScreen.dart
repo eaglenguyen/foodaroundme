@@ -41,6 +41,7 @@ class _MapScreenState extends State<MapScreen> {
                 position: viewModel.center,
                 infoWindow: const InfoWindow(title: "You're here"),
               ),
+              // inserting each items from the list into another Marker set/list
               ...viewModel.markers,
             },
           ),

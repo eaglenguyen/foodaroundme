@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_place/google_place.dart';
+import '../model/place.dart';
 import '../service/locationService.dart';
 
 class MapViewModel extends ChangeNotifier {
@@ -17,6 +18,12 @@ class MapViewModel extends ChangeNotifier {
   late GooglePlace _places;
   Set<Marker> markers = {};
 
+  //
+  List<Place> allPlaces = [];
+  List<Place> filteredPlaces = [];
+
+
+  // init block via flutter
   MapViewModel() {
     initPlaces();
   }
@@ -35,23 +42,38 @@ class MapViewModel extends ChangeNotifier {
 
     if (result == null || result.results == null) return;
 
-    final newMarkers = result.results!.map((place) {
-      final location = place.geometry?.location;
-      if (location == null) return null;
 
+
+    // Convert all API results → Place models
+    allPlaces = result.results!
+        .map(
+            (pr) => Place.fromSearchResult(pr)
+    )
+        .whereType<Place>()
+        .toList();
+
+    // default: show all restaurants
+    filteredPlaces = List.from(allPlaces);
+
+    // convert filteredPlaces → markers
+    updateMarkers();
+  }
+
+  // --- Convert places → markers and notify UI ---
+  void updateMarkers() {
+    markers = filteredPlaces.map(
+            (p) {
       return Marker(
-        markerId: MarkerId(place.placeId ?? place.name ?? "unknown"),
-        position: LatLng(location.lat!, location.lng!),
-        infoWindow: InfoWindow(
-          title: place.name,
-          snippet: place.vicinity,
-        ),
+        markerId: MarkerId(p.name),
+        position: p.location,
+        infoWindow: InfoWindow(title: p.name),
       );
-    }).whereType<Marker>().toSet();
+    }).toSet();
 
-    markers = newMarkers;
     notifyListeners();
   }
+
+
 
   void toggleButton(int index) {
     for (int i = 0; i < selectedButtons.length; i++) {
