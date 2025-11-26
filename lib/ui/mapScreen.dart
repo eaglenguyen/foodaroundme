@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:foodaroundme/resources/place_filter.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
@@ -80,17 +81,14 @@ class _MapScreenState extends State<MapScreen> {
             distance: 112,
           children: [
             ActionButton(icon: const Icon(Icons.restaurant),
-            onPressed: () => viewModel.loadNearbyRestaurants(),
+            onPressed: () => viewModel.applyFilter(PlaceFilter.restaurant),
             ),
             ActionButton(icon: const Icon(Icons.local_offer),
-            onPressed: () {
-              //
-            },
+            onPressed: () => viewModel.applyFilter(PlaceFilter.cafe),
             ),
             ActionButton(icon: const Icon(Icons.favorite),
-            onPressed: () {
-              //
-            },)
+            onPressed: ()=> viewModel.applyFilter(PlaceFilter. bar),
+            )
           ],
         ),
         /////////////////

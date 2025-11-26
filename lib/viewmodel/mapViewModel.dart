@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:foodaroundme/resources/place_filter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_place/google_place.dart';
 import '../model/place.dart';
 import '../service/locationService.dart';
 
 class MapViewModel extends ChangeNotifier {
+
 
   // current layout is state variables -> methods/functions
   // state (in android) is value that changes over time
@@ -33,11 +35,25 @@ class MapViewModel extends ChangeNotifier {
     _places = GooglePlace(apiKey);
   }
 
-  Future<void> loadNearbyRestaurants() async {
+  // --- Convert places → markers and notify UI ---
+  void updateMarkers() {
+    markers = filteredPlaces.map(
+            (p) {
+          return Marker(
+            markerId: MarkerId(p.name),
+            position: p.location,
+            infoWindow: InfoWindow(title: p.name),
+          );
+        }).toSet();
+
+    notifyListeners();
+  }
+
+  Future<void> loadNearbyRestaurants(String filter) async {
     final result = await _places.search.getNearBySearch(
       Location(lat: center.latitude, lng: center.longitude),
       800, // radius meters
-      type: "restaurant",
+      type: filter,
     );
 
     if (result == null || result.results == null) return;
@@ -46,9 +62,7 @@ class MapViewModel extends ChangeNotifier {
 
     // Convert all API results → Place models
     allPlaces = result.results!
-        .map(
-            (pr) => Place.fromSearchResult(pr)
-    )
+        .map( (pr) => Place.fromSearchResult(pr) )
         .whereType<Place>()
         .toList();
 
@@ -57,22 +71,9 @@ class MapViewModel extends ChangeNotifier {
 
     // convert filteredPlaces → markers
     updateMarkers();
+
+
   }
-
-  // --- Convert places → markers and notify UI ---
-  void updateMarkers() {
-    markers = filteredPlaces.map(
-            (p) {
-      return Marker(
-        markerId: MarkerId(p.name),
-        position: p.location,
-        infoWindow: InfoWindow(title: p.name),
-      );
-    }).toSet();
-
-    notifyListeners();
-  }
-
 
 
   void toggleButton(int index) {
@@ -80,6 +81,23 @@ class MapViewModel extends ChangeNotifier {
       selectedButtons[i] = i == index;
     }
     notifyListeners();
+  }
+
+  Future<void> applyFilter(PlaceFilter filter) async {
+    switch(filter) {
+      case PlaceFilter.restaurant:
+        await loadNearbyRestaurants("restaurant");
+        break;
+      case PlaceFilter.cafe:
+        await loadNearbyRestaurants("cafe");
+        break;
+      case PlaceFilter.bar:
+        await loadNearbyRestaurants("bar");
+        break;
+      case PlaceFilter.popular:
+        await loadNearbyRestaurants("popular");
+        break;
+    }
   }
 
   void onMapCreated(GoogleMapController controller) {
@@ -131,4 +149,7 @@ class MapViewModel extends ChangeNotifier {
       throw 'Could not open Instagram tag';
     }
   }*/
+
+
+
 }
