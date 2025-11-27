@@ -46,31 +46,35 @@ class _MapScreenState extends State<MapScreen> {
               ...viewModel.markers,
             },
           ),
-          // togglebuttons
+          // ToggleButtonGroup
           Positioned(
             right: 0,
             left: 0,
             bottom: 40, // position under FAB
             child: Center(
-            child: ToggleButtons(
-              borderRadius: const BorderRadius.all(Radius.circular(30)),
-              constraints: const BoxConstraints(minHeight: 50, minWidth: 50),
-              fillColor: Colors.green,
-              selectedColor: Colors.white,
-              color: Colors.black,
-              selectedBorderColor: Colors.green,
-              borderColor: Colors.grey,
-              isSelected: viewModel.selectedButtons,
-              onPressed: (index) {
-                viewModel.toggleButton(index);  // update your viewmodel
-              },
-              children: const [
-                Icon(Icons.home),
-                Icon(Icons.map),
-                Icon(Icons.person),
-                Icon(Icons.search),
-              ],
-            ),
+              child: AnimatedOpacity(
+                opacity: isMenuOpen ? 0.0 : 1.0, // hides when FAB is expanded
+                duration: const Duration(milliseconds: 200),
+                  child: ToggleButtons(
+                    borderRadius: const BorderRadius.all(Radius.circular(30)),
+                    constraints: const BoxConstraints(minHeight: 50, minWidth: 50),
+                    fillColor: Colors.green,
+                    selectedColor: Colors.white,
+                    color: Colors.black,
+                    selectedBorderColor: Colors.green,
+                    borderColor: Colors.grey,
+                    isSelected: viewModel.selectedButtons,
+                    onPressed: (index) {
+                      viewModel.toggleButton(index);  // update your viewmodel
+                    },
+                    children: const [
+                      Icon(Icons.home),
+                      Icon(Icons.map),
+                      Icon(Icons.person),
+                      Icon(Icons.search),
+                    ],
+                  ),
+              ),
           ),
           )
         ],
@@ -79,6 +83,9 @@ class _MapScreenState extends State<MapScreen> {
         // ⭐ ADD THE EXPANDABLE FAB HERE
         floatingActionButton: ExpandableFab(
             distance: 112,
+          onOpenChanged: (isOpen) {
+              setState( () => isMenuOpen = isOpen );
+          },
           children: [
             ActionButton(icon: const Icon(Icons.restaurant),
             onPressed: () => viewModel.applyFilter(PlaceFilter.restaurant),

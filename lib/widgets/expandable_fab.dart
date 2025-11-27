@@ -8,6 +8,9 @@ class ExpandableFab extends StatefulWidget {
   final bool? initialOpen;
   final double distance;
   final List<Widget> children;
+  // callback for togglebutton
+  final ValueChanged<bool>? onOpenChanged;
+
 
   // Constructor
   // fills the fields with value
@@ -16,6 +19,7 @@ class ExpandableFab extends StatefulWidget {
     this.initialOpen, // connects to fields above
     required this.distance,
     required this.children,
+    this.onOpenChanged,
   });
 
 
@@ -56,6 +60,10 @@ class _ExpandableFabState extends State<ExpandableFab>
   void _toggle() {
     setState(() {
       _open = !_open;
+
+      //call callback
+      widget.onOpenChanged?.call(_open);
+
       if (_open) {
         _controller.forward();
       } else {
