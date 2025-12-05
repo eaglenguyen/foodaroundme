@@ -35,7 +35,7 @@ class MapViewModel extends ChangeNotifier {
     _places = GooglePlace(apiKey);
   }
 
-  // --- Convert places → markers and notify UI ---
+  // --- Convert Places p into markers and notify UI ---
   void updateMarkers() {
     markers = filteredPlaces.map(
             (p) {
@@ -49,10 +49,11 @@ class MapViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Api call to fetch nearby restaurants
   Future<void> loadNearbyRestaurants(String filter) async {
     final result = await _places.search.getNearBySearch(
       Location(lat: center.latitude, lng: center.longitude),
-      800, // radius meters
+      800, // radius meters, half a mile
       type: filter,
     );
 

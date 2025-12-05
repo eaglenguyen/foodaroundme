@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/resources/place_filter.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
+import 'package:foodaroundme/widgets/bottom_sheet_map.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-
 import '../widgets/expandable_fab.dart';
 
 
@@ -22,6 +22,7 @@ class _MapScreenState extends State<MapScreen> {
     final viewModel = Provider.of<MapViewModel>(context);
 
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       appBar: AppBar(
         title: const Text("Maps Sample App"),
         backgroundColor: Colors.green,
@@ -55,14 +56,27 @@ class _MapScreenState extends State<MapScreen> {
               child: AnimatedOpacity(
                 opacity: isMenuOpen ? 0.0 : 1.0, // hides when FAB is expanded
                 duration: const Duration(milliseconds: 200),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.9),  // soft light background
+                    borderRadius: BorderRadius.circular(40),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      )
+                    ],
+                  ),
                   child: ToggleButtons(
-                    borderRadius: const BorderRadius.all(Radius.circular(30)),
-                    constraints: const BoxConstraints(minHeight: 50, minWidth: 50),
-                    fillColor: Colors.green,
+                    borderRadius: const BorderRadius.all(Radius.circular(40)),
+                    constraints: const BoxConstraints(minHeight: 40, minWidth: 40),
+                    fillColor: Colors.green.shade300,
                     selectedColor: Colors.white,
                     color: Colors.black,
                     selectedBorderColor: Colors.green,
-                    borderColor: Colors.grey,
+                    borderColor: Colors.transparent,
                     isSelected: viewModel.selectedButtons,
                     onPressed: (index) {
                       viewModel.toggleButton(index);  // update your viewmodel
@@ -77,28 +91,98 @@ class _MapScreenState extends State<MapScreen> {
               ),
           ),
           )
+          )
         ],
       ),
         //////////////////
         // ⭐ ADD THE EXPANDABLE FAB HERE
-        floatingActionButton: ExpandableFab(
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.only(bottom: 90), // moves FAB up
+          child: ExpandableFab(
             distance: 112,
           onOpenChanged: (isOpen) {
               setState( () => isMenuOpen = isOpen );
           },
           children: [
-            ActionButton(icon: const Icon(Icons.restaurant),
-            onPressed: () => viewModel.applyFilter(PlaceFilter.restaurant),
+            ActionButton(
+              icon: const Icon(Icons.fastfood_rounded),
+              label: "Food",
+              onPressed: () async {
+                await viewModel.applyFilter(PlaceFilter.restaurant);
+                if(!context.mounted) return;
+
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius:  BorderRadius.vertical(
+                        top: Radius.circular(25.0),
+                    ),
+                    ),
+                    builder: (_) => BottomSheetMap(
+                      title: "Restaurants",
+                      places: viewModel.filteredPlaces,
+                      onSelect: () {
+                      Navigator.pop(context);
+                  },
+                ),
+                );
+              },
             ),
-            ActionButton(icon: const Icon(Icons.local_offer),
-            onPressed: () => viewModel.applyFilter(PlaceFilter.cafe),
+            ActionButton(
+              icon: const Icon(Icons.coffee),
+              label: "Cafe",
+              onPressed: () async {
+                await viewModel.applyFilter(PlaceFilter.cafe);
+                if(!context.mounted) return;
+
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius:  BorderRadius.vertical(
+                      top: Radius.circular(25.0),
+                    ),
+                  ),
+                  builder: (_) => BottomSheetMap(
+                    title: "Cafe",
+                    places: viewModel.filteredPlaces,
+                    onSelect: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                );
+              },
+
             ),
-            ActionButton(icon: const Icon(Icons.favorite),
-            onPressed: ()=> viewModel.applyFilter(PlaceFilter. bar),
+            ActionButton(
+              icon: const Icon(Icons.local_bar),
+              label: "Bars",
+              onPressed: () async {
+                await viewModel.applyFilter(PlaceFilter.bar);
+                if(!context.mounted) return;
+
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius:  BorderRadius.vertical(
+                      top: Radius.circular(25.0),
+                    ),
+                  ),
+                  builder: (_) => BottomSheetMap(
+                    title: "Bars",
+                    places: viewModel.filteredPlaces,
+                    onSelect: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                );
+              },
             )
           ],
         ),
-        /////////////////
+        )
     );
   }
 }
