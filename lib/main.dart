@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodaroundme/ui/mapScreen.dart';
+import 'package:foodaroundme/ui/main_screen.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
 
 import 'package:provider/provider.dart';
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: true,
-      home: MapScreen(),
+      home: MainScreen(),
     );
   }
 }
