@@ -111,18 +111,28 @@ class _MainScreenState extends State<MainScreen> {
 
 
       appBar: AppBar(
-        title: const Text("Maps Sample App"),
+        title: const Text("Maps"),
         backgroundColor: Colors.green,
       ),
+      // animation for navigation
       body: Stack(
         children: [
-          IndexedStack(
-            index: currentIndex,
-            children: const [
-              MapScreen(),
-              SearchScreen(),
-            ],
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 400),
+            transitionBuilder: (child, animation) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 1),  // bottom
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              );
+            },
+            child: currentIndex == 0
+                ? const MapScreen(key: ValueKey(0))
+                : const SearchScreen(key: ValueKey(1)),
           ),
+
           // ToggleButtonGroup
           Positioned(
             right: 0,
@@ -153,20 +163,14 @@ class _MainScreenState extends State<MainScreen> {
                     color: Colors.black,
                     selectedBorderColor: Colors.green,
                     borderColor: Colors.transparent,
-                    isSelected: [
-                      viewModel.selectedButtons[0],     // home
-                      viewModel.selectedButtons[1],     // map
-                      viewModel.selectedButtons[2],     // user
-                      currentIndex == 1,
-                    ],
+                    isSelected: viewModel.selectedButtons,
                     onPressed: (index) {
                       viewModel.toggleButton(index);  // update your viewmodel
 
-                      if(index == 3) {
-                        setState(() => currentIndex = 1);
-                      } else {
-                        setState(() => currentIndex = 0);
-                      }
+                      setState(() {
+                        currentIndex = index == 3 ? 1 : 0; // ternary operator
+                      });
+
                     },
                     children: const [
                       Icon(Icons.home),
@@ -187,21 +191,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-Route _bottomToTopRoute() {
-  return PageRouteBuilder(
-    transitionDuration: const Duration(milliseconds: 350),
-    pageBuilder: (_, animation, __) => const SearchScreen(),
-    transitionsBuilder: (_, animation, __, child) {
-      final tween = Tween(begin: const Offset(0, 1), end: Offset.zero)
-          .chain(CurveTween(curve: Curves.easeOutCubic));
 
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
-}
 
 
 /*
