@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/resources/place_filter.dart';
 import 'package:foodaroundme/ui/map_screen.dart';
+import 'package:foodaroundme/ui/profile_screen.dart';
 import 'package:foodaroundme/ui/search_screen.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
 import 'package:foodaroundme/widgets/bottom_sheet_map.dart';
@@ -18,6 +19,12 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int currentIndex = 0; // 0 is Map, 1 is searchScreen
   bool isMenuOpen = false;
+
+  final List<Widget> screens = const [
+    MapScreen(key: ValueKey(0)),     // index 0
+    ProfileScreen(key: ValueKey(1)), // index 2
+    SearchScreen(key: ValueKey(2)),  // index 3
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -128,9 +135,7 @@ class _MainScreenState extends State<MainScreen> {
                 child: child,
               );
             },
-            child: currentIndex == 0
-                ? const MapScreen(key: ValueKey(0))
-                : const SearchScreen(key: ValueKey(1)),
+            child: screens[currentIndex]
           ),
 
           // ToggleButtonGroup
@@ -157,7 +162,7 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                   child: ToggleButtons(
                     borderRadius: const BorderRadius.all(Radius.circular(40)),
-                    constraints: const BoxConstraints(minHeight: 40, minWidth: 40),
+                    constraints: const BoxConstraints(minHeight: 40, minWidth: 70),
                     fillColor: Colors.green.shade300,
                     selectedColor: Colors.white,
                     color: Colors.black,
@@ -168,12 +173,11 @@ class _MainScreenState extends State<MainScreen> {
                       viewModel.toggleButton(index);  // update your viewmodel
 
                       setState(() {
-                        currentIndex = index == 3 ? 1 : 0; // ternary operator
+                        currentIndex = index;
                       });
 
                     },
                     children: const [
-                      Icon(Icons.home),
                       Icon(Icons.map),
                       Icon(Icons.person),
                       Icon(Icons.search),
