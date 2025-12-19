@@ -5,11 +5,13 @@ import 'package:google_place/google_place.dart';
 class Place{
   final String name;
   final LatLng location;
+  final String address;
   final List<String> types;
 
   Place({
     required this.name,
     required this.location,
+    required this.address,
     required this.types,
   });
 
@@ -21,6 +23,7 @@ class Place{
     return Place(
       name: result.name ?? 'Unknown',
       location: LatLng(loc.lat ?? 0.0, loc.lng ?? 0.0),
+      address: result.formattedAddress ?? 'null',
       types: result.types?.cast<String>() ?? [],
     );
   }

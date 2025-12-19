@@ -4,6 +4,7 @@ import 'package:foodaroundme/ui/map_screen.dart';
 import 'package:foodaroundme/ui/profile_screen.dart';
 import 'package:foodaroundme/ui/search_screen.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
+import 'package:foodaroundme/widgets/bottom_sheet_detail/bottom_sheet_details.dart';
 import 'package:foodaroundme/widgets/bottom_sheet_map.dart';
 import 'package:provider/provider.dart';
 import '../widgets/expandable_fab.dart';
@@ -63,6 +64,7 @@ class _MainScreenState extends State<MainScreen> {
                       builder: (_) => BottomSheetMap(
                         title: "Restaurants",
                         places: viewModel.filteredPlaces,
+                        close: () => Navigator.pop(context),
                         onSelect: () => Navigator.pop(context),
                       ),
                     );
@@ -84,6 +86,7 @@ class _MainScreenState extends State<MainScreen> {
                       builder: (_) => BottomSheetMap(
                         title: "Cafe",
                         places: viewModel.filteredPlaces,
+                        close: () => Navigator.pop(context),
                         onSelect: () => Navigator.pop(context),
                       ),
                     );
@@ -105,8 +108,18 @@ class _MainScreenState extends State<MainScreen> {
                       builder: (_) => BottomSheetMap(
                         title: "Bars",
                         places: viewModel.filteredPlaces,
-                        onSelect: () => Navigator.pop(context),
+                        close: () => Navigator.pop(context),
+                        onSelect: () => showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+                            ),
+                            builder: (_) => BottomSheetDetails(
+                              place: viewModel.filteredPlaces.first,
+                        ),
                       ),
+                      )
                     );
                   },
                 ),
@@ -144,7 +157,9 @@ class _MainScreenState extends State<MainScreen> {
             left: 0,
             bottom: 40, // position under FAB
             child: Center(
-              child: AnimatedOpacity(
+              child: IgnorePointer(
+                ignoring: isMenuOpen, // when true (fab is open), ignore interaction
+                child: AnimatedOpacity(
                 opacity: isMenuOpen ? 0.0 : 1.0, // hides when FAB is expanded
                 duration: const Duration(milliseconds: 200),
                 child: Container(
@@ -187,6 +202,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
           )
           )
+          ),
         ],
       ),
         //////////////////

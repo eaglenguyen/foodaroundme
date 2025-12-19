@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
 import 'package:provider/provider.dart';
 
+import '../widgets/bottom_sheet_detail/bottom_sheet_details.dart';
+
 
 
 class SearchScreen extends StatefulWidget {
@@ -46,6 +48,16 @@ class _SearchScreenState extends State<SearchScreen> {
                 subtitle: Text(
                   place.types.join(", "),
                   ),
+                onTap: () => showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+                  ),
+                  builder: (_) => BottomSheetDetails(
+                    place: place,
+                  ),
+                ),
                 );
             },
           ),

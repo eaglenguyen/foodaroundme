@@ -5,17 +5,20 @@ import '../model/place.dart';
 class BottomSheetMap extends StatelessWidget {
   final String title;
   final VoidCallback onSelect;
+  final VoidCallback close;
   final List<Place> places;
+
 
   const BottomSheetMap({
     super.key,
     required this.title,
     required this.onSelect,
+    required this.close,
     required this.places,
   });
 
   @override
-  Widget build(BuildContext context) {    return DraggableScrollableSheet(
+  Widget build(BuildContext context) { return DraggableScrollableSheet(
     expand: false,
     initialChildSize: 0.25,
     minChildSize: 0.25,
@@ -71,7 +74,7 @@ class BottomSheetMap extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.close),
               title: const Text("Close"),
-              onTap: onSelect,
+              onTap: close,
             ),
           ],
         ),
