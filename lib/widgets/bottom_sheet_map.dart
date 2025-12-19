@@ -4,7 +4,8 @@ import '../model/place.dart';
 
 class BottomSheetMap extends StatelessWidget {
   final String title;
-  final VoidCallback onSelect;
+  // changed to function to take place object
+  final void Function(Place) onSelect;
   final VoidCallback close;
   final List<Place> places;
 
@@ -62,11 +63,12 @@ class BottomSheetMap extends StatelessWidget {
             const SizedBox(height: 12),
 
             /// ⭐ The correct way to show the list
+            /// p is the place object clicked
             ...places.map( (p) {
               return ListTile(
                 leading: const Icon(Icons.location_on),
                 title: Text(p.name),
-                onTap: onSelect,
+                onTap:  () => onSelect(p),
               );
             }),
 

@@ -65,7 +65,16 @@ class _MainScreenState extends State<MainScreen> {
                         title: "Restaurants",
                         places: viewModel.filteredPlaces,
                         close: () => Navigator.pop(context),
-                        onSelect: () => Navigator.pop(context),
+                        onSelect: (selectedPlace) => showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+                          ),
+                          builder: (_) => BottomSheetDetails(
+                            place: selectedPlace,
+                          ),
+                        ),
                       ),
                     );
                   },
@@ -87,7 +96,16 @@ class _MainScreenState extends State<MainScreen> {
                         title: "Cafe",
                         places: viewModel.filteredPlaces,
                         close: () => Navigator.pop(context),
-                        onSelect: () => Navigator.pop(context),
+                        onSelect: (selectedPlace) => showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+                          ),
+                          builder: (_) => BottomSheetDetails(
+                            place: selectedPlace,
+                          ),
+                        ),
                       ),
                     );
                   },
@@ -109,14 +127,14 @@ class _MainScreenState extends State<MainScreen> {
                         title: "Bars",
                         places: viewModel.filteredPlaces,
                         close: () => Navigator.pop(context),
-                        onSelect: () => showModalBottomSheet(
+                        onSelect: (selectedPlace) => showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,
                             shape: const RoundedRectangleBorder(
                               borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
                             ),
                             builder: (_) => BottomSheetDetails(
-                              place: viewModel.filteredPlaces.first,
+                              place: selectedPlace,
                         ),
                       ),
                       )
