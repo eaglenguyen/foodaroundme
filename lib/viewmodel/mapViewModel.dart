@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/resources/place_filter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -23,6 +25,9 @@ class MapViewModel extends ChangeNotifier {
   //
   List<Place> allPlaces = [];
   List<Place> filteredPlaces = [];
+
+  Timer? _debounce;
+
 
 
   // init block via flutter
@@ -74,6 +79,22 @@ class MapViewModel extends ChangeNotifier {
     updateMarkers();
 
 
+  }
+
+  void filterBySearchQuery(String query) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      if (query.isEmpty) {
+        filteredPlaces = List.from(allPlaces);
+      } else {
+
+        final q = query.toLowerCase();
+        filteredPlaces = allPlaces.where((place) {
+          return place.name.toLowerCase().contains(q);
+        }).toList();
+      }
+      notifyListeners();
+    });
   }
 
 

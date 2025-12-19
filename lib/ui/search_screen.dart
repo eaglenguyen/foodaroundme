@@ -44,9 +44,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 leading: const Icon(Icons.restaurant),
                 title: Text(place.name),
                 subtitle: Text(
-                  "1 mile away",
-                ),
-              );
+                  place.types.join(", "),
+                  ),
+                );
             },
           ),
 
@@ -59,6 +59,9 @@ class _SearchScreenState extends State<SearchScreen> {
               elevation: 6,
               borderRadius: BorderRadius.circular(30),
               child: TextField(
+                onChanged: (value) {
+                  context.read<MapViewModel>().filterBySearchQuery(value);
+                },
                 decoration: InputDecoration(
                   hintText: "Search...",
                   prefixIcon: const Icon(Icons.search),
