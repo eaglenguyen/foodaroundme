@@ -53,6 +53,7 @@ class _MainScreenState extends State<MainScreen> {
                   label: "Food",
                   onPressed: () async {
                     await viewModel.applyFilter(PlaceFilter.restaurant);
+
                     if (!context.mounted) return;
 
                     showModalBottomSheet(
@@ -65,17 +66,25 @@ class _MainScreenState extends State<MainScreen> {
                         title: "Restaurants",
                         places: viewModel.filteredPlaces,
                         close: () => Navigator.pop(context),
-                        onSelect: (selectedPlace) => showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
-                          ),
-                          builder: (_) => BottomSheetDetails(
-                            place: selectedPlace,
-                          ),
+                        onSelect: (selectedPlace) async {
+                          final details = await viewModel.getPlaceDetails(selectedPlace.placeId);
+                          if (!context.mounted) return;
+
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(25.0)),
+                            ),
+                            builder: (_) =>
+                                BottomSheetDetails(
+                                  place: selectedPlace,
+                                  details: details,
+                                ),
+                          );
+                        }
                         ),
-                      ),
                     );
                   },
                 ),
@@ -96,17 +105,24 @@ class _MainScreenState extends State<MainScreen> {
                         title: "Cafe",
                         places: viewModel.filteredPlaces,
                         close: () => Navigator.pop(context),
-                        onSelect: (selectedPlace) => showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
-                          ),
-                          builder: (_) => BottomSheetDetails(
-                            place: selectedPlace,
-                          ),
-                        ),
-                      ),
+                        onSelect: (selectedPlace) async {
+                          final details = await viewModel.getPlaceDetails(
+                              selectedPlace.placeId);
+                          if (!context.mounted) return;
+
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(25.0)),
+                            ),
+                            builder: (_) =>
+                                BottomSheetDetails(
+                                  place: selectedPlace, details: details,
+                                ),
+                          );
+                        }),
                     );
                   },
                 ),
@@ -127,17 +143,23 @@ class _MainScreenState extends State<MainScreen> {
                         title: "Bars",
                         places: viewModel.filteredPlaces,
                         close: () => Navigator.pop(context),
-                        onSelect: (selectedPlace) => showModalBottomSheet(
+                        onSelect: (selectedPlace) async {
+                          final details = await viewModel.getPlaceDetails(
+                              selectedPlace.placeId);
+                          if (!context.mounted) return;
+                          showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,
                             shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(25.0)),
                             ),
-                            builder: (_) => BottomSheetDetails(
-                              place: selectedPlace,
-                        ),
-                      ),
-                      )
+                            builder: (_) =>
+                                BottomSheetDetails(
+                                  place: selectedPlace, details: details,
+                                ),
+                          );
+                        })
                     );
                   },
                 ),

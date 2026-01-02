@@ -3,16 +3,19 @@ import 'package:foodaroundme/widgets/bottom_sheet_detail/action_row.dart';
 import 'package:foodaroundme/widgets/bottom_sheet_detail/header.dart';
 import 'package:foodaroundme/widgets/bottom_sheet_detail/photo_grid.dart';
 import 'package:foodaroundme/widgets/bottom_sheet_detail/social_links.dart';
+import 'package:google_maps_webservice/places.dart';
 
 import '../../model/place.dart';
 
 
 class BottomSheetDetails extends StatelessWidget {
   final Place place;
+  final PlaceDetails details;
 
   const BottomSheetDetails({
     super.key,
-    required this.place
+    required this.place,
+    required this.details,
   });
 
   @override
@@ -33,7 +36,7 @@ class BottomSheetDetails extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Header(place: place),
-                ActionRow(place: place),
+                ActionRow(place: place, details: details),
                 SocialLinks(place: place),
                 PhotoGrid(place: place)
               ],

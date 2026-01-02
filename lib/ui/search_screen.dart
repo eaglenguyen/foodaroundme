@@ -48,17 +48,23 @@ class _SearchScreenState extends State<SearchScreen> {
                 subtitle: Text(
                   place.types.join(", "),
                   ),
-                onTap: () => showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
-                  ),
-                  builder: (_) => BottomSheetDetails(
-                    place: place,
-                  ),
-                ),
-                );
+                onTap: () async {
+                  final details = await viewModel.getPlaceDetails(
+                      place.placeId);
+                  if (!context.mounted) return;
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(25.0)),
+                    ),
+                    builder: (_) =>
+                        BottomSheetDetails(
+                          place: place, details: details,
+                        ),
+                  );
+                });
             },
           ),
 

@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/resources/place_filter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_place/google_place.dart';
+import 'package:google_maps_webservice/places.dart' as gmw;
+import 'package:google_place/google_place.dart' as gp;
 import '../model/place.dart';
 import '../service/locationService.dart';
 
@@ -17,9 +18,12 @@ class MapViewModel extends ChangeNotifier {
   LatLng center = const LatLng(42.3104, -71.0575);
   List<bool> selectedButtons = [true, false, false];
   GoogleMapController? mapController;
+  static const apiKey = String.fromEnvironment("GOOGLE_MAPS_API_KEY");
 
   // fetch restaurant api
-  late GooglePlace _places;
+  late gp.GooglePlace _places;
+  final placesApi = gmw.GoogleMapsPlaces(apiKey: apiKey);
+
   Set<Marker> markers = {};
 
   //
@@ -36,8 +40,7 @@ class MapViewModel extends ChangeNotifier {
   }
 
   void initPlaces() {
-    const apiKey = String.fromEnvironment("GOOGLE_MAPS_API_KEY");
-    _places = GooglePlace(apiKey);
+    _places = gp.GooglePlace(apiKey);
   }
 
   // --- Convert Places p into markers and notify UI ---
@@ -57,7 +60,7 @@ class MapViewModel extends ChangeNotifier {
   // Api call to fetch nearby restaurants
   Future<void> loadNearbyRestaurants(String filter) async {
     final result = await _places.search.getNearBySearch(
-      Location(lat: center.latitude, lng: center.longitude),
+      gp.Location(lat: center.latitude, lng: center.longitude),
       800, // radius meters, half a mile
       type: filter,
     );
@@ -79,6 +82,18 @@ class MapViewModel extends ChangeNotifier {
     updateMarkers();
 
 
+  }
+
+  Future<gmw.PlaceDetails> getPlaceDetails(String placeId) async {
+    final response = await placesApi.getDetailsByPlaceId(
+      placeId,
+      fields: [
+        'website',
+        'formatted_phone_number',
+        'url',
+      ],
+    );
+    return response.result;
   }
 
   void filterBySearchQuery(String query) {

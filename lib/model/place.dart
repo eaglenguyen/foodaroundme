@@ -3,12 +3,14 @@ import 'package:google_place/google_place.dart';
 
 
 class Place{
+  final String placeId;
   final String name;
   final LatLng location;
   final String address;
   final List<String> types;
 
   Place({
+    required this.placeId,
     required this.name,
     required this.location,
     required this.address,
@@ -21,9 +23,10 @@ class Place{
     if (loc == null) return null;
 
     return Place(
+      placeId: result.placeId!,
       name: result.name ?? 'Unknown',
       location: LatLng(loc.lat ?? 0.0, loc.lng ?? 0.0),
-      address: result.formattedAddress ?? 'null',
+      address: result.vicinity ?? 'Not Available',
       types: result.types?.cast<String>() ?? [],
     );
   }

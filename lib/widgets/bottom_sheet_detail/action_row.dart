@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-
+import 'package:google_maps_webservice/places.dart';
 import '../../model/place.dart';
 
 
 
 class ActionRow extends StatelessWidget {
   final Place place;
+  final PlaceDetails details;
 
   const ActionRow({
     super.key,
     required this.place,
+    required this.details,
   });
 
   @override
@@ -30,10 +32,16 @@ class ActionRow extends StatelessWidget {
           _ActionChip(
             icon: Icons.language,
             label: "Website",
+            onTap: () {
+              // website
+            },
           ),
           _ActionChip(
             icon: Icons.call,
             label: "Call",
+            onTap: () {
+              // call
+            },
           ),
           _ActionChip(
             icon: Icons.share,

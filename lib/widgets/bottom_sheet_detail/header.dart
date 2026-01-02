@@ -27,7 +27,7 @@ class Header extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            place.address,
+            place.address ,
             style: const TextStyle(color: Colors.black54),
           ),
           const SizedBox(height: 8),

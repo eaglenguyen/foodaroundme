@@ -30,7 +30,7 @@ class SocialLinks extends StatelessWidget {
             const SizedBox(width: 16),
 
             _SocialLink(
-              label: "see more on insta",
+              label: "see more on instagram",
               icon: Icons.camera_alt,
               onTap: () {
                 // open Instagram
