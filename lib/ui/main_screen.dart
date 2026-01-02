@@ -67,8 +67,16 @@ class _MainScreenState extends State<MainScreen> {
                         places: viewModel.filteredPlaces,
                         close: () => Navigator.pop(context),
                         onSelect: (selectedPlace) async {
+
                           final details = await viewModel.getPlaceDetails(selectedPlace.placeId);
                           if (!context.mounted) return;
+
+                          if (details == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Details not available')),
+                            );
+                            return;
+                          }
 
                           showModalBottomSheet(
                             context: context,
@@ -110,6 +118,13 @@ class _MainScreenState extends State<MainScreen> {
                               selectedPlace.placeId);
                           if (!context.mounted) return;
 
+                          if (details == null || details.placeId == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Details not available')),
+                            );
+                            return;
+                          }
+
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,
@@ -147,6 +162,14 @@ class _MainScreenState extends State<MainScreen> {
                           final details = await viewModel.getPlaceDetails(
                               selectedPlace.placeId);
                           if (!context.mounted) return;
+
+                          if (details == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Details not available')),
+                            );
+                            return;
+                          }
+
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,

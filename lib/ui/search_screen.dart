@@ -52,6 +52,14 @@ class _SearchScreenState extends State<SearchScreen> {
                   final details = await viewModel.getPlaceDetails(
                       place.placeId);
                   if (!context.mounted) return;
+
+                  if (details == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Details not available')),
+                    );
+                    return;
+                  }
+
                   showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,

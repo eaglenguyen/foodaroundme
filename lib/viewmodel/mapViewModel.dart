@@ -84,16 +84,30 @@ class MapViewModel extends ChangeNotifier {
 
   }
 
-  Future<gmw.PlaceDetails> getPlaceDetails(String placeId) async {
-    final response = await placesApi.getDetailsByPlaceId(
-      placeId,
-      fields: [
-        'website',
-        'formatted_phone_number',
-        'url',
-      ],
-    );
-    return response.result;
+  Future<gmw.PlaceDetails?> getPlaceDetails(String placeId) async {
+    try {
+      final response = await placesApi.getDetailsByPlaceId(
+        placeId,
+        fields: [
+          'place_id',
+          'name',
+          'formatted_address',
+          'website',
+          'formatted_phone_number',
+          'url',
+        ],
+      );
+
+      if (!response.isOkay) {
+        debugPrint('PlaceDetails error: ${response.errorMessage}');
+        return null;
+      }
+
+      return response.result;
+    } catch (e) {
+      debugPrint('PlaceDetails exception: $e');
+      return null;
+    }
   }
 
   void filterBySearchQuery(String query) {

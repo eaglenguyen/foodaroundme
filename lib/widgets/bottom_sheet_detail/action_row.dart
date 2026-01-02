@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_webservice/places.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../model/place.dart';
 
 
@@ -26,21 +27,21 @@ class ActionRow extends StatelessWidget {
             icon: Icons.directions,
             label: "Directions",
             onTap: () {
-              // open maps
+              // maps
             },
           ),
           _ActionChip(
             icon: Icons.language,
             label: "Website",
-            onTap: () {
-              // website
+            onTap: details.website == null ? null : () {
+              launchUrl(Uri.parse(details.website!));
             },
           ),
           _ActionChip(
             icon: Icons.call,
             label: "Call",
             onTap: () {
-              // call
+
             },
           ),
           _ActionChip(
