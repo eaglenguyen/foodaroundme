@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_webservice/places.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../model/place.dart';
 
@@ -40,15 +41,15 @@ class ActionRow extends StatelessWidget {
           _ActionChip(
             icon: Icons.call,
             label: "Call",
-            onTap: () {
-
+            onTap: details.formattedPhoneNumber == null ? null : () {
+              callPlace(details.formattedPhoneNumber);
             },
           ),
           _ActionChip(
             icon: Icons.share,
             label: "Share",
             onTap: () {
-              // share place
+              sharePlace(place, details);
             },
           ),
           _ActionChip(
@@ -110,3 +111,21 @@ class _ActionChip extends StatelessWidget {
     );
   }
 }
+
+void callPlace(String? phone) {
+  if (phone == null) return;
+  final uri = Uri.parse('tel:$phone');
+  launchUrl(uri);
+}
+
+void sharePlace(Place place, PlaceDetails details) {
+  final text =   '''
+  ${place.name}
+  ${place.address}
+
+  ${details.url ?? ''}
+  ''';
+
+  Share.share(text.trim());
+}
+
