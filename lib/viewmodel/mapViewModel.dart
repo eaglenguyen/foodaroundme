@@ -15,7 +15,9 @@ class MapViewModel extends ChangeNotifier {
   // state (in android) is value that changes over time
   final LocationService _locationService = LocationService();
   bool isLoading = false;
-  LatLng center = const LatLng(42.3104, -71.0575);
+  LatLng center = const LatLng(42.3104, -71.0575); // default coordinate before it is assigned by getCurrentLocation()
+  LatLng cameraCenter = const LatLng(42.3104, -71.0575);
+  double cameraZoom = 11.0;
   List<bool> selectedButtons = [true, false, false];
   GoogleMapController? mapController;
   static const apiKey = String.fromEnvironment("GOOGLE_MAPS_API_KEY");
@@ -44,7 +46,7 @@ class MapViewModel extends ChangeNotifier {
     _places = gp.GooglePlace(apiKey);
   }
 
-  //
+  // assigns selectedPlace to a marker
   void selectPlace(Place place) {
     selectedPlace = place;
     // Update marker to show only one/selected
@@ -72,10 +74,14 @@ class MapViewModel extends ChangeNotifier {
     )
     );
   }
+  // At the maps moves, keep updating these variables so i know where the map current position is
+  void onCameraMove(CameraPosition position) {
+    cameraCenter = position.target;
+    cameraZoom = position.zoom;
+  }
 
-  void clearSelection() {
-    selectedPlace == null;
-    updateMarkers();
+  void onCameraIdle() {
+    center = cameraCenter;
   }
 
   // --- Convert Places p into markers and notify UI ---
@@ -106,7 +112,7 @@ class MapViewModel extends ChangeNotifier {
   // Api call to fetch nearby restaurants
   Future<void> loadNearbyRestaurants(String filter) async {
     final result = await _places.search.getNearBySearch(
-      gp.Location(lat: center.latitude, lng: center.longitude),
+      gp.Location(lat: cameraCenter.latitude, lng: cameraCenter.longitude),
       800, // radius meters, half a mile
       type: filter,
     );
@@ -126,8 +132,6 @@ class MapViewModel extends ChangeNotifier {
 
     // convert filteredPlaces → markers
     updateMarkers();
-
-
   }
 
   Future<gmw.PlaceDetails?> getPlaceDetails(String placeId) async {
@@ -225,6 +229,7 @@ class MapViewModel extends ChangeNotifier {
       return;
     }
 
+    // real center coordinates
     center = LatLng(position.latitude, position.longitude);
     mapController?.animateCamera(
       CameraUpdate.newCameraPosition(CameraPosition(target: center, zoom: 15)),

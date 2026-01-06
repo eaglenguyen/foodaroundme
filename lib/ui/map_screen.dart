@@ -15,6 +15,8 @@ class MapScreen extends StatelessWidget {
 
     return GoogleMap(
       onMapCreated: viewModel.onMapCreated,
+      onCameraMove: viewModel.onCameraMove,
+      onCameraIdle: viewModel.onCameraIdle,
       initialCameraPosition: CameraPosition(
         target: viewModel.center,
         zoom: 11.0,
@@ -26,10 +28,12 @@ class MapScreen extends StatelessWidget {
           markerId: const MarkerId('currentLocation'),
           position: viewModel.center,
           infoWindow: const InfoWindow(title: "You're here"),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueAzure,
+          )
         ),
         ...viewModel.markers,
       },
-      onTap: (_) => viewModel.clearSelection(),
     );
 
   }
