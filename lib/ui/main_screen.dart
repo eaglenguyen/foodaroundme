@@ -70,6 +70,9 @@ class _MainScreenState extends State<MainScreen> {
                           // closes first bottom sheet
                           Navigator.pop(sheetContext);
 
+                          // Update state and marker
+                          viewModel.selectPlace(selectedPlace);
+
                           final details = await viewModel.getPlaceDetails(selectedPlace.placeId);
                           if (!context.mounted) return;
 
@@ -110,11 +113,17 @@ class _MainScreenState extends State<MainScreen> {
                       shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
                       ),
-                      builder: (_) => BottomSheetMap(
+                      builder: (sheetContext) => BottomSheetMap(
                         title: "Cafe",
                         places: viewModel.filteredPlaces,
-                        close: () => Navigator.pop(context),
+                        close: () => Navigator.pop(sheetContext),
                         onSelect: (selectedPlace) async {
+
+                          Navigator.pop(sheetContext);
+
+                          // Update state and marker
+                          viewModel.selectPlace(selectedPlace);
+
                           final details = await viewModel.getPlaceDetails(
                               selectedPlace.placeId);
                           if (!context.mounted) return;
@@ -155,11 +164,16 @@ class _MainScreenState extends State<MainScreen> {
                       shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
                       ),
-                      builder: (_) => BottomSheetMap(
+                      builder: (sheetContext) => BottomSheetMap(
                         title: "Bars",
                         places: viewModel.filteredPlaces,
-                        close: () => Navigator.pop(context),
+                        close: () => Navigator.pop(sheetContext),
                         onSelect: (selectedPlace) async {
+                          Navigator.pop(sheetContext);
+
+                          // Update state and marker
+                          viewModel.selectPlace(selectedPlace);
+
                           final details = await viewModel.getPlaceDetails(
                               selectedPlace.placeId);
                           if (!context.mounted) return;
@@ -274,45 +288,4 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 }
-
-
-
-
-/*
-              // Restaurant detailScreen
-                // TikTok Button
-                Expanded(
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.video_library_outlined),
-                    label: const Text('TikTok'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () => viewModel.openTikTok(restaurantName),
-                  ),
-                ),
-
-                const SizedBox(width: 12), // spacing between buttons
-
-                // Instagram Button
-                Expanded(
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.camera_alt_outlined),
-                    label: const Text('Instagram'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple[600],
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () => viewModel.openInstagramTag(tag),
-                  ),
-                ),*/
 

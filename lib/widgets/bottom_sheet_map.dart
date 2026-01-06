@@ -19,7 +19,8 @@ class BottomSheetMap extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) { return DraggableScrollableSheet(
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
     expand: false,
     initialChildSize: 0.5,
     minChildSize: 0.25,

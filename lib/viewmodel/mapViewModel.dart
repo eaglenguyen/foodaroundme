@@ -29,6 +29,7 @@ class MapViewModel extends ChangeNotifier {
   //
   List<Place> allPlaces = [];
   List<Place> filteredPlaces = [];
+  Place? selectedPlace;
 
   Timer? _debounce;
 
@@ -43,18 +44,63 @@ class MapViewModel extends ChangeNotifier {
     _places = gp.GooglePlace(apiKey);
   }
 
+  //
+  void selectPlace(Place place) {
+    selectedPlace = place;
+    // Update marker to show only one/selected
+    markers = {
+      Marker(
+        markerId: MarkerId(place.placeId),
+        position: place.location,
+        infoWindow: InfoWindow(title: place.name),
+      )
+    };
+
+    _focusOnPlace(place);
+    notifyListeners();
+
+  }
+  // zoom in on selectedPlace
+  Future<void> _focusOnPlace(Place place) async {
+    if (mapController == null) return;
+    await mapController!.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: place.location,
+            zoom: 16.5,
+      ),
+    )
+    );
+  }
+
+  void clearSelection() {
+    selectedPlace == null;
+    updateMarkers();
+  }
+
   // --- Convert Places p into markers and notify UI ---
   void updateMarkers() {
-    markers = filteredPlaces.map(
-            (p) {
-          return Marker(
-            markerId: MarkerId(p.name),
-            position: p.location,
-            infoWindow: InfoWindow(title: p.name),
-          );
-        }).toSet();
+    // show one selectedMarker
+    if(selectedPlace != null) {
+      markers = {
+        Marker(
+          markerId: MarkerId(selectedPlace!.placeId),
+          position: selectedPlace!.location,
+          infoWindow: InfoWindow(title: selectedPlace!.name),
+        )
+      };
+  } else {
+      // show all (filtered) markers
+      markers = filteredPlaces.map(
+              (p) => Marker(
+              markerId: MarkerId(p.name),
+              position: p.location,
+              infoWindow: InfoWindow(title: p.name),
+            ),
+          ).toSet();
 
-    notifyListeners();
+      notifyListeners();
+    }
   }
 
   // Api call to fetch nearby restaurants
@@ -135,6 +181,9 @@ class MapViewModel extends ChangeNotifier {
   }
 
   Future<void> applyFilter(PlaceFilter filter) async {
+    selectedPlace = null;
+    notifyListeners();
+
     switch(filter) {
       case PlaceFilter.restaurant:
         await loadNearbyRestaurants("restaurant");
@@ -149,6 +198,15 @@ class MapViewModel extends ChangeNotifier {
         await loadNearbyRestaurants("popular");
         break;
     }
+    resetCamera();
+  }
+
+  void resetCamera() {
+    mapController?.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: center, zoom: 15),
+      ),
+    );
   }
 
   void onMapCreated(GoogleMapController controller) {

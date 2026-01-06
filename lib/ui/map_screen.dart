@@ -29,6 +29,7 @@ class MapScreen extends StatelessWidget {
         ),
         ...viewModel.markers,
       },
+      onTap: (_) => viewModel.clearSelection(),
     );
 
   }
