@@ -21,9 +21,9 @@ class BottomSheetMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) { return DraggableScrollableSheet(
     expand: false,
-    initialChildSize: 0.25,
+    initialChildSize: 0.5,
     minChildSize: 0.25,
-    maxChildSize: 0.9,
+    maxChildSize: 0.95,
     builder: (context, controller) {
       return Container(
         decoration: const BoxDecoration(

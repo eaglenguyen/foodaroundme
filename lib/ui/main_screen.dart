@@ -62,11 +62,13 @@ class _MainScreenState extends State<MainScreen> {
                       shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
                       ),
-                      builder: (_) => BottomSheetMap(
+                      builder: (sheetContext) => BottomSheetMap(
                         title: "Restaurants",
                         places: viewModel.filteredPlaces,
-                        close: () => Navigator.pop(context),
+                        close: () => Navigator.pop(sheetContext),
                         onSelect: (selectedPlace) async {
+                          // closes first bottom sheet
+                          Navigator.pop(sheetContext);
 
                           final details = await viewModel.getPlaceDetails(selectedPlace.placeId);
                           if (!context.mounted) return;
@@ -77,7 +79,6 @@ class _MainScreenState extends State<MainScreen> {
                             );
                             return;
                           }
-
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,

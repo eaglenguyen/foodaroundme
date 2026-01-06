@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:share_plus/share_plus.dart';
@@ -27,9 +29,7 @@ class ActionRow extends StatelessWidget {
           _ActionChip(
             icon: Icons.directions,
             label: "Directions",
-            onTap: () {
-              // maps
-            },
+            onTap: () => showDirectionsPicker(context, place),
           ),
           _ActionChip(
             icon: Icons.language,
@@ -49,7 +49,7 @@ class ActionRow extends StatelessWidget {
             icon: Icons.share,
             label: "Share",
             onTap: () {
-              sharePlace(place, details);
+              sharePlace(context, place, details);
             },
           ),
           _ActionChip(
@@ -112,20 +112,108 @@ class _ActionChip extends StatelessWidget {
   }
 }
 
+
+
 void callPlace(String? phone) {
   if (phone == null) return;
   final uri = Uri.parse('tel:$phone');
   launchUrl(uri);
 }
 
-void sharePlace(Place place, PlaceDetails details) {
-  final text =   '''
-  ${place.name}
-  ${place.address}
+// IOS/IPad requires a source rectangle for popovers/anchor, hence the context parameter
+void sharePlace(
+    BuildContext context,
+    Place place,
+    PlaceDetails details,
+    ) {
+  final box = context.findRenderObject() as RenderBox?;
 
-  ${details.url ?? ''}
-  ''';
+  final text = '''
+${place.name}
+${place.address}
 
-  Share.share(text.trim());
+${details.url ?? ''}
+'''.trim();
+
+  Share.share(
+    text,
+    sharePositionOrigin:
+    box!.localToGlobal(Offset.zero) & box.size,
+  );
 }
+
+void showDirectionsPicker(
+    BuildContext context,
+    Place place,
+    ) {
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    ),
+    builder: (_) => Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ListTile(
+          leading: const Icon(Icons.map),
+          title: const Text("Apple Maps"),
+          onTap: () {
+            Navigator.pop(context);
+            launchUrl(
+              Uri.parse(
+                'http://maps.apple.com/?daddr='
+                    '${place.location.latitude},'
+                    '${place.location.longitude}',
+              ),
+              mode: LaunchMode.externalApplication,
+            );
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.map_outlined),
+          title: const Text("Google Maps"),
+          onTap: () {
+            Navigator.pop(context);
+            launchUrl(
+              Uri.parse(
+                'https://www.google.com/maps/dir/?api=1'
+                    '&destination='
+                    '${place.location.latitude},'
+                    '${place.location.longitude}',
+              ),
+              mode: LaunchMode.externalApplication,
+            );
+          },
+        ),
+      ],
+    ),
+  );
+}
+
+
+// Restaurant detailScreen
+/*  Future<void> openTikTok(String restaurantName) async {
+    final query = Uri.encodeComponent(restaurantName);
+    final url = 'https://www.tiktok.com/tag/$query';
+    final uri = Uri.parse(url);
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not open TikTok';
+    }
+  }
+
+  Future<void> openInstagramTag(String tag) async {
+    final encodedTag = Uri.encodeComponent(tag);
+    final url = 'https://www.instagram.com/explore/tags/$encodedTag/';
+    final uri = Uri.parse(url);
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not open Instagram tag';
+    }
+  }*/
+
 

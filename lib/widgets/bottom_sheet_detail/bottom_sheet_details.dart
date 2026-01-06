@@ -21,29 +21,33 @@ class BottomSheetDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-      initialChildSize: 0.75,
-      minChildSize: 0.4,
+      expand: false,
+      initialChildSize: 0.5,
+      minChildSize: 0.25,
       maxChildSize: 0.95,
       builder: (context, scrollController) {
         return Container(
           decoration: const BoxDecoration(
             color: Color(0xFFF9F7FB),
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: SingleChildScrollView(
-            controller: scrollController,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Header(place: place),
-                ActionRow(place: place, details: details),
-                SocialLinks(place: place),
-                PhotoGrid(place: place)
-              ],
             ),
-          ),
-        );
-      },
-    );
+            child: SingleChildScrollView(
+              controller: scrollController,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Header(place: place),
+                  ActionRow(place: place, details: details),
+                  SocialLinks(place: place),
+                  PhotoGrid(place: place)
+                ],
+              ),
+            ),
+          );
+        },
+      );
   }
 }
+
+
+
