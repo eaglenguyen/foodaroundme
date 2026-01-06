@@ -41,9 +41,9 @@ class ActionRow extends StatelessWidget {
           _ActionChip(
             icon: Icons.call,
             label: "Call",
-            onTap: details.formattedPhoneNumber == null ? null : () {
-              callPlace(details.formattedPhoneNumber);
-            },
+            onTap: details.formattedPhoneNumber == null
+                ? null
+                : () => callPlace(details.formattedPhoneNumber),
           ),
           _ActionChip(
             icon: Icons.share,
@@ -114,10 +114,22 @@ class _ActionChip extends StatelessWidget {
 
 
 
-void callPlace(String? phone) {
-  if (phone == null) return;
-  final uri = Uri.parse('tel:$phone');
-  launchUrl(uri);
+Future<void> callPlace(String? phone) async {
+  if (phone == null || phone.isEmpty) return;
+
+  // Remove spaces, dashes, parentheses
+  final sanitizedPhone = phone.replaceAll(RegExp(r'[^\d+]'), '');
+  final uri = Uri(scheme: 'tel', path: sanitizedPhone);
+
+  if(!await canLaunchUrl(uri)) {
+    debugPrint('Could not launch phone dialer');
+    return;
+  }
+
+  await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+  );
 }
 
 // IOS/IPad requires a source rectangle for popovers/anchor, hence the context parameter
@@ -191,29 +203,6 @@ void showDirectionsPicker(
 }
 
 
-// Restaurant detailScreen
-/*  Future<void> openTikTok(String restaurantName) async {
-    final query = Uri.encodeComponent(restaurantName);
-    final url = 'https://www.tiktok.com/tag/$query';
-    final uri = Uri.parse(url);
 
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      throw 'Could not open TikTok';
-    }
-  }
-
-  Future<void> openInstagramTag(String tag) async {
-    final encodedTag = Uri.encodeComponent(tag);
-    final url = 'https://www.instagram.com/explore/tags/$encodedTag/';
-    final uri = Uri.parse(url);
-
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      throw 'Could not open Instagram tag';
-    }
-  }*/
 
 
