@@ -56,8 +56,7 @@ class MapViewModel extends ChangeNotifier {
   }
 
   void initPlaces() {
-    _places = gp.GooglePlace(apiKey);
-  }
+    _places = gp.GooglePlace(apiKey);}
 
   void openSheet() {
     showBottomSheet = true;
@@ -209,6 +208,7 @@ class MapViewModel extends ChangeNotifier {
   }
 
   Future<void> applyFilter(PlaceFilter filter) async {
+
     // Update Intent
     activeFilter = filter;
     showBottomSheet = true;

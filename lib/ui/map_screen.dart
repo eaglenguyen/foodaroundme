@@ -57,8 +57,7 @@ class MapScreen extends StatelessWidget {
                 onSelect: (place) async {
                   viewModel.selectPlace(place);
 
-                  final details =
-                  await viewModel.getPlaceDetails(place.placeId);
+                  final details = await viewModel.getPlaceDetails(place.placeId);
 
                   if (!context.mounted || details == null) return;
 
