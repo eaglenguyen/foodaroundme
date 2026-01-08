@@ -15,12 +15,14 @@ class MapViewModel extends ChangeNotifier {
   // state (in android) is value that changes over time
   final LocationService _locationService = LocationService();
   bool isLoading = false;
+  bool showBottomSheet = false;
   LatLng center = const LatLng(42.3104, -71.0575); // default coordinate before it is assigned by getCurrentLocation()
   LatLng cameraCenter = const LatLng(42.3104, -71.0575);
   double cameraZoom = 11.0;
   List<bool> selectedButtons = [true, false, false];
   GoogleMapController? mapController;
   static const apiKey = String.fromEnvironment("GOOGLE_MAPS_API_KEY");
+  Timer? _debounce;
 
   // fetch restaurant api
   late gp.GooglePlace _places;
@@ -28,13 +30,24 @@ class MapViewModel extends ChangeNotifier {
 
   Set<Marker> markers = {};
 
-  //
+  // place
   List<Place> allPlaces = [];
   List<Place> filteredPlaces = [];
   Place? selectedPlace;
+  PlaceFilter? activeFilter;
 
-  Timer? _debounce;
 
+  // hiding fab/togglebuttongroup via bottomsheet size
+
+  bool showToggleFab = true;
+
+
+  void setFabVisibility(bool visible) {
+    if (showToggleFab != visible) {
+      showToggleFab = visible;
+      notifyListeners();
+    }
+  }
 
 
   // init block via flutter
@@ -44,6 +57,17 @@ class MapViewModel extends ChangeNotifier {
 
   void initPlaces() {
     _places = gp.GooglePlace(apiKey);
+  }
+
+  void openSheet() {
+    showBottomSheet = true;
+    notifyListeners();
+  }
+
+  void closeSheet() {
+    showBottomSheet = false;
+    showToggleFab = true;
+    notifyListeners();
   }
 
   // assigns selectedPlace to a marker
@@ -185,8 +209,16 @@ class MapViewModel extends ChangeNotifier {
   }
 
   Future<void> applyFilter(PlaceFilter filter) async {
+    // Update Intent
+    activeFilter = filter;
+    showBottomSheet = true;
     selectedPlace = null;
+
+    isLoading = true;
     notifyListeners();
+
+    await Future.delayed(const Duration(milliseconds: 1000));
+
 
     switch(filter) {
       case PlaceFilter.restaurant:
@@ -203,7 +235,11 @@ class MapViewModel extends ChangeNotifier {
         break;
     }
     resetCamera();
+    isLoading = false;
+    notifyListeners();
   }
+
+
 
   void resetCamera() {
     mapController?.animateCamera(
@@ -238,6 +274,25 @@ class MapViewModel extends ChangeNotifier {
     isLoading = false;
     notifyListeners();
   }
-
-
+  // for map_screen.dart
+  String get sheetTitle {
+    switch (activeFilter) {
+      case PlaceFilter.restaurant:
+        return "Restaurants";
+      case PlaceFilter.cafe:
+        return "Cafés";
+      case PlaceFilter.bar:
+        return "Bars";
+      case PlaceFilter.popular:
+        return "Popular";
+      default:
+        return "";
+    }
+  }
 }
+
+
+
+
+
+

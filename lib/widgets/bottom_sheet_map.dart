@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-
+import 'package:foodaroundme/viewmodel/mapViewModel.dart';
+import 'package:provider/provider.dart';
 import '../model/place.dart';
 
-class BottomSheetMap extends StatelessWidget {
+class BottomSheetMap extends StatefulWidget {
   final String title;
   // changed to function to take place object
   final void Function(Place) onSelect;
@@ -19,20 +20,53 @@ class BottomSheetMap extends StatelessWidget {
   });
 
   @override
+  State<BottomSheetMap> createState() => _BottomSheetMapState();
+}
+
+class _BottomSheetMapState extends State<BottomSheetMap> {
+  late final DraggableScrollableController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = DraggableScrollableController();
+
+    _controller.addListener(_handleSheetSize);
+  }
+
+  void _handleSheetSize() {
+    final size = _controller.size;
+    final shouldShowFab = size <= 0.055;
+    context.read<MapViewModel>()
+    .setFabVisibility(shouldShowFab);
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_handleSheetSize);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+
+
     return DraggableScrollableSheet(
     expand: false,
+    controller: _controller,
     initialChildSize: 0.5,
-    minChildSize: 0.25,
+    minChildSize: 0.05,
     maxChildSize: 0.95,
-    builder: (context, controller) {
+    builder: (context, scrollController) {
       return Container(
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: ListView(
-          controller: controller,
+          primary: false,
+          controller: scrollController,
           children: [
             const SizedBox(height: 16),
 
@@ -53,7 +87,7 @@ class BottomSheetMap extends StatelessWidget {
             /// Title
             Center(
               child: Text(
-                title,
+                widget.title,
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -63,26 +97,44 @@ class BottomSheetMap extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            /// ⭐ The correct way to show the list
-            /// p is the place object clicked
-            ...places.map( (p) {
-              return ListTile(
+            // Displays text if list of places are empty
+            if(widget.places.isEmpty) ...[   // ... is used to inject a list of widgets
+              const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24),
+                  child: Text(
+                    "No Restaurants/Cafes Nearby",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
+                    ),
+                      ),
+                        ),
+                ] else ...[
+                  /// ⭐ The correct way to show the list
+                  /// p is the place object clicked
+                ...widget.places.map( (p) =>
+                ListTile(
                 leading: const Icon(Icons.location_on),
                 title: Text(p.name),
-                onTap:  () => onSelect(p),
-              );
-            }),
+                onTap:  () => widget.onSelect(p),
+      ),
+      ),
+            ],
+
+
 
 
             ListTile(
               leading: const Icon(Icons.close),
               title: const Text("Close"),
-              onTap: close,
+              onTap: widget.close,
             ),
           ],
         ),
       );
-    },
+      },
   );
   }
 }

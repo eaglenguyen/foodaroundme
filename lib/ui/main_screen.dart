@@ -21,6 +21,7 @@ class _MainScreenState extends State<MainScreen> {
   int currentIndex = 0; // 0 is Map, 1 is searchScreen
   bool isMenuOpen = false;
 
+
   final List<Widget> screens = const [
     MapScreen(key: ValueKey(0)),     // index 0
     ProfileScreen(key: ValueKey(1)), // index 2
@@ -32,20 +33,22 @@ class _MainScreenState extends State<MainScreen> {
     final viewModel = Provider.of<MapViewModel>(context);
 
     return Scaffold(
+
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
 
       // ⭐ ADD THE EXPANDABLE FAB HERE (only on mapScreen)
       floatingActionButton: AnimatedOpacity(
-        opacity: currentIndex == 0 ? 1.0 : 0.0, // visible only on MapScreen
+        opacity: currentIndex == 0 && viewModel.showToggleFab ? 1.0 : 0.0, // visible only on MapScreen
         duration: const Duration(milliseconds: 200),
         child: IgnorePointer(
-          ignoring: currentIndex != 0, // prevents interaction when invisible
+          ignoring: currentIndex != 0 || !viewModel.showToggleFab, // prevents interaction when invisible
           child: Padding(
             padding: const EdgeInsets.only(bottom: 90), // moves FAB up
             child: ExpandableFab(
               distance: 112,
               onOpenChanged: (isOpen) {
-                setState(() => isMenuOpen = isOpen);
+                setState(() => isMenuOpen = isOpen
+                );
               },
               children: [
                 ActionButton(
@@ -53,51 +56,10 @@ class _MainScreenState extends State<MainScreen> {
                   label: "Food",
                   onPressed: () async {
                     await viewModel.applyFilter(PlaceFilter.restaurant);
+                    viewModel.openSheet();
 
                     if (!context.mounted) return;
 
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
-                      ),
-                      builder: (sheetContext) => BottomSheetMap(
-                        title: "Restaurants",
-                        places: viewModel.filteredPlaces,
-                        close: () => Navigator.pop(sheetContext),
-                        onSelect: (selectedPlace) async {
-                          // closes first bottom sheet
-                          Navigator.pop(sheetContext);
-
-                          // Update state and marker
-                          viewModel.selectPlace(selectedPlace);
-
-                          final details = await viewModel.getPlaceDetails(selectedPlace.placeId);
-                          if (!context.mounted) return;
-
-                          if (details == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Details not available')),
-                            );
-                            return;
-                          }
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(25.0)),
-                            ),
-                            builder: (_) =>
-                                BottomSheetDetails(
-                                  place: selectedPlace,
-                                  details: details,
-                                ),
-                          );
-                        }
-                        ),
-                    );
                   },
                 ),
                 ActionButton(
@@ -105,50 +67,11 @@ class _MainScreenState extends State<MainScreen> {
                   label: "Cafe",
                   onPressed: () async {
                     await viewModel.applyFilter(PlaceFilter.cafe);
+                    viewModel.openSheet();
+
                     if (!context.mounted) return;
 
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
-                      ),
-                      builder: (sheetContext) => BottomSheetMap(
-                        title: "Cafe",
-                        places: viewModel.filteredPlaces,
-                        close: () => Navigator.pop(sheetContext),
-                        onSelect: (selectedPlace) async {
 
-                          Navigator.pop(sheetContext);
-
-                          // Update state and marker
-                          viewModel.selectPlace(selectedPlace);
-
-                          final details = await viewModel.getPlaceDetails(
-                              selectedPlace.placeId);
-                          if (!context.mounted) return;
-
-                          if (details == null || details.placeId == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Details not available')),
-                            );
-                            return;
-                          }
-
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(25.0)),
-                            ),
-                            builder: (_) =>
-                                BottomSheetDetails(
-                                  place: selectedPlace, details: details,
-                                ),
-                          );
-                        }),
-                    );
                   },
                 ),
                 ActionButton(
@@ -156,49 +79,8 @@ class _MainScreenState extends State<MainScreen> {
                   label: "Bars",
                   onPressed: () async {
                     await viewModel.applyFilter(PlaceFilter.bar);
+                    viewModel.openSheet();
                     if (!context.mounted) return;
-
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
-                      ),
-                      builder: (sheetContext) => BottomSheetMap(
-                        title: "Bars",
-                        places: viewModel.filteredPlaces,
-                        close: () => Navigator.pop(sheetContext),
-                        onSelect: (selectedPlace) async {
-                          Navigator.pop(sheetContext);
-
-                          // Update state and marker
-                          viewModel.selectPlace(selectedPlace);
-
-                          final details = await viewModel.getPlaceDetails(
-                              selectedPlace.placeId);
-                          if (!context.mounted) return;
-
-                          if (details == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Details not available')),
-                            );
-                            return;
-                          }
-
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(25.0)),
-                            ),
-                            builder: (_) =>
-                                BottomSheetDetails(
-                                  place: selectedPlace, details: details,
-                                ),
-                          );
-                        })
-                    );
                   },
                 ),
               ],
@@ -236,9 +118,9 @@ class _MainScreenState extends State<MainScreen> {
             bottom: 40, // position under FAB
             child: Center(
               child: IgnorePointer(
-                ignoring: isMenuOpen, // when true (fab is open), ignore interaction
+                ignoring: isMenuOpen || !viewModel.showToggleFab, // when true (fab is open), ignore interaction
                 child: AnimatedOpacity(
-                opacity: isMenuOpen ? 0.0 : 1.0, // hides when FAB is expanded
+                opacity: isMenuOpen || !viewModel.showToggleFab ? 0.0 : 1.0, // hides when FAB is expanded
                 duration: const Duration(milliseconds: 200),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -280,7 +162,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
           )
           )
-          ),
+          )
         ],
       ),
         //////////////////
