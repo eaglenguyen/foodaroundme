@@ -48,6 +48,7 @@ class MapScreen extends StatelessWidget {
           ),
           /// PERSISTENT BOTTOM SHEET
           if (viewModel.showBottomSheet)
+
             Align(
               alignment: Alignment.bottomCenter,
               child: BottomSheetMap(

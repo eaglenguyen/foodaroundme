@@ -4,8 +4,7 @@ import 'package:foodaroundme/ui/map_screen.dart';
 import 'package:foodaroundme/ui/profile_screen.dart';
 import 'package:foodaroundme/ui/search_screen.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
-import 'package:foodaroundme/widgets/bottom_sheet_detail/bottom_sheet_details.dart';
-import 'package:foodaroundme/widgets/bottom_sheet_map.dart';
+
 import 'package:provider/provider.dart';
 import '../widgets/expandable_fab.dart';
 

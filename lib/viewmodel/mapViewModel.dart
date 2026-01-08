@@ -59,6 +59,7 @@ class MapViewModel extends ChangeNotifier {
     _places = gp.GooglePlace(apiKey);}
 
   void openSheet() {
+
     showBottomSheet = true;
     notifyListeners();
   }
@@ -211,7 +212,6 @@ class MapViewModel extends ChangeNotifier {
 
     // Update Intent
     activeFilter = filter;
-    showBottomSheet = true;
     selectedPlace = null;
 
     isLoading = true;
@@ -219,6 +219,7 @@ class MapViewModel extends ChangeNotifier {
 
     await Future.delayed(const Duration(milliseconds: 1000));
 
+    showBottomSheet = true;
 
     switch(filter) {
       case PlaceFilter.restaurant:
