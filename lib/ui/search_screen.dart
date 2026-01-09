@@ -69,7 +69,8 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                     builder: (_) =>
                         BottomSheetDetails(
-                          place: place, details: details,
+                          place: place,
+                          details: details,
                         ),
                   );
                 });

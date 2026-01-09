@@ -6,6 +6,7 @@ import 'package:foodaroundme/ui/search_screen.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
 
 import 'package:provider/provider.dart';
+import '../widgets/action_button.dart';
 import '../widgets/expandable_fab.dart';
 
 
@@ -17,19 +18,18 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int currentIndex = 0; // 0 is Map, 1 is searchScreen
   bool isMenuOpen = false;
 
 
   final List<Widget> screens = const [
     MapScreen(key: ValueKey(0)),     // index 0
-    ProfileScreen(key: ValueKey(1)), // index 2
-    SearchScreen(key: ValueKey(2)),  // index 3
+    ProfileScreen(key: ValueKey(1)), // index 1
+    SearchScreen(key: ValueKey(2)),  // index 2
   ];
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<MapViewModel>(context);
+    final viewModel = context.watch<MapViewModel>();
 
     return Scaffold(
 
@@ -37,16 +37,16 @@ class _MainScreenState extends State<MainScreen> {
 
       // ⭐ ADD THE EXPANDABLE FAB HERE (only on mapScreen)
       floatingActionButton: AnimatedOpacity(
-        opacity: currentIndex == 0 && viewModel.showToggleFab ? 1.0 : 0.0, // visible only on MapScreen
+        opacity: viewModel.selectedIndex == 0 && viewModel.showFab ? 1.0 : 0.0, // visible only on MapScreen
         duration: const Duration(milliseconds: 200),
         child: IgnorePointer(
-          ignoring: currentIndex != 0 || !viewModel.showToggleFab, // prevents interaction when invisible
+          ignoring: viewModel.selectedIndex != 0 || !viewModel.showFab, // prevents interaction when invisible
           child: Padding(
             padding: const EdgeInsets.only(bottom: 90), // moves FAB up
             child: ExpandableFab(
               distance: 112,
               onOpenChanged: (isOpen) {
-                setState(() => isMenuOpen = isOpen
+                setState(() => isMenuOpen = isOpen // setState similar to LaunchedEffect/mutableStateof
                 );
               },
               children: [
@@ -54,6 +54,7 @@ class _MainScreenState extends State<MainScreen> {
                   icon: const Icon(Icons.fastfood_rounded),
                   label: "Food",
                   onPressed: () async {
+                    viewModel.hideExpandableFab();
                     await viewModel.applyFilter(PlaceFilter.restaurant);
                     viewModel.openSheet();
 
@@ -65,6 +66,7 @@ class _MainScreenState extends State<MainScreen> {
                   icon: const Icon(Icons.coffee),
                   label: "Cafe",
                   onPressed: () async {
+                    viewModel.hideExpandableFab();
                     await viewModel.applyFilter(PlaceFilter.cafe);
                     viewModel.openSheet();
 
@@ -77,6 +79,7 @@ class _MainScreenState extends State<MainScreen> {
                   icon: const Icon(Icons.local_bar),
                   label: "Bars",
                   onPressed: () async {
+                    viewModel.hideExpandableFab();
                     await viewModel.applyFilter(PlaceFilter.bar);
                     viewModel.openSheet();
                     if (!context.mounted) return;
@@ -86,12 +89,6 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
         ),
-      ),
-
-
-      appBar: AppBar(
-        title: const Text("Maps"),
-        backgroundColor: Colors.green,
       ),
       // animation for navigation
       body: Stack(
@@ -107,7 +104,7 @@ class _MainScreenState extends State<MainScreen> {
                 child: child,
               );
             },
-            child: screens[currentIndex]
+            child: screens[viewModel.selectedIndex]
           ),
 
           // ToggleButtonGroup
@@ -117,9 +114,9 @@ class _MainScreenState extends State<MainScreen> {
             bottom: 40, // position under FAB
             child: Center(
               child: IgnorePointer(
-                ignoring: isMenuOpen || !viewModel.showToggleFab, // when true (fab is open), ignore interaction
+                ignoring: isMenuOpen || !viewModel.showFab, // when true (fab is open), ignore interaction
                 child: AnimatedOpacity(
-                opacity: isMenuOpen || !viewModel.showToggleFab ? 0.0 : 1.0, // hides when FAB is expanded
+                opacity: isMenuOpen || !viewModel.showFab ? 0.0 : 1.0, // hides when FAB is expanded
                 duration: const Duration(milliseconds: 200),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -137,19 +134,18 @@ class _MainScreenState extends State<MainScreen> {
                   child: ToggleButtons(
                     borderRadius: const BorderRadius.all(Radius.circular(40)),
                     constraints: const BoxConstraints(minHeight: 40, minWidth: 70),
-                    fillColor: Colors.green.shade300,
-                    selectedColor: Colors.white,
-                    color: Colors.black,
-                    selectedBorderColor: Colors.green,
+                    fillColor: Colors.white,
+                    selectedColor: Colors.black,
+                    color: Colors.grey,
+                    selectedBorderColor: Colors.black,
                     borderColor: Colors.transparent,
-                    isSelected: viewModel.selectedButtons,
+                    isSelected: List.generate(
+                      3,
+                          (index) => (index == viewModel.selectedIndex),   // iterates through list, sets current index of list to true/false depending if i actually equals index
+
+                    ),
                     onPressed: (index) {
                       viewModel.toggleButton(index);  // update your viewmodel
-
-                      setState(() {
-                        currentIndex = index;
-                      });
-
                     },
                     children: const [
                       Icon(Icons.map),

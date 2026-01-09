@@ -48,18 +48,20 @@ class MapScreen extends StatelessWidget {
           ),
           /// PERSISTENT BOTTOM SHEET
           if (viewModel.showBottomSheet)
-
             Align(
               alignment: Alignment.bottomCenter,
               child: BottomSheetMap(
                 title: viewModel.sheetTitle,
                 places: viewModel.filteredPlaces,
-                close: viewModel.closeSheet,
+                close: () {
+                  viewModel.closeSheet();
+                  viewModel.showExpandableFabAgain();
+                },
                 onSelect: (place) async {
                   viewModel.selectPlace(place);
 
                   final details = await viewModel.getPlaceDetails(place.placeId);
-
+                  //final overview = details
                   if (!context.mounted || details == null) return;
 
                   showModalBottomSheet(

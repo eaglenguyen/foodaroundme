@@ -26,19 +26,28 @@ class BottomSheetMap extends StatefulWidget {
 class _BottomSheetMapState extends State<BottomSheetMap> {
   late final DraggableScrollableController _controller;
 
+
   @override
   void initState() {
     super.initState();
+    // Linking viewmodel method to here
     _controller = DraggableScrollableController();
 
     _controller.addListener(_handleSheetSize);
+
+
   }
 
   void _handleSheetSize() {
     final size = _controller.size;
     final shouldShowFab = size <= 0.155;
+    if (shouldShowFab) {
     context.read<MapViewModel>()
-    .setFabVisibility(shouldShowFab);
+    .showExpandableFabAgain();
+  } else {
+      context.read<MapViewModel>()
+          .hideExpandableFab();
+    }
   }
 
   @override
@@ -50,7 +59,6 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
 
   @override
   Widget build(BuildContext context) {
-
 
     return DraggableScrollableSheet(
     expand: false,
@@ -103,120 +111,135 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
 
             // Displays text if list of places are empty
             if(widget.places.isEmpty) ...[   // ... is used to inject a list of widgets
-              const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 24),
-                  child: Text(
-                    "No Restaurants/Cafes Nearby",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                    ),
+                const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Text(
+                      "No Restaurants/Cafes Nearby",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
                       ),
                         ),
-                ] else ...[
-                  /// ⭐ The correct way to show the list
-                  /// p is the place object clicked
-                ...widget.places.map( (p) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: () => widget.onSelect(p),
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF2A2433), // dark card
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Row(
-                          children: [
-                            /// LEFT IMAGE
-                            SizedBox(
-                              width: 60,
-                              height: 60,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.network(
-                                'https://via.placeholder.com/60',
-                                fit: BoxFit.cover,
+                          ),
+                  ] else ...[
+                    /// ⭐ The correct way to show the list
+                    /// p is the place object clicked
+                  ...widget.places.map( (p) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () => widget.onSelect(p),
+                        child: Container(
+                          padding: const EdgeInsets.all(1),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2A2433), // dark card
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            children: [
+                              /// LEFT IMAGE
+                              SizedBox(
+                                width: 60,
+                                height: 60,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: p.photoReference != null
+                                ? Image.network(
+                                  getPlacePhotoUrl(p.photoReference!)!,
+                                  fit: BoxFit.cover,
+                                ) : Container( // if null, placeholder icon
+                                  width: 60,
+                                  height: 60,
+                                  color: Colors.grey,
+                                  child: const Icon(Icons.restaurant, color: Colors.white),
+                                )
+                              )
                               ),
-                            ),
-                            ),
-                            const SizedBox(width: 12),
+                              const SizedBox(width: 12),
 
-                            /// CENTER TEXT
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  /// Title
-                                  Text(
-                                    p.name ?? 'Unknown',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                              /// CENTER TEXT
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    /// Title
+                                    Text(
+                                      p.name,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
                                     ),
-                                  ),
 
-                                  const SizedBox(height: 4),
+                                    const SizedBox(height: 4),
 
-                                  /// Categories
-                                  Text(
-                                     'Restaurant',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.white70,
+                                    /// Cuisine Info
+                                    Text(
+                                       'Restaurant',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.white70,
+                                      ),
                                     ),
-                                  ),
 
-                                  const SizedBox(height: 6),
+                                    const SizedBox(height: 6),
 
-                                  /// Meta info
-                                  Text(
-                                    'Open Now',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.white60,
+                                    /// Meta info
+                                    Text(
+                                      'Open Now',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.white60,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                }
-      ),
+                    );
+                  }
+        ),
+              ],
             ],
-          ],
-        ),
-          /// CLOSE BUTTON
-          Positioned(
-            top: 8,
-            left: 8,
-            child: IconButton(
-              icon: const Icon(Icons.close),
-              color: Colors.white70,
-              splashRadius: 20,
-              onPressed: widget.close,
-            ),
           ),
+            /// CLOSE BUTTON
+            Positioned(
+              top: 8,
+              left: 8,
+              child: IconButton(
+                icon: const Icon(Icons.close),
+                color: Colors.white70,
+                splashRadius: 20,
+                onPressed: widget.close,
+              ),
+            ),
 
-        ],
-        ),
-      );
-      },
+          ],
+          ),
+        );
+        },
   );
   }
+}
+
+String? getPlacePhotoUrl(String? photoReference) {
+  if (photoReference == null) return null;
+
+  return 'https://maps.googleapis.com/maps/api/place/photo'
+      '?maxwidth=400'
+      '&photo_reference=$photoReference'
+      '&key=${MapViewModel.apiKey}';
 }
 
 

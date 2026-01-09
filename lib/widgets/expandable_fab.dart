@@ -3,17 +3,16 @@ import 'package:flutter/material.dart';
 
 @immutable
 class ExpandableFab extends StatefulWidget {
-  // Fields aka properties
+  // Fields == properties
   // Properties are empty/null by default
   final bool? initialOpen;
   final double distance;
   final List<Widget> children;
-  // callback for togglebutton
-  final ValueChanged<bool>? onOpenChanged;
+  final ValueChanged<bool>? onOpenChanged;  // callback for togglebutton
 
 
-  // Constructor
-  // fills the fields with value
+
+  // Constructor , this fills the fields with value
   const ExpandableFab({
     super.key,
     this.initialOpen, // connects to fields above
@@ -24,13 +23,11 @@ class ExpandableFab extends StatefulWidget {
 
 
 
-  // object from ExpandableFabState
   @override
-  State<ExpandableFab> createState() => _ExpandableFabState();
+  State<ExpandableFab> createState() => _ExpandableFabState();   // object from ExpandableFabState
 }
 
-class _ExpandableFabState extends State<ExpandableFab>
-    with SingleTickerProviderStateMixin {
+class _ExpandableFabState extends State<ExpandableFab> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _expandAnimation;
   bool _open = false;
@@ -113,10 +110,8 @@ class _ExpandableFabState extends State<ExpandableFab>
     final count = widget.children.length;
     final step = 90.0 / (count - 1);
 
-    for (
-    var i = 0, angleInDegrees = 0.0;
-    i < count;
-    i++, angleInDegrees += step
+    for (var i = 0, angleInDegrees = 0.0; i < count; i++,
+    angleInDegrees += step
     ) {
       children.add(
         _ExpandingActionButton(
@@ -198,54 +193,3 @@ class _ExpandingActionButton extends StatelessWidget {
   }
 }
 
-@immutable
-class ActionButton extends StatelessWidget {
-
-  final VoidCallback? onPressed;
-  final Widget icon;
-  final String label;
-
-  const ActionButton({
-    super.key,
-    this.onPressed,
-    required this.icon,
-    required this.label,
-  });
-
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return GestureDetector(
-      onTap: onPressed,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-      children: [
-        Material(
-          shape: const CircleBorder(),
-          clipBehavior: Clip.antiAlias,
-          color: theme.colorScheme.secondary,
-          elevation: 4,
-          child: IconButton(
-            onPressed: onPressed,
-            icon: icon,
-            color: theme.colorScheme.onSecondary,
-          ),
-        ),
-
-        const SizedBox(height: 6),
-
-        Text(
-          label,
-          style: TextStyle(
-          fontSize: 12,
-          color: Colors.black87,
-          fontWeight: FontWeight.w500,
-        ),
-        ),
-      ],
-      ),
-    );
-  }
-}

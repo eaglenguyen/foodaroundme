@@ -7,6 +7,7 @@ class Place{
   final String name;
   final LatLng location;
   final String address;
+  final String? photoReference;
   final List<String> types;
 
   Place({
@@ -14,10 +15,11 @@ class Place{
     required this.name,
     required this.location,
     required this.address,
+    this.photoReference,
     required this.types,
   });
 
-  /// Converts GooglePlace's PlaceSearchResult → our Place
+  /// Converts GooglePlace's SearchResult → Place data class
   static Place? fromSearchResult(SearchResult result) {
     final loc = result.geometry?.location;
     if (loc == null) return null;
@@ -28,6 +30,9 @@ class Place{
       location: LatLng(loc.lat ?? 0.0, loc.lng ?? 0.0),
       address: result.vicinity ?? 'Not Available',
       types: result.types?.cast<String>() ?? [],
+      photoReference: result.photos?.isNotEmpty == true
+        ? result.photos!.first.photoReference
+          : null,
     );
   }
 }

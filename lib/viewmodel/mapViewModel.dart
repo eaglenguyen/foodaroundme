@@ -9,6 +9,14 @@ import '../model/place.dart';
 import '../service/locationService.dart';
 
 class MapViewModel extends ChangeNotifier {
+  // Rule of thumb
+  // Use:
+  // ✅ setState → tiny, UI-only state
+  // ✅ ViewModel / Provider → anything that:
+  // affects navigation
+  // affects data
+  // affects multiple widgets
+  // affects behavior
 
 
   // current layout is state variables -> methods/functions
@@ -16,13 +24,14 @@ class MapViewModel extends ChangeNotifier {
   final LocationService _locationService = LocationService();
   bool isLoading = false;
   bool showBottomSheet = false;
+  bool showFab = true;
   LatLng center = const LatLng(42.3104, -71.0575); // default coordinate before it is assigned by getCurrentLocation()
   LatLng cameraCenter = const LatLng(42.3104, -71.0575);
   double cameraZoom = 11.0;
-  List<bool> selectedButtons = [true, false, false];
   GoogleMapController? mapController;
   static const apiKey = String.fromEnvironment("GOOGLE_MAPS_API_KEY");
   Timer? _debounce;
+  int selectedIndex = 0;
 
   // fetch restaurant api
   late gp.GooglePlace _places;
@@ -37,17 +46,46 @@ class MapViewModel extends ChangeNotifier {
   PlaceFilter? activeFilter;
 
 
-  // hiding fab/togglebuttongroup via bottomsheet size
-
-  bool showToggleFab = true;
 
 
-  void setFabVisibility(bool visible) {
-    if (showToggleFab != visible) {
-      showToggleFab = visible;
-      notifyListeners();
-    }
+
+  void onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+    getCurrentLocation();
   }
+
+  Future<void> getCurrentLocation() async {
+    isLoading = true;
+    notifyListeners();
+
+    final position = await _locationService.getCurrentPosition();
+    if (position == null) {
+      isLoading = false;
+      notifyListeners();
+      return;
+    }
+
+    // real center coordinates
+    center = LatLng(position.latitude, position.longitude);
+    mapController?.animateCamera(
+      CameraUpdate.newCameraPosition(CameraPosition(target: center, zoom: 15)),
+    );
+
+    isLoading = false;
+    notifyListeners();
+  }
+
+  void hideExpandableFab() {
+    showFab = false;
+    notifyListeners();
+  }
+
+  void showExpandableFabAgain() {
+    showFab = true;
+    notifyListeners();
+  }
+
+
 
 
   // init block via flutter
@@ -59,14 +97,12 @@ class MapViewModel extends ChangeNotifier {
     _places = gp.GooglePlace(apiKey);}
 
   void openSheet() {
-
     showBottomSheet = true;
     notifyListeners();
   }
 
   void closeSheet() {
     showBottomSheet = false;
-    showToggleFab = true;
     notifyListeners();
   }
 
@@ -81,11 +117,10 @@ class MapViewModel extends ChangeNotifier {
         infoWindow: InfoWindow(title: place.name),
       )
     };
-
     _focusOnPlace(place);
     notifyListeners();
-
   }
+
   // zoom in on selectedPlace
   Future<void> _focusOnPlace(Place place) async {
     if (mapController == null) return;
@@ -128,7 +163,6 @@ class MapViewModel extends ChangeNotifier {
               infoWindow: InfoWindow(title: p.name),
             ),
           ).toSet();
-
       notifyListeners();
     }
   }
@@ -184,6 +218,8 @@ class MapViewModel extends ChangeNotifier {
     }
   }
 
+
+
   void filterBySearchQuery(String query) {
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 300), () {
@@ -202,9 +238,7 @@ class MapViewModel extends ChangeNotifier {
 
 
   void toggleButton(int index) {
-    for (int i = 0; i < selectedButtons.length; i++) {
-      selectedButtons[i] = i == index;
-    }
+    selectedIndex = index;
     notifyListeners();
   }
 
@@ -250,31 +284,7 @@ class MapViewModel extends ChangeNotifier {
     );
   }
 
-  void onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-    getCurrentLocation();
-  }
 
-  Future<void> getCurrentLocation() async {
-    isLoading = true;
-    notifyListeners();
-
-    final position = await _locationService.getCurrentPosition();
-    if (position == null) {
-      isLoading = false;
-      notifyListeners();
-      return;
-    }
-
-    // real center coordinates
-    center = LatLng(position.latitude, position.longitude);
-    mapController?.animateCamera(
-      CameraUpdate.newCameraPosition(CameraPosition(target: center, zoom: 15)),
-    );
-
-    isLoading = false;
-    notifyListeners();
-  }
   // for map_screen.dart
   String get sheetTitle {
     switch (activeFilter) {
