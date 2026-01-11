@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
+import 'package:foodaroundme/widgets/drag_handles/drag_handle_arrow.dart';
+import 'package:foodaroundme/widgets/drag_handles/drag_handle_line.dart';
 import 'package:provider/provider.dart';
 import '../model/place.dart';
 
@@ -25,6 +27,8 @@ class BottomSheetMap extends StatefulWidget {
 
 class _BottomSheetMapState extends State<BottomSheetMap> {
   late final DraggableScrollableController _controller;
+  double _sheetSize = 0.4;
+
 
 
   @override
@@ -32,7 +36,6 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
     super.initState();
     // Linking viewmodel method to here
     _controller = DraggableScrollableController();
-
     _controller.addListener(_handleSheetSize);
 
 
@@ -40,7 +43,14 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
 
   void _handleSheetSize() {
     final size = _controller.size;
+    if(size != _sheetSize) {
+      setState(() { // runs when this variable values have changed, so rebuild UI/widget
+        _sheetSize = size;
+      });
+    }
+
     final shouldShowFab = size <= 0.155;
+
     if (shouldShowFab) {
     context.read<MapViewModel>()
     .showExpandableFabAgain();
@@ -59,6 +69,7 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
 
   @override
   Widget build(BuildContext context) {
+
 
     return DraggableScrollableSheet(
     expand: false,
@@ -83,12 +94,18 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
 
             /// drag handle
             Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
+              child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 150),
+                transitionBuilder: (child, animation) =>
+                  FadeTransition(opacity: animation, child: child,),
+                child: _sheetSize <= 0.155
+                  ? const DragHandleArrow(
+                  key: ValueKey('arrow'),
                   color: Colors.black26,
-                  borderRadius: BorderRadius.circular(10),
+                )
+                    : const DragHandleLine(
+                  key: ValueKey('line'),
+                  color: Colors.black26,
                 ),
               ),
             ),
