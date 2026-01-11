@@ -35,7 +35,7 @@ class _ArrowStroke extends StatelessWidget {
         width: 19,
         height: 3,
         decoration: BoxDecoration(
-          color: Colors.black26,
+          color: Colors.grey,
           borderRadius: BorderRadius.circular(10),
         ),
       ),

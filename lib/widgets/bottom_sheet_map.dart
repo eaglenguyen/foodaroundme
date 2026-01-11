@@ -72,25 +72,25 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
 
 
     return DraggableScrollableSheet(
-    expand: false,
-    controller: _controller,
-    initialChildSize: 0.4,
-    minChildSize: 0.15,
-    maxChildSize: 0.95,
-    builder: (context, scrollController) {
-      return Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF2A2433),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-        ),
-        child: Stack(
-        children:[
-          ListView(
-          primary: false,
-          controller: scrollController,
-          padding: const EdgeInsets.only(top: 28),
-          children: [
-            const SizedBox(height: 16),
+      expand: false,
+      controller: _controller,
+      initialChildSize: 0.57,
+      minChildSize: 0.15,
+      maxChildSize: 0.95,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Color(0xFF2A2433),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          child: Stack(
+          children:[
+            ListView(
+            primary: false,
+            controller: scrollController,
+            padding: const EdgeInsets.only(top: 28),
+            children: [
+              const SizedBox(height: 16),
 
             /// drag handle
             Center(
@@ -101,11 +101,15 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
                 child: _sheetSize <= 0.155
                   ? const DragHandleArrow(
                   key: ValueKey('arrow'),
-                  color: Colors.black26,
+                  color: Colors.grey,
                 )
-                    : const DragHandleLine(
+                    : _sheetSize < 0.90
+                  ? const DragHandleLine(
                   key: ValueKey('line'),
-                  color: Colors.black26,
+                  color: Colors.grey,
+                )
+                : const SizedBox(
+                  key: ValueKey('empty'),
                 ),
               ),
             ),
@@ -226,7 +230,7 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
                       ),
                     );
                   }
-        ),
+                    ),
               ],
             ],
           ),
