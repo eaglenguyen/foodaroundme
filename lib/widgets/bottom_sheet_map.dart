@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
-import 'package:foodaroundme/widgets/drag_handles/drag_handle_arrow.dart';
-import 'package:foodaroundme/widgets/drag_handles/drag_handle_line.dart';
+import 'package:foodaroundme/widgets/drag_handles/morph_drag_handle.dart';
 import 'package:provider/provider.dart';
 import '../model/place.dart';
 
@@ -94,24 +93,7 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
 
             /// drag handle
             Center(
-              child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 150),
-                transitionBuilder: (child, animation) =>
-                  FadeTransition(opacity: animation, child: child,),
-                child: _sheetSize <= 0.155
-                  ? const DragHandleArrow(
-                  key: ValueKey('arrow'),
-                  color: Colors.grey,
-                )
-                    : _sheetSize < 0.90
-                  ? const DragHandleLine(
-                  key: ValueKey('line'),
-                  color: Colors.grey,
-                )
-                : const SizedBox(
-                  key: ValueKey('empty'),
-                ),
-              ),
+              child: MorphingDragHandle(sheetSize: _sheetSize)
             ),
 
             const SizedBox(height: 16),
