@@ -1,56 +1,79 @@
 import 'package:flutter/material.dart';
-import '../../model/place.dart';
 
 
 
 
 class PhotoGrid extends StatelessWidget {
-  final Place place;
+  final List<String> photoUrls;
 
   const PhotoGrid({
     super.key,
-    required this.place,
+    required this.photoUrls,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Placeholder count for now
-    const itemCount = 6;
-
-    return Padding(
-      padding: const EdgeInsets.all(16),
+    if(photoUrls.isEmpty){
+      return const Padding(
+        padding: EdgeInsets.all(24),
+        child: Center(
+          child: Text(
+            "No Photos Available",
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      );
+    }
+    return Padding(padding: EdgeInsets.all(16),
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: itemCount,
+        itemCount: photoUrls.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          mainAxisSpacing: 12,
           crossAxisSpacing: 12,
-          childAspectRatio: 1,
+          mainAxisSpacing: 12,
         ),
         itemBuilder: (_, index) {
-          return _MediaPlaceholder();
-        },
-      ),
-    );
+          return _PhotoTile(url: photoUrls[index]);
+        }
+    ));
   }
 }
 
-class _MediaPlaceholder extends StatelessWidget {
+class _PhotoTile extends StatelessWidget {
+  final String url;
+
+  const _PhotoTile({
+    required this.url,
+  });
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey.shade300,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: const Center(
-        child: Icon(
-          Icons.play_circle_fill,
-          size: 40,
-          color: Colors.white70,
-        ),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Image.network(
+        url,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, progress) {
+          if (progress == null) return child;
+          return Container(
+            color: Colors.grey.shade800,
+            child: const Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          );
+        },
+        errorBuilder: (_, __, ___) {
+          return Container(
+            color: Colors.grey.shade700,
+            child: const Icon(Icons.image_not_supported),
+          );
+        },
       ),
     );
   }

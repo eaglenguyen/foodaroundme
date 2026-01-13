@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:foodaroundme/viewmodel/mapViewModel.dart';
 import 'package:foodaroundme/widgets/bottom_sheet_detail/action_row.dart';
 import 'package:foodaroundme/widgets/bottom_sheet_detail/header.dart';
 import 'package:foodaroundme/widgets/bottom_sheet_detail/photo_grid.dart';
@@ -7,7 +8,7 @@ import 'package:foodaroundme/widgets/drag_handles/drag_handle_line.dart';
 import 'package:google_maps_webservice/places.dart';
 import '../../model/place.dart';
 
-
+// When in final production, look at possibility that details.photos can be null. Line 71
 class BottomSheetDetails extends StatelessWidget {
   final Place place;
   final PlaceDetails details;
@@ -43,7 +44,7 @@ class BottomSheetDetails extends StatelessWidget {
                   Header(place: place),
                   ActionRow(place: place, details: details),
                   SocialLinks(place: place),
-                  PhotoGrid(place: place)
+                  PhotoGrid(photoUrls: buildPhotoUrls(details))
                 ],
               ),
             ),
@@ -66,5 +67,18 @@ class BottomSheetDetails extends StatelessWidget {
   }
 }
 
+List<String> buildPhotoUrls(PlaceDetails details) {
+  if (details.photos.isEmpty) return [];
+
+  return details.photos
+      .take(12) // limit for grid
+      .map((p) =>
+  'https://maps.googleapis.com/maps/api/place/photo'
+      '?maxwidth=800'
+      '&photo_reference=${p.photoReference}'
+      '&key=${MapViewModel.apiKey}'
+  )
+      .toList();
+}
 
 

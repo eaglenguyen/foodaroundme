@@ -60,14 +60,15 @@ class _ArrowStroke extends StatelessWidget {
   }
 }
 
+// LERP formula , lerp(a, b, t) = a + (b - a) * t, a = 0.6, b = 0.0, t = percentage/progress between a & b
 double _arrowAngle(double size) {
   const double maxAngle = 0.6; // arrow angle
   const double collapseStart = 0.155;
-  const double collapseEnd = 0.90;
+  const double collapseEnd = 0.80;
 
-  if (size <= collapseStart) return maxAngle;
-  if (size >= collapseEnd) return 0.0;
+  if (size <= collapseStart) return maxAngle; // full arrow
+  if (size >= collapseEnd) return 0.0; // line
 
-  final t = (collapseEnd - size) / (collapseEnd - collapseStart);
-  return maxAngle * t;
+  final t = (collapseEnd - size) / (collapseEnd - collapseStart); // linear interpolation, remaining distance / total distance
+  return maxAngle * t; // converts into an angle
 }

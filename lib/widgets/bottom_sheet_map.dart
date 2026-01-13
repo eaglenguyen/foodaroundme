@@ -73,9 +73,9 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
     return DraggableScrollableSheet(
       expand: false,
       controller: _controller,
-      initialChildSize: 0.57,
+      initialChildSize: 0.4,
       minChildSize: 0.15,
-      maxChildSize: 0.95,
+      maxChildSize: 0.93,
       builder: (context, scrollController) {
         return Container(
           decoration: const BoxDecoration(

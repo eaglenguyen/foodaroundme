@@ -32,6 +32,8 @@ class MapViewModel extends ChangeNotifier {
   static const apiKey = String.fromEnvironment("GOOGLE_MAPS_API_KEY");
   Timer? _debounce;
   int selectedIndex = 0;
+  static const double searchRadius = 800;
+  Set<Circle> circles = {};
 
   // fetch restaurant api
   late gp.GooglePlace _places;
@@ -94,7 +96,8 @@ class MapViewModel extends ChangeNotifier {
   }
 
   void initPlaces() {
-    _places = gp.GooglePlace(apiKey);}
+    _places = gp.GooglePlace(apiKey);
+  }
 
   void openSheet() {
     showBottomSheet = true;
@@ -141,6 +144,7 @@ class MapViewModel extends ChangeNotifier {
 
   void onCameraIdle() {
     center = cameraCenter;
+    updateUserLocation(center);
   }
 
   // --- Convert Places p into markers and notify UI ---
@@ -165,6 +169,29 @@ class MapViewModel extends ChangeNotifier {
           ).toSet();
       notifyListeners();
     }
+  }
+
+
+
+
+
+
+  void updateUserLocation(LatLng location) {
+    center = location;
+
+    circles = {
+      Circle(
+        circleId: const CircleId('search-radius'),
+        center: center,
+        radius: searchRadius,
+        strokeWidth: 2,
+        strokeColor: Colors.blue.withOpacity(0.6),
+        fillColor: Colors.blue.withOpacity(0.15),
+      ),
+    };
+
+    updateMarkers();
+
   }
 
   // Api call to fetch nearby restaurants
@@ -203,6 +230,7 @@ class MapViewModel extends ChangeNotifier {
           'website',
           'formatted_phone_number',
           'url',
+          'photos'
         ],
       );
 

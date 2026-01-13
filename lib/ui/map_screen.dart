@@ -14,17 +14,22 @@ class MapScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<MapViewModel>();
 
+
+
     return Scaffold(
       body: Stack(
         children: [
           GoogleMap(
           onMapCreated: viewModel.onMapCreated,
           onCameraMove: viewModel.onCameraMove,
-          onCameraIdle: viewModel.onCameraIdle,
-          initialCameraPosition: CameraPosition(
+            onCameraIdle: () {
+              viewModel.onCameraIdle();
+            },
+            initialCameraPosition: CameraPosition(
             target: viewModel.center,
             zoom: 11.0,
       ),
+      circles: viewModel.circles,
       myLocationButtonEnabled: true,
       myLocationEnabled: true,
       markers: {
