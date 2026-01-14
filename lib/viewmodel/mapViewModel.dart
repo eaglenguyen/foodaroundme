@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:foodaroundme/repository/place_repository.dart';
 import 'package:foodaroundme/resources/place_filter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -10,6 +11,8 @@ import '../model/place.dart';
 import '../service/locationService.dart';
 
 class MapViewModel extends ChangeNotifier {
+  final PlacesRepository placesRepository;
+
   // Rule of thumb
   // Use:
   // ✅ setState → tiny, UI-only state
@@ -72,7 +75,9 @@ class MapViewModel extends ChangeNotifier {
   // 🏗️ Constructor
   // ======================================================
 
-  MapViewModel() {    // init block via flutter
+  MapViewModel({
+    required this.placesRepository
+  }) {    // init block via flutter
     _initPlaces();
   }
 
@@ -150,61 +155,30 @@ class MapViewModel extends ChangeNotifier {
   // ======================================================
 
 
-  // Api call to fetch nearby restaurants
+  // Api call to fetch nearby restaurants via repository
+
   Future<void> loadNearbyRestaurants(String filter) async {
-    final result = await _places.search.getNearBySearch(
-      gp.Location(lat: cameraCenter.latitude, lng: cameraCenter.longitude),
-      searchRadius.toInt(), // 800 meters, half a mile
+    final places = await placesRepository.getNearbyPlaces(
+      center: cameraCenter,
       type: filter,
+      radius: searchRadius.toInt()
     );
 
-    if (result == null || result.results == null) return;
+    allPlaces = places;
+    filteredPlaces = List.from(places); // default: show all restaurants
 
 
-
-    // Convert all API results → Place models
-    allPlaces = result.results!
-        .map( (pr) => Place.fromSearchResult(pr) )
-        .whereType<Place>()
-        .toList();
-
-    // default: show all restaurants
-    filteredPlaces = List.from(allPlaces);
-
-    // sort places from nearest to farthest
     sortPlacesByDistance();
-
-    // convert filteredPlaces → markers
-    updateMarkers();
+    updateMarkers(); // convert filteredPlaces → markers
   }
 
-  // Api call to fetch place detail info
   Future<gmw.PlaceDetails?> getPlaceDetails(String placeId) async {
-    try {
-      final response = await placesApi.getDetailsByPlaceId(
-        placeId,
-        fields: [
-          'place_id',
-          'name',
-          'formatted_address',
-          'website',
-          'formatted_phone_number',
-          'url',
-          'photos'
-        ],
-      );
-
-      if (!response.isOkay) {
-        debugPrint('PlaceDetails error: ${response.errorMessage}');
-        return null;
-      }
-
-      return response.result;
-    } catch (e) {
-      debugPrint('PlaceDetails exception: $e');
-      return null;
-    }
+    return placesRepository.getPlaceDetails(placeId);
   }
+
+
+
+
 
   // ======================================================
   // 📏 Distance/Sorting
@@ -213,7 +187,7 @@ class MapViewModel extends ChangeNotifier {
   void sortPlacesByDistance() {
     final origin = userLocation ?? center;
 
-    filteredPlaces.sort((a, b) {
+    filteredPlaces = [...filteredPlaces]..sort((a, b) {
       final distanceA = Geolocator.distanceBetween(
         origin.latitude,
         origin.longitude,

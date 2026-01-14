@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:foodaroundme/repository/place_repository.dart';
 import 'package:foodaroundme/ui/main_screen.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
 
@@ -9,8 +10,15 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
+        Provider(
+        create: (_) => PlacesRepository(
+            apiKey: MapViewModel.apiKey
+        ),
+        ),
         // created once the app starts for entire app
-        ChangeNotifierProvider(create: (_) => MapViewModel()),
+        ChangeNotifierProvider(create: (context) => MapViewModel(
+            placesRepository: context.read<PlacesRepository>(),
+        )),
       ],
       child: const MyApp(),
     ),
