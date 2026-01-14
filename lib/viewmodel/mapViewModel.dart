@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/resources/place_filter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart' as gmw;
 import 'package:google_place/google_place.dart' as gp;
@@ -19,42 +20,91 @@ class MapViewModel extends ChangeNotifier {
   // affects behavior
 
 
-  // current layout is state variables -> methods/functions
-  // state (in android) is value that changes over time
+  // ======================================================
+  // 🔧 Services & APIs
+  // ======================================================
+
   final LocationService _locationService = LocationService();
-  bool isLoading = false;
-  bool showBottomSheet = false;
-  bool showFab = true;
-  LatLng center = const LatLng(42.3104, -71.0575); // default coordinate before it is assigned by getCurrentLocation()
-  LatLng cameraCenter = const LatLng(42.3104, -71.0575);
-  double cameraZoom = 11.0;
-  GoogleMapController? mapController;
   static const apiKey = String.fromEnvironment("GOOGLE_MAPS_API_KEY");
+  late final gp.GooglePlace _places;
+  final gmw.GoogleMapsPlaces placesApi = gmw.GoogleMapsPlaces(apiKey: apiKey);
   Timer? _debounce;
-  int selectedIndex = 0;
+
+  // state (in android) is value that changes over time
+  // ======================================================
+  // 🗺️ Map State
+  // ======================================================
+
+  GoogleMapController? mapController;
+
+  LatLng center = const LatLng(42.3104, -71.0575);// default coordinate before it is assigned by getCurrentLocation()
+  LatLng cameraCenter = const LatLng(42.3104, -71.0575);
+  LatLng? userLocation;
+
+  double cameraZoom = 11.0;
+
   static const double searchRadius = 800;
   Set<Circle> circles = {};
-
-  // fetch restaurant api
-  late gp.GooglePlace _places;
-  final placesApi = gmw.GoogleMapsPlaces(apiKey: apiKey);
-
   Set<Marker> markers = {};
 
-  // place
+
+  // ======================================================
+  // 📍 Places State
+  // ======================================================
   List<Place> allPlaces = [];
   List<Place> filteredPlaces = [];
   Place? selectedPlace;
   PlaceFilter? activeFilter;
 
 
+  // ======================================================
+  // 🧭 UI State
+  // ======================================================
+
+  bool isLoading = false;
+  bool showBottomSheet = false;
+  bool showFab = true;
+
+  int selectedIndex = 0;
 
 
+  // ======================================================
+  // 🏗️ Constructor
+  // ======================================================
+
+  MapViewModel() {    // init block via flutter
+    _initPlaces();
+  }
+
+  void _initPlaces() {
+    _places = gp.GooglePlace(apiKey);
+  }
+
+
+  // ======================================================
+  // 🗺️ Map Lifecycle
+  // ======================================================
 
   void onMapCreated(GoogleMapController controller) {
     mapController = controller;
     getCurrentLocation();
   }
+
+  // When the maps moves, keep updating these variables so i know where the map current position is
+  void onCameraMove(CameraPosition position) {
+    cameraCenter = position.target;
+    cameraZoom = position.zoom;
+  }
+  // Fire when map stops moving
+  void onCameraIdle() {
+    center = cameraCenter;
+    updateUserLocation(center);
+  }
+
+
+  // ======================================================
+  // 📍 Location
+  // ======================================================
 
   Future<void> getCurrentLocation() async {
     isLoading = true;
@@ -69,6 +119,7 @@ class MapViewModel extends ChangeNotifier {
 
     // real center coordinates
     center = LatLng(position.latitude, position.longitude);
+
     mapController?.animateCamera(
       CameraUpdate.newCameraPosition(CameraPosition(target: center, zoom: 15)),
     );
@@ -77,112 +128,11 @@ class MapViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void hideExpandableFab() {
-    showFab = false;
-    notifyListeners();
-  }
-
-  void showExpandableFabAgain() {
-    showFab = true;
-    notifyListeners();
-  }
-
-
-
-
-  // init block via flutter
-  MapViewModel() {
-    initPlaces();
-  }
-
-  void initPlaces() {
-    _places = gp.GooglePlace(apiKey);
-  }
-
-  void openSheet() {
-    showBottomSheet = true;
-    notifyListeners();
-  }
-
-  void closeSheet() {
-    showBottomSheet = false;
-    notifyListeners();
-  }
-
-  // assigns selectedPlace to a marker
-  void selectPlace(Place place) {
-    selectedPlace = place;
-    // Update marker to show only one/selected
-    markers = {
-      Marker(
-        markerId: MarkerId(place.placeId),
-        position: place.location,
-        infoWindow: InfoWindow(title: place.name),
-      )
-    };
-    _focusOnPlace(place);
-    notifyListeners();
-  }
-
-  // zoom in on selectedPlace
-  Future<void> _focusOnPlace(Place place) async {
-    if (mapController == null) return;
-    await mapController!.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: place.location,
-            zoom: 16.5,
-      ),
-    )
-    );
-  }
-  // At the maps moves, keep updating these variables so i know where the map current position is
-  void onCameraMove(CameraPosition position) {
-    cameraCenter = position.target;
-    cameraZoom = position.zoom;
-  }
-
-  void onCameraIdle() {
-    center = cameraCenter;
-    updateUserLocation(center);
-  }
-
-  // --- Convert Places p into markers and notify UI ---
-  void updateMarkers() {
-    // show one selectedMarker
-    if(selectedPlace != null) {
-      markers = {
-        Marker(
-          markerId: MarkerId(selectedPlace!.placeId),
-          position: selectedPlace!.location,
-          infoWindow: InfoWindow(title: selectedPlace!.name),
-        )
-      };
-  } else {
-      // show all (filtered) markers
-      markers = filteredPlaces.map(
-              (p) => Marker(
-              markerId: MarkerId(p.name),
-              position: p.location,
-              infoWindow: InfoWindow(title: p.name),
-            ),
-          ).toSet();
-      notifyListeners();
-    }
-  }
-
-
-
-
-
-
   void updateUserLocation(LatLng location) {
-    center = location;
-
     circles = {
       Circle(
         circleId: const CircleId('search-radius'),
-        center: center,
+        center: location,
         radius: searchRadius,
         strokeWidth: 2,
         strokeColor: Colors.blue.withOpacity(0.6),
@@ -194,11 +144,17 @@ class MapViewModel extends ChangeNotifier {
 
   }
 
+
+  // ======================================================
+  // 📍 Places Fetching
+  // ======================================================
+
+
   // Api call to fetch nearby restaurants
   Future<void> loadNearbyRestaurants(String filter) async {
     final result = await _places.search.getNearBySearch(
       gp.Location(lat: cameraCenter.latitude, lng: cameraCenter.longitude),
-      800, // radius meters, half a mile
+      searchRadius.toInt(), // 800 meters, half a mile
       type: filter,
     );
 
@@ -215,10 +171,14 @@ class MapViewModel extends ChangeNotifier {
     // default: show all restaurants
     filteredPlaces = List.from(allPlaces);
 
+    // sort places from nearest to farthest
+    sortPlacesByDistance();
+
     // convert filteredPlaces → markers
     updateMarkers();
   }
 
+  // Api call to fetch place detail info
   Future<gmw.PlaceDetails?> getPlaceDetails(String placeId) async {
     try {
       final response = await placesApi.getDetailsByPlaceId(
@@ -246,15 +206,94 @@ class MapViewModel extends ChangeNotifier {
     }
   }
 
+  // ======================================================
+  // 📏 Distance/Sorting
+  // ======================================================
+
+  void sortPlacesByDistance() {
+    final origin = userLocation ?? center;
+
+    filteredPlaces.sort((a, b) {
+      final distanceA = Geolocator.distanceBetween(
+        origin.latitude,
+        origin.longitude,
+        a.location.latitude,
+        a.location.longitude,
+      );
+
+      final distanceB = Geolocator.distanceBetween(
+        origin.latitude,
+        origin.longitude,
+        b.location.latitude,
+        b.location.longitude,
+      );
+      return distanceA.compareTo(distanceB);
+    });
+
+  }
 
 
-  void filterBySearchQuery(String query) {
+  // ======================================================
+  // 📍 Markers
+  // ======================================================
+
+
+  // --- Convert Places p into markers and notify UI ---
+  void updateMarkers() {
+    // show one selectedMarker
+    if(selectedPlace != null) {
+      markers = { // Update marker to show only one/selected
+        Marker(
+          markerId: MarkerId(selectedPlace!.placeId),
+          position: selectedPlace!.location,
+          infoWindow: InfoWindow(title: selectedPlace!.name),
+        )
+      };
+    } else {
+      // show all (filtered) markers
+      markers = filteredPlaces.map(
+            (p) => Marker(
+          markerId: MarkerId(p.name),
+          position: p.location,
+          infoWindow: InfoWindow(title: p.name),
+        ),
+      ).toSet();
+      notifyListeners();
+    }
+  }
+
+  // assigns selectedPlace to a marker
+  void selectPlace(Place place) {
+    selectedPlace = place;
+    _focusOnPlace(place);
+    notifyListeners();
+  }
+
+  // zoom in on selectedPlace
+  Future<void> _focusOnPlace(Place place) async {
+    if (mapController == null) return;
+
+    await mapController!.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: place.location,
+            zoom: 16.5,
+          ),
+        )
+    );
+  }
+
+
+  // ======================================================
+  // 🔎 Search & Filters
+  // ======================================================
+  void filterBySearchQuery(String query) { // Should be in separate VM class
     _debounce?.cancel();
+
     _debounce = Timer(const Duration(milliseconds: 300), () {
       if (query.isEmpty) {
         filteredPlaces = List.from(allPlaces);
       } else {
-
         final q = query.toLowerCase();
         filteredPlaces = allPlaces.where((place) {
           return place.name.toLowerCase().contains(q);
@@ -262,12 +301,6 @@ class MapViewModel extends ChangeNotifier {
       }
       notifyListeners();
     });
-  }
-
-
-  void toggleButton(int index) {
-    selectedIndex = index;
-    notifyListeners();
   }
 
   Future<void> applyFilter(PlaceFilter filter) async {
@@ -303,6 +336,32 @@ class MapViewModel extends ChangeNotifier {
   }
 
 
+  // ======================================================
+  // 🧭 UI Controls
+  // ======================================================
+
+  void toggleButton(int index) {
+    selectedIndex = index;
+    notifyListeners();
+  }
+  void openSheet() {
+    showBottomSheet = true;
+    notifyListeners();
+  }
+  void closeSheet() {
+    showBottomSheet = false;
+    notifyListeners();
+  }
+
+  void hideExpandableFab() {
+    showFab = false;
+    notifyListeners();
+  }
+
+  void showExpandableFabAgain() {
+    showFab = true;
+    notifyListeners();
+  }
 
   void resetCamera() {
     mapController?.animateCamera(
@@ -312,8 +371,9 @@ class MapViewModel extends ChangeNotifier {
     );
   }
 
-
+  // 🧾 Derived UI Data
   // for map_screen.dart
+
   String get sheetTitle {
     switch (activeFilter) {
       case PlaceFilter.restaurant:
