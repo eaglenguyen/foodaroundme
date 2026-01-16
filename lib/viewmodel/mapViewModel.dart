@@ -6,7 +6,6 @@ import 'package:foodaroundme/resources/place_filter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart' as gmw;
-import 'package:google_place/google_place.dart' as gp;
 import '../model/place.dart';
 import '../service/locationService.dart';
 
@@ -29,8 +28,6 @@ class MapViewModel extends ChangeNotifier {
 
   final LocationService _locationService = LocationService();
   static const apiKey = String.fromEnvironment("GOOGLE_MAPS_API_KEY");
-  late final gp.GooglePlace _places;
-  final gmw.GoogleMapsPlaces placesApi = gmw.GoogleMapsPlaces(apiKey: apiKey);
   Timer? _debounce;
 
   // state (in android) is value that changes over time
@@ -78,12 +75,9 @@ class MapViewModel extends ChangeNotifier {
   MapViewModel({
     required this.placesRepository
   }) {    // init block via flutter
-    _initPlaces();
   }
 
-  void _initPlaces() {
-    _places = gp.GooglePlace(apiKey);
-  }
+
 
 
   // ======================================================
@@ -155,7 +149,6 @@ class MapViewModel extends ChangeNotifier {
   // ======================================================
 
 
-  // Api call to fetch nearby restaurants via repository
 
   Future<void> loadNearbyRestaurants(String filter) async {
     final places = await placesRepository.getNearbyPlaces(
@@ -171,6 +164,8 @@ class MapViewModel extends ChangeNotifier {
     sortPlacesByDistance();
     updateMarkers(); // convert filteredPlaces → markers
   }
+
+
 
   Future<gmw.PlaceDetails?> getPlaceDetails(String placeId) async {
     return placesRepository.getPlaceDetails(placeId);
@@ -282,8 +277,9 @@ class MapViewModel extends ChangeNotifier {
     // Update Intent
     activeFilter = filter;
     selectedPlace = null;
-
     isLoading = true;
+
+    // final detailTypes = await placesRepository.getPlaceDetailsV1()
     notifyListeners();
 
     await Future.delayed(const Duration(milliseconds: 1000));
@@ -362,6 +358,15 @@ class MapViewModel extends ChangeNotifier {
         return "";
     }
   }
+
+  // Filtering Cuisines
+  List<String> extractCuisineTypes(List<String> types) {
+    return types
+        .where((t) => t.endsWith('_restaurant'))
+        .map((t) => t.replaceAll('_restaurant', '').replaceAll('_', ' '))
+        .toList();
+  }
+
 }
 
 

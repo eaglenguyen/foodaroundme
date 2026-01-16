@@ -89,14 +89,13 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
             controller: scrollController,
             padding: const EdgeInsets.only(top: 28),
             children: [
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
 
             /// drag handle
             Center(
               child: MorphingDragHandle(sheetSize: _sheetSize)
             ),
 
-            const SizedBox(height: 16),
 
             /// Title
             Center(
@@ -110,7 +109,7 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
               ),
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: 6),
 
             // Displays text if list of places are empty
             if(widget.places.isEmpty) ...[   // ... is used to inject a list of widgets
@@ -174,17 +173,17 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 15,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                       ),
                                     ),
 
-                                    const SizedBox(height: 4),
+                                    const SizedBox(height: 2),
 
                                     /// Cuisine Info
                                     Text(
-                                       'Restaurant',
+                                      "Restaurant • Food • Drinks ",
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
@@ -193,13 +192,13 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
                                       ),
                                     ),
 
-                                    const SizedBox(height: 6),
+                                    const SizedBox(height: 2),
 
                                     /// Meta info
                                     Text(
-                                      'Open Now',
+                                      hoursAndRatings(p),
                                       style: const TextStyle(
-                                        fontSize: 12,
+                                        fontSize: 13,
                                         color: Colors.white60,
                                       ),
                                     ),
@@ -245,4 +244,27 @@ String? getPlacePhotoUrl(String? photoReference) {
       '&key=${MapViewModel.apiKey}';
 }
 
+
+String hoursAndRatings(Place p) {
+  final status = p.isOpen == null
+      ? 'Hours Unknown'
+      : p.isOpen!
+      ? 'Open Now'
+      : 'Closed';
+
+  final ratingText = p.rating != null
+      ? ' • ⭐ ${p.rating!.toStringAsFixed(1)}'
+      : '';
+
+  String priceLevelToString(int? level) {
+    if (level == null || level <= 0) return '';
+    return '\$' * level;
+  }
+  final priceText = p.priceLevel != null && p.priceLevel! > 0
+      ? ' • ${priceLevelToString(p.priceLevel)}'
+      : '';
+
+
+  return status + ratingText + priceText;
+}
 

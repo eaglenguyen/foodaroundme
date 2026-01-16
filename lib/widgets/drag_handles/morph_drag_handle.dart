@@ -64,7 +64,7 @@ class _ArrowStroke extends StatelessWidget {
 double _arrowAngle(double size) {
   const double maxAngle = 0.6; // arrow angle
   const double collapseStart = 0.155;
-  const double collapseEnd = 0.80;
+  const double collapseEnd = 0.4;
 
   if (size <= collapseStart) return maxAngle; // full arrow
   if (size >= collapseEnd) return 0.0; // line

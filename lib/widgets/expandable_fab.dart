@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 
 @immutable
 class ExpandableFab extends StatefulWidget {
-  // Fields == properties
-  // Properties are empty/null by default
+
   final bool? initialOpen;
   final double distance;
   final List<Widget> children;
@@ -12,10 +11,9 @@ class ExpandableFab extends StatefulWidget {
 
 
 
-  // Constructor , this fills the fields with value
   const ExpandableFab({
     super.key,
-    this.initialOpen, // connects to fields above
+    this.initialOpen,
     required this.distance,
     required this.children,
     this.onOpenChanged,
