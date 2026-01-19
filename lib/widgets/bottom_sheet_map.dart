@@ -75,7 +75,7 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
       controller: _controller,
       initialChildSize: 0.4,
       minChildSize: 0.15,
-      maxChildSize: 0.93,
+      maxChildSize: 1,
       builder: (context, scrollController) {
         return Container(
           decoration: const BoxDecoration(

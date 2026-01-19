@@ -47,4 +47,6 @@ class Place{
       priceLevel: result.priceLevel
     );
   }
+
+
 }
