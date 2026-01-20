@@ -31,8 +31,9 @@ class MapViewModel extends ChangeNotifier {
   // ======================================================
 
   final LocationService _locationService = LocationService();
+  // when adding new keys make sure to pass into android build. Run , edit , add to args
   static const apiKey = String.fromEnvironment("GOOGLE_MAPS_API_KEY");
-  static const apiKeyFourSquare = String.fromEnvironment("XLNGGSARXXVOJPAMEKFA3CNCKPI0LASRB14R0PMZUHMK2LZG");
+  static const apiKeyFourSquare = String.fromEnvironment("FOURSQUARE_API_KEY");
 
   Timer? _debounce;
 
@@ -167,7 +168,7 @@ class MapViewModel extends ChangeNotifier {
   Future<void> loadNearbyRestaurants(String filter) async {
     final places = await placesFourSquareRepository.searchNearby(
       center: cameraCenter,
-      category: filter,
+      categoryId: filter,
       radius: searchRadius.toInt()
     );
 
@@ -302,13 +303,13 @@ class MapViewModel extends ChangeNotifier {
 
     switch(filter) {
       case PlaceFilter.restaurant:
-        await loadNearbyRestaurants("13065");
+        await loadNearbyRestaurants("56aa371be4b08b9a8d573550");
         break;
       case PlaceFilter.cafe:
-        await loadNearbyRestaurants("13032");
+        await loadNearbyRestaurants("4bf58dd8d48988d16d941735");
         break;
       case PlaceFilter.bar:
-        await loadNearbyRestaurants("13003");
+        await loadNearbyRestaurants("4bf58dd8d48988d116941735");
         break;
       case PlaceFilter.popular:
         await loadNearbyRestaurants("popular");

@@ -11,17 +11,24 @@ class PlacesFourSquareRepository {
   Future<List<PlaceFoursquare>> searchNearby({
     required LatLng center,
     required int radius,
-    String? category,
+    String? categoryId,
   }) async {
     final results = await api.searchNearBy(
       lat: center.latitude,
       lng: center.longitude,
       radius: radius,
-      category: category,
+      categoryId: categoryId,
     );
 
     return results
-        .map((json) => PlaceFoursquare.fromFoursquare(json))
+        .map((json) {
+      try {
+        return PlaceFoursquare.fromFoursquare(json);
+      } catch (_) {
+        return null;
+      }
+    })
+        .whereType<PlaceFoursquare>()
         .toList();
   }
 }
