@@ -6,7 +6,7 @@ class FoursquareApi {
   static const _baseUrl = 'https://api.foursquare.com/v3/places/search';
   final String apiKey;
 
-  FoursquareApi(this.apiKey);
+  FoursquareApi({required this.apiKey});
 
   Future<List<Map< String, dynamic>>> searchNearBy({
     required double lat,

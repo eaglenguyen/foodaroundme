@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart' as gmw;
 import 'package:google_place/google_place.dart' as gp;
@@ -23,8 +22,8 @@ class PlacesRepository {
   // Api call to fetch nearby restaurants
   Future<List<Place>> getNearbyPlaces({
     required LatLng center,
-    required String type,
     required int radius,
+    required String type,
   }) async {
   final result = await _places.search.getNearBySearch(
     gp.Location (

@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:foodaroundme/model/place_foursquare.dart';
+import 'package:foodaroundme/repository/place_foursquare_repository.dart';
 import 'package:foodaroundme/repository/place_repository.dart';
 import 'package:foodaroundme/resources/place_filter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -11,6 +13,8 @@ import '../service/locationService.dart';
 
 class MapViewModel extends ChangeNotifier {
   final PlacesRepository placesRepository;
+  final PlacesFourSquareRepository placesFourSquareRepository;
+
 
   // Rule of thumb
   // Use:
@@ -28,6 +32,8 @@ class MapViewModel extends ChangeNotifier {
 
   final LocationService _locationService = LocationService();
   static const apiKey = String.fromEnvironment("GOOGLE_MAPS_API_KEY");
+  static const apiKeyFourSquare = String.fromEnvironment("XLNGGSARXXVOJPAMEKFA3CNCKPI0LASRB14R0PMZUHMK2LZG");
+
   Timer? _debounce;
 
   // state (in android) is value that changes over time
@@ -56,6 +62,13 @@ class MapViewModel extends ChangeNotifier {
   Place? selectedPlace;
   PlaceFilter? activeFilter;
 
+  // ======================================================
+  // 📍 Foursquare Places State
+  // ======================================================
+  List<PlaceFoursquare> allPlacesFoursquare = [];
+  List<PlaceFoursquare> filteredPlacesFoursquare = [];
+
+
 
   // ======================================================
   // 🧭 UI State
@@ -73,7 +86,8 @@ class MapViewModel extends ChangeNotifier {
   // ======================================================
 
   MapViewModel({
-    required this.placesRepository
+    required this.placesRepository,
+    required this.placesFourSquareRepository,
   }) {    // init block via flutter
   }
 
@@ -151,14 +165,14 @@ class MapViewModel extends ChangeNotifier {
 
 
   Future<void> loadNearbyRestaurants(String filter) async {
-    final places = await placesRepository.getNearbyPlaces(
+    final places = await placesFourSquareRepository.searchNearby(
       center: cameraCenter,
-      type: filter,
+      category: filter,
       radius: searchRadius.toInt()
     );
 
-    allPlaces = places;
-    filteredPlaces = List.from(places); // default: show all restaurants
+    allPlacesFoursquare = places;
+    filteredPlacesFoursquare = List.from(places); // default: show all restaurants
 
 
     sortPlacesByDistance();
@@ -288,13 +302,13 @@ class MapViewModel extends ChangeNotifier {
 
     switch(filter) {
       case PlaceFilter.restaurant:
-        await loadNearbyRestaurants("restaurant");
+        await loadNearbyRestaurants("13065");
         break;
       case PlaceFilter.cafe:
-        await loadNearbyRestaurants("cafe");
+        await loadNearbyRestaurants("13032");
         break;
       case PlaceFilter.bar:
-        await loadNearbyRestaurants("bar");
+        await loadNearbyRestaurants("13003");
         break;
       case PlaceFilter.popular:
         await loadNearbyRestaurants("popular");
