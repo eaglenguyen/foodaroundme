@@ -44,7 +44,7 @@ class _MainScreenState extends State<MainScreen> {
           child: Padding(
             padding: const EdgeInsets.only(bottom: 90), // moves FAB up
             child: ExpandableFab(
-              distance: 112,
+              distance: 112, // controls the spread of icons
               onOpenChanged: (isOpen) {
                 setState(() => isMenuOpen = isOpen // setState similar to LaunchedEffect/mutableStateof
                 );

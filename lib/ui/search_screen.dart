@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:foodaroundme/viewmodel/mapViewModel.dart';
 import 'package:provider/provider.dart';
 
+import '../viewmodel/mapViewModel.dart';
+import '../viewmodel/searchViewModel.dart';
 import '../widgets/bottom_sheet_detail/bottom_sheet_details.dart';
 
 
@@ -19,16 +20,14 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<MapViewModel>().loadNearbyRestaurants("restaurant");
-    });
   }
 
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<MapViewModel>();
+    final searchViewModel = context.watch<SearchViewModel>();
+    final mapViewModel = context.watch<MapViewModel>();
+
     return Scaffold(
       appBar: AppBar(title: const Text("")),
       body: Stack(
@@ -38,9 +37,9 @@ class _SearchScreenState extends State<SearchScreen> {
           // 📍 Restaurant list
           ListView.builder(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 160),
-            itemCount: viewModel.filteredPlaces.length,
+            itemCount: searchViewModel.newPlaces.length,
             itemBuilder: (_, index) {
-              final place = viewModel.filteredPlaces[index];
+              final place = searchViewModel.newPlaces[index];
 
               return ListTile(
                 leading: const Icon(Icons.restaurant),
@@ -49,7 +48,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   place.types.join(", "),
                   ),
                 onTap: () async {
-                  final details = await viewModel.getPlaceDetails(
+                  final details = await mapViewModel.getPlaceDetails(
                       place.placeId);
                   if (!context.mounted) return;
 
@@ -86,9 +85,12 @@ class _SearchScreenState extends State<SearchScreen> {
               elevation: 6,
               borderRadius: BorderRadius.circular(30),
               child: TextField(
-                onChanged: (value) {
-                  context.read<MapViewModel>().filterBySearchQuery(value);
-                },
+                onChanged: (query) {
+                  if (query.length < 3) {
+                    searchViewModel.filterPlacesLocally(query);
+                  } else {
+                    searchViewModel.searchPlaces(query);
+                  }                },
                 decoration: InputDecoration(
                   hintText: "Search...",
                   prefixIcon: const Icon(Icons.search),

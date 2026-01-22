@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 @immutable
@@ -17,37 +19,59 @@ class ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
 
     return GestureDetector(
       onTap: onPressed,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          Material(
-            shape: const CircleBorder(),
-            clipBehavior: Clip.antiAlias,
-            color: theme.colorScheme.secondary,
-            elevation: 4,
-            child: IconButton(
-              onPressed: onPressed,
-              icon: icon,
-              color: theme.colorScheme.onSecondary,
-            ),
-          ),
 
-          const SizedBox(height: 6),
 
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.black,
-              fontWeight: FontWeight.w500,
-            ),
+          // 🔹 Your original widget (unchanged)
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Material(
+                shape: const CircleBorder(),
+                clipBehavior: Clip.antiAlias,
+                color: Colors.black54,
+                elevation: 1,
+                child: IconButton(
+                  onPressed: onPressed,
+                  icon: icon,
+                  color: Theme.of(context).colorScheme.onSecondary,
+                ),
+              ),
+
+              const SizedBox(height: 6),
+
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                  ),
+                    color: Colors.black.withOpacity(0.35), // makes blur visible
+                    child: Text(
+                      label,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+              ),
+                ),
+              ),
+
+              ],
           ),
         ],
       ),
     );
+
   }
 }

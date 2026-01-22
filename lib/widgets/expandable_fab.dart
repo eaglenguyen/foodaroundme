@@ -83,19 +83,29 @@ class _ExpandableFabState extends State<ExpandableFab> with SingleTickerProvider
   }
 
   Widget _buildTapToCloseFab() {
-    return SizedBox(
-      width: 56,
-      height: 56,
-      child: Center(
-        child: Material(
-          shape: const CircleBorder(),
-          clipBehavior: Clip.antiAlias,
-          elevation: 4,
-          child: InkWell(
-            onTap: _toggle,
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: Icon(Icons.close, color: Theme.of(context).primaryColor),
+    return IgnorePointer(
+      ignoring: !_open,
+      child: AnimatedOpacity(
+        opacity: _open ? 1.0 : 0.0,
+        duration: const Duration(milliseconds: 200),
+        child: SizedBox(
+          width: 56,
+          height: 56,
+          child: Center(
+            child: Material(
+              shape: const CircleBorder(),
+              clipBehavior: Clip.antiAlias,
+              elevation: 4,
+              child: InkWell(
+                onTap: _toggle,
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Icon(
+                    Icons.close,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ),
             ),
           ),
         ),
@@ -143,8 +153,9 @@ class _ExpandableFabState extends State<ExpandableFab> with SingleTickerProvider
           /// ⭐ Updated — main FAB now extended with text
           child: FloatingActionButton.extended(
             onPressed: _toggle,
-            label: const Text("foodaroundme"),
-            icon: const Icon(Icons.restaurant_menu),
+            label: const Text("FoodAroundMe"),
+            foregroundColor: Colors.white, // text color
+            backgroundColor: Colors.black87, // button color,
           ),
         ),
       ),

@@ -42,6 +42,31 @@ class PlacesRepository {
       .toList();
   }
 
+  // Api call to fetch places by name
+  Future<List<Place>> searchPlacesByName({
+    required String query,
+    LatLng? center,
+    int radius = 1500,
+  }) async {
+    final result = await _places.search.getTextSearch(
+      query,
+      location: center != null
+          ? gp.Location(
+        lat: center.latitude,
+        lng: center.longitude,
+      )
+          : null,
+      radius: center != null ? radius : null,
+    );
+
+    if (result == null || result.results == null) return [];
+
+    return result.results!
+        .map((pr) => Place.fromSearchResult(pr))
+        .whereType<Place>()
+        .toList();
+  }
+
   // Api call to fetch place detail info
   Future<gmw.PlaceDetails?> getPlaceDetails(String placeId) async {
     try {

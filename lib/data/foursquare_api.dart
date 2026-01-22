@@ -7,7 +7,9 @@ class FoursquareApi {
   static const _baseUrl = 'https://places-api.foursquare.com/places/search';
   final String apiKey;
 
-  FoursquareApi({required this.apiKey});
+  FoursquareApi({
+    required this.apiKey
+  });
 
   Future<List<Map< String, dynamic>>> searchNearBy({
     required double lat,
@@ -32,11 +34,13 @@ class FoursquareApi {
           'accept': 'application/json',
       },
     );
-    debugPrint('FSQ status: ${response.statusCode}');
-    debugPrint('FSQ body: ${response.body}');
+
+    debugPrint('Status: ${response.statusCode}');
+    debugPrint('Body: ${response.body}');
 
     if (response.statusCode != 200) {
       throw Exception('Foursquare error: ${response.body}');
+
   }
 
     final data = jsonDecode(response.body);

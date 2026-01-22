@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/model/place_foursquare.dart';
-import 'package:foodaroundme/repository/place_foursquare_repository.dart';
 import 'package:foodaroundme/repository/place_repository.dart';
 import 'package:foodaroundme/resources/place_filter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -13,7 +12,6 @@ import '../service/locationService.dart';
 
 class MapViewModel extends ChangeNotifier {
   final PlacesRepository placesRepository;
-  final PlacesFourSquareRepository placesFourSquareRepository;
 
 
   // Rule of thumb
@@ -88,7 +86,6 @@ class MapViewModel extends ChangeNotifier {
 
   MapViewModel({
     required this.placesRepository,
-    required this.placesFourSquareRepository,
   }) {    // init block via flutter
   }
 
@@ -166,19 +163,21 @@ class MapViewModel extends ChangeNotifier {
 
 
   Future<void> loadNearbyRestaurants(String filter) async {
-    final places = await placesFourSquareRepository.searchNearby(
+    final places = await placesRepository.getNearbyPlaces(
       center: cameraCenter,
-      categoryId: filter,
+      type: filter,
       radius: searchRadius.toInt()
     );
 
-    allPlacesFoursquare = places;
-    filteredPlacesFoursquare = List.from(places); // default: show all restaurants
+    allPlaces = places;
+    filteredPlaces = List.from(places); // default: show all restaurants
 
 
     sortPlacesByDistance();
     updateMarkers(); // convert filteredPlaces → markers
   }
+
+
 
 
 
@@ -271,21 +270,7 @@ class MapViewModel extends ChangeNotifier {
   // ======================================================
   // 🔎 Search & Filters
   // ======================================================
-  void filterBySearchQuery(String query) { // Should be in separate VM class
-    _debounce?.cancel();
 
-    _debounce = Timer(const Duration(milliseconds: 300), () {
-      if (query.isEmpty) {
-        filteredPlaces = List.from(allPlaces);
-      } else {
-        final q = query.toLowerCase();
-        filteredPlaces = allPlaces.where((place) {
-          return place.name.toLowerCase().contains(q);
-        }).toList();
-      }
-      notifyListeners();
-    });
-  }
 
   Future<void> applyFilter(PlaceFilter filter) async {
 
@@ -303,13 +288,13 @@ class MapViewModel extends ChangeNotifier {
 
     switch(filter) {
       case PlaceFilter.restaurant:
-        await loadNearbyRestaurants("56aa371be4b08b9a8d573550");
+        await loadNearbyRestaurants("Restaurant");
         break;
       case PlaceFilter.cafe:
-        await loadNearbyRestaurants("4bf58dd8d48988d16d941735");
+        await loadNearbyRestaurants("Cafe");
         break;
       case PlaceFilter.bar:
-        await loadNearbyRestaurants("4bf58dd8d48988d116941735");
+        await loadNearbyRestaurants("Bar");
         break;
       case PlaceFilter.popular:
         await loadNearbyRestaurants("popular");
