@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 @immutable
@@ -94,6 +93,7 @@ class _ExpandableFabState extends State<ExpandableFab> with SingleTickerProvider
           child: Center(
             child: Material(
               shape: const CircleBorder(),
+              color: Colors.black54,
               clipBehavior: Clip.antiAlias,
               elevation: 4,
               child: InkWell(
@@ -102,7 +102,7 @@ class _ExpandableFabState extends State<ExpandableFab> with SingleTickerProvider
                   padding: const EdgeInsets.all(8),
                   child: Icon(
                     Icons.close,
-                    color: Theme.of(context).primaryColor,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -116,15 +116,13 @@ class _ExpandableFabState extends State<ExpandableFab> with SingleTickerProvider
   List<Widget> _buildExpandingActionButtons() {
     final children = <Widget>[];
     final count = widget.children.length;
-    final step = 90.0 / (count - 1);
 
-    for (var i = 0, angleInDegrees = 0.0; i < count; i++,
-    angleInDegrees += step
-    ) {
+    for (var i = 0; i < count; i++) {
       children.add(
-        _ExpandingActionButton(
-          directionInDegrees: angleInDegrees,
-          maxDistance: widget.distance,
+        _HorizontalExpandingActionButton(
+          index: i,
+          totalCount: count,
+          spacing: widget.distance,
           progress: _expandAnimation,
           child: widget.children[i],
         ),
@@ -164,41 +162,51 @@ class _ExpandableFabState extends State<ExpandableFab> with SingleTickerProvider
 }
 
 @immutable
-class _ExpandingActionButton extends StatelessWidget {
-
-  final double directionInDegrees;
-  final double maxDistance;
+class _HorizontalExpandingActionButton extends StatelessWidget {
+  final int index;
+  final int totalCount;
+  final double spacing;
   final Animation<double> progress;
   final Widget child;
 
-  const _ExpandingActionButton({
-    required this.directionInDegrees,
-    required this.maxDistance,
+  const _HorizontalExpandingActionButton({
+    required this.index,
+    required this.totalCount,
+    required this.spacing,
     required this.progress,
     required this.child,
   });
-
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: progress,
       builder: (context, child) {
-        final offset = Offset.fromDirection(
-          directionInDegrees * (math.pi / 180.0),
-          progress.value * maxDistance,
-        );
+        // Center items around FAB
+        final dx = (chipOffsets[index] + 53.0) * progress.value;
+
         return Positioned(
-          right: 4.0 + offset.dx,
-          bottom: 4.0 + offset.dy,
-          child: Transform.rotate(
-            angle: (1.0 - progress.value) * math.pi / 2,
+          bottom: 0, // wont register if out of parent paint bounds aka negative
+          left: MediaQuery.of(context).size.width / 2 - 24 + dx,
+          child: Transform.translate(
+            offset: const Offset(0, 10),
+          child: FadeTransition(
+            opacity: progress,
             child: child!,
           ),
-        );
+        )
+        )
+        ;
       },
-      child: FadeTransition(opacity: progress, child: child),
+      child: child,
     );
   }
 }
+
+final List<double> chipOffsets = [
+  -120, // chip 0
+  -40,  // chip 1 (closer to chip 0)
+  40,   // chip 2 (larger gap)
+  120,  // chip 3
+];
 

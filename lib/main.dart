@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:foodaroundme/repository/place_repository.dart';
 import 'package:foodaroundme/ui/main_screen.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
-import 'package:foodaroundme/viewmodel/searchViewModel.dart';
 
 import 'package:provider/provider.dart';
 
@@ -19,10 +18,6 @@ void main() {
         ),
         // created once the app starts for entire app
         ChangeNotifierProvider(create: (context) => MapViewModel(
-          placesRepository: context.read<PlacesRepository>(),
-        )
-        ),
-        ChangeNotifierProvider(create: (context) => SearchViewModel(
           placesRepository: context.read<PlacesRepository>(),
         )
         ),

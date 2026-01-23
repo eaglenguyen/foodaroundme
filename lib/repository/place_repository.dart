@@ -45,11 +45,15 @@ class PlacesRepository {
   // Api call to fetch places by name
   Future<List<Place>> searchPlacesByName({
     required String query,
+    String? type,
     LatLng? center,
-    int radius = 1500,
+    int radius = 500,
   }) async {
+
+    final effectiveQuery = type != null ? '$query $type' : query;
+
     final result = await _places.search.getTextSearch(
-      query,
+      effectiveQuery,
       location: center != null
           ? gp.Location(
         lat: center.latitude,
@@ -57,6 +61,7 @@ class PlacesRepository {
       )
           : null,
       radius: center != null ? radius : null,
+
     );
 
     if (result == null || result.results == null) return [];

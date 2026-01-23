@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../viewmodel/mapViewModel.dart';
-import '../viewmodel/searchViewModel.dart';
 import '../widgets/bottom_sheet_detail/bottom_sheet_details.dart';
 
 
@@ -17,6 +16,7 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
 
+  // Runs when widget is created
   @override
   void initState() {
     super.initState();
@@ -25,8 +25,9 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final searchViewModel = context.watch<SearchViewModel>();
-    final mapViewModel = context.watch<MapViewModel>();
+    final viewModel = context.watch<MapViewModel>();
+    final places = viewModel.filteredSearchPlaces;
+    final itemCount = places.length > 10 ? 10 : places.length;
 
     return Scaffold(
       appBar: AppBar(title: const Text("")),
@@ -37,9 +38,9 @@ class _SearchScreenState extends State<SearchScreen> {
           // 📍 Restaurant list
           ListView.builder(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 160),
-            itemCount: searchViewModel.newPlaces.length,
+            itemCount: itemCount,
             itemBuilder: (_, index) {
-              final place = searchViewModel.newPlaces[index];
+              final place = viewModel.filteredSearchPlaces[index];
 
               return ListTile(
                 leading: const Icon(Icons.restaurant),
@@ -48,7 +49,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   place.types.join(", "),
                   ),
                 onTap: () async {
-                  final details = await mapViewModel.getPlaceDetails(
+                  final details = await viewModel.getPlaceDetails(
                       place.placeId);
                   if (!context.mounted) return;
 
@@ -87,9 +88,9 @@ class _SearchScreenState extends State<SearchScreen> {
               child: TextField(
                 onChanged: (query) {
                   if (query.length < 3) {
-                    searchViewModel.filterPlacesLocally(query);
+                    viewModel.filterPlacesLocally(query);
                   } else {
-                    searchViewModel.searchPlaces(query);
+                    viewModel.searchPlaces(query);
                   }                },
                 decoration: InputDecoration(
                   hintText: "Search...",

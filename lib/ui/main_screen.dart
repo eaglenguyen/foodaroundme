@@ -44,7 +44,7 @@ class _MainScreenState extends State<MainScreen> {
           child: Padding(
             padding: const EdgeInsets.only(bottom: 90), // moves FAB up
             child: ExpandableFab(
-              distance: 112, // controls the spread of icons
+              distance: 64, // controls the spread of icons
               onOpenChanged: (isOpen) {
                 setState(() => isMenuOpen = isOpen // setState similar to LaunchedEffect/mutableStateof
                 );
@@ -52,7 +52,7 @@ class _MainScreenState extends State<MainScreen> {
               children: [
                 ActionButton(
                   icon: const Icon(Icons.fastfood_rounded),
-                  label: "Food",
+                  label: "food",
                   onPressed: () async {
                     viewModel.hideExpandableFab();
                     await viewModel.applyFilter(PlaceFilter.restaurant);
@@ -64,7 +64,7 @@ class _MainScreenState extends State<MainScreen> {
                 ),
                 ActionButton(
                   icon: const Icon(Icons.coffee),
-                  label: "Cafe",
+                  label: "cafe",
                   onPressed: () async {
                     viewModel.hideExpandableFab();
                     await viewModel.applyFilter(PlaceFilter.cafe);
@@ -77,7 +77,7 @@ class _MainScreenState extends State<MainScreen> {
                 ),
                 ActionButton(
                   icon: const Icon(Icons.local_bar),
-                  label: "Bars",
+                  label: "bars",
                   onPressed: () async {
                     viewModel.hideExpandableFab();
                     await viewModel.applyFilter(PlaceFilter.bar);
@@ -141,10 +141,14 @@ class _MainScreenState extends State<MainScreen> {
                     borderColor: Colors.transparent,
                     isSelected: List.generate(
                       3,
-                          (index) => (index == viewModel.selectedIndex),   // iterates through list, sets current index of list to true/false depending if i actually equals index
+                      // iterates through list, sets current index of list to true/false depending if i actually equals index
+                          (index) => (index == viewModel.selectedIndex),
 
                     ),
                     onPressed: (index) {
+                      if (index == 0) {
+                        viewModel.closeSheet();
+                      }
                       viewModel.toggleButton(index);  // update your viewmodel
                     },
                     children: const [

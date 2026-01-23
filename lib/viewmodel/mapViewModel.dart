@@ -58,6 +58,11 @@ class MapViewModel extends ChangeNotifier {
   // ======================================================
   List<Place> allPlaces = [];
   List<Place> filteredPlaces = [];
+
+  List<Place> allSearchPlaces = [];
+  List<Place> filteredSearchPlaces = [];
+
+
   Place? selectedPlace;
   PlaceFilter? activeFilter;
 
@@ -86,7 +91,8 @@ class MapViewModel extends ChangeNotifier {
 
   MapViewModel({
     required this.placesRepository,
-  }) {    // init block via flutter
+  }) {
+    getCurrentLocation(); // init block via flutter
   }
 
 
@@ -98,7 +104,9 @@ class MapViewModel extends ChangeNotifier {
 
   void onMapCreated(GoogleMapController controller) {
     mapController = controller;
-    getCurrentLocation();
+    mapController?.animateCamera(
+      CameraUpdate.newCameraPosition(CameraPosition(target: center, zoom: 15)),
+    );
   }
 
   // When the maps moves, keep updating these variables so i know where the map current position is
@@ -271,6 +279,57 @@ class MapViewModel extends ChangeNotifier {
   // 🔎 Search & Filters
   // ======================================================
 
+  Future<void> fetchPlacesByTextSearch(String query) async {
+    final places = await placesRepository.searchPlacesByName(
+        center: cameraCenter,
+        radius: searchRadius.toInt(),
+        query: query,
+        type: "restaurant"
+    );
+
+    allSearchPlaces = places;
+    filteredSearchPlaces = List.from(places);
+
+    notifyListeners();
+  }
+
+  void filterPlacesLocally(String query) { // Should be in separate VM class
+    _debounce?.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      if (query.isEmpty) {
+        filteredSearchPlaces = List.from(allSearchPlaces);
+      } else {
+        final q = query.toLowerCase();
+        filteredSearchPlaces = allSearchPlaces.where((place) {
+          return place.name.toLowerCase().contains(q);
+        }
+        ).toList();
+      }
+      notifyListeners();
+    });
+  }
+
+  Future<void> searchPlaces(String query) async {
+    _debounce?.cancel();
+
+    final q = query.trim();
+    // If query is short, don't hit the API
+    if (query.trim().length < 2) {
+      filteredSearchPlaces = [];
+      allSearchPlaces = [];
+      notifyListeners();
+      return;
+    }
+    // 🔥 CLEAR immediately so UI updates
+    filteredSearchPlaces = [];
+    allSearchPlaces = [];
+    notifyListeners();
+    
+    await fetchPlacesByTextSearch(query);
+  }
+
+  /////////////////////////////////////////////////////////////
 
   Future<void> applyFilter(PlaceFilter filter) async {
 
@@ -288,13 +347,13 @@ class MapViewModel extends ChangeNotifier {
 
     switch(filter) {
       case PlaceFilter.restaurant:
-        await loadNearbyRestaurants("Restaurant");
+        await loadNearbyRestaurants("restaurant");
         break;
       case PlaceFilter.cafe:
-        await loadNearbyRestaurants("Cafe");
+        await loadNearbyRestaurants("cafe");
         break;
       case PlaceFilter.bar:
-        await loadNearbyRestaurants("Bar");
+        await loadNearbyRestaurants("bar");
         break;
       case PlaceFilter.popular:
         await loadNearbyRestaurants("popular");

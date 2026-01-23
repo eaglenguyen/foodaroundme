@@ -8,13 +8,16 @@ import '../widgets/bottom_sheet_map.dart';
 
 
 class MapScreen extends StatelessWidget {
+
+
   const MapScreen({super.key});
+
+
+
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<MapViewModel>();
-
-
 
     return Scaffold(
       body: Stack(

@@ -28,6 +28,8 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
   late final DraggableScrollableController _controller;
   double _sheetSize = 0.4;
 
+  late final viewModel = context.watch<MapViewModel>();
+
 
 
   @override
@@ -36,8 +38,6 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
     // Linking viewmodel method to here
     _controller = DraggableScrollableController();
     _controller.addListener(_handleSheetSize);
-
-
   }
 
   void _handleSheetSize() {
