@@ -19,6 +19,25 @@ class MapScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<MapViewModel>();
 
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final place = viewModel.selectedPlace;
+      if (place == null) return;
+
+      final details = await viewModel.getPlaceDetails(place.placeId);
+      if (!context.mounted || details == null) return;
+
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (_) => BottomSheetDetails(
+          place: place,
+          details: details,
+        ),
+      );
+
+      viewModel.clearSelectedPlace(); // VERY important
+    });
+
     return Scaffold(
       body: Stack(
         children: [

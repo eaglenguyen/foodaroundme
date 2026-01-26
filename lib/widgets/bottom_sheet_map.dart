@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
 import 'package:foodaroundme/widgets/drag_handles/morph_drag_handle.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import '../model/place.dart';
 
@@ -29,6 +30,8 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
   double _sheetSize = 0.4;
 
   late final viewModel = context.watch<MapViewModel>();
+
+
 
 
 
@@ -68,6 +71,20 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
 
   @override
   Widget build(BuildContext context) {
+
+
+
+    viewModel.filteredPlaces.map(
+          (p) => Marker(
+        markerId: MarkerId(p.name),
+        position: p.location,
+        infoWindow: InfoWindow(
+          title: p.name,
+          onTap: () {debugPrint('Marker tapped: ${p.name}');},
+        ),
+      ),
+    ).toSet();
+
 
 
     return DraggableScrollableSheet(

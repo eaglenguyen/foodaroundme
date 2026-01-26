@@ -64,7 +64,22 @@ class MapViewModel extends ChangeNotifier {
 
 
   Place? selectedPlace;
+  Place? get selectedPlaces => selectedPlace;
+
   PlaceFilter? activeFilter;
+
+
+  void showSheetViaMarker(Place place) {
+    selectedPlace = place;
+    showBottomSheet = true;
+    notifyListeners();
+  }
+
+  void clearSelectedPlace() {
+    selectedPlace = null;
+    showBottomSheet = false;
+    notifyListeners();
+  }
 
   // ======================================================
   // 📍 Foursquare Places State
@@ -229,6 +244,9 @@ class MapViewModel extends ChangeNotifier {
   // ======================================================
 
 
+
+
+
   // --- Convert Places p into markers and notify UI ---
   void updateMarkers() {
     // show one selectedMarker
@@ -238,15 +256,25 @@ class MapViewModel extends ChangeNotifier {
           markerId: MarkerId(selectedPlace!.placeId),
           position: selectedPlace!.location,
           infoWindow: InfoWindow(title: selectedPlace!.name),
-        )
+          onTap: () {
+            showSheetViaMarker(selectedPlace!);
+            },
+        ),
       };
     } else {
       // show all (filtered) markers
       markers = filteredPlaces.map(
             (p) => Marker(
-          markerId: MarkerId(p.name),
+
+
+              markerId: MarkerId(p.name),
           position: p.location,
-          infoWindow: InfoWindow(title: p.name),
+          infoWindow: InfoWindow(
+              title: p.name,
+            onTap: () {
+              showSheetViaMarker(p);
+            },
+          ),
         ),
       ).toSet();
       notifyListeners();
@@ -259,6 +287,10 @@ class MapViewModel extends ChangeNotifier {
     _focusOnPlace(place);
     notifyListeners();
   }
+
+
+
+
 
   // zoom in on selectedPlace
   Future<void> _focusOnPlace(Place place) async {
