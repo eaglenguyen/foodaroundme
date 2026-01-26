@@ -71,7 +71,6 @@ class MapViewModel extends ChangeNotifier {
 
   void showSheetViaMarker(Place place) {
     selectedPlace = place;
-    showBottomSheet = true;
     notifyListeners();
   }
 
@@ -107,7 +106,8 @@ class MapViewModel extends ChangeNotifier {
   MapViewModel({
     required this.placesRepository,
   }) {
-    getCurrentLocation(); // init block via flutter
+    getCurrentLocation();
+    // init block via flutter
   }
 
 
@@ -255,24 +255,22 @@ class MapViewModel extends ChangeNotifier {
         Marker(
           markerId: MarkerId(selectedPlace!.placeId),
           position: selectedPlace!.location,
-          infoWindow: InfoWindow(title: selectedPlace!.name),
-          onTap: () {
-            showSheetViaMarker(selectedPlace!);
-            },
+          infoWindow: InfoWindow(title: selectedPlace!.name,
+              onTap: () {
+        },
+          ),
+
         ),
       };
     } else {
       // show all (filtered) markers
       markers = filteredPlaces.map(
             (p) => Marker(
-
-
               markerId: MarkerId(p.name),
           position: p.location,
           infoWindow: InfoWindow(
               title: p.name,
             onTap: () {
-              showSheetViaMarker(p);
             },
           ),
         ),
@@ -280,6 +278,7 @@ class MapViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
 
   // assigns selectedPlace to a marker
   void selectPlace(Place place) {
