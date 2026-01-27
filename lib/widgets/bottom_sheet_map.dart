@@ -3,7 +3,9 @@ import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
 import 'package:foodaroundme/widgets/drag_handles/morph_drag_handle.dart';
+import 'package:foodaroundme/widgets/skeleton_row.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer_animation/shimmer_animation.dart';
 import '../model/place.dart';
 
 class BottomSheetMap extends StatefulWidget {
@@ -14,6 +16,7 @@ class BottomSheetMap extends StatefulWidget {
   final VoidCallback addCount;
   final List<Place> places;
   final int count;
+  final bool isLoading;
 
 
   const BottomSheetMap({
@@ -24,6 +27,7 @@ class BottomSheetMap extends StatefulWidget {
     required this.addCount,
     required this.places,
     required this.count,
+    required this.isLoading,
   });
 
   @override
@@ -115,9 +119,24 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
             ),
 
             const SizedBox(height: 6),
-
-            // Displays text if list of places are empty
-            if(widget.places.isEmpty) ...[   // ... is used to inject a list of widgets
+              if (widget.isLoading) ...[
+                Shimmer(
+                  duration: const Duration(milliseconds: 1500),
+                  color: Colors.white,
+                  colorOpacity: 0.25,
+                child: Column(
+                children: List.generate(
+                  6,
+                      (_) => const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    child: ShimmerPlaceRow(),
+                  ),
+                ),
+                ),
+        ),
+              ] else if
+              // Displays text if list of places are empty
+              (widget.places.isEmpty) ...[   // ... is used to inject a list of widgets
                 const Padding(
                     padding: EdgeInsets.symmetric(vertical: 24),
                     child: Text(

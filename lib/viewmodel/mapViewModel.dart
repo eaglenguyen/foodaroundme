@@ -361,7 +361,7 @@ class MapViewModel extends ChangeNotifier {
     // final detailTypes = await placesRepository.getPlaceDetailsV1()
     notifyListeners();
 
-    await Future.delayed(const Duration(milliseconds: 1000));
+    await Future.delayed(const Duration(milliseconds: 2000));
 
     showBottomSheet = true;
 
@@ -393,10 +393,13 @@ class MapViewModel extends ChangeNotifier {
     selectedIndex = index;
     notifyListeners();
   }
-  void openSheet() {
+
+  void openSheetandResetCount() {
+    visibleCount = 10;
     showBottomSheet = true;
     notifyListeners();
   }
+
   void closeSheet() {
     showBottomSheet = false;
     notifyListeners();
@@ -424,11 +427,8 @@ class MapViewModel extends ChangeNotifier {
     visibleCount += 5;
     notifyListeners();
   }
-  
-  void resetCount() {
-    visibleCount = 10;
-    notifyListeners();
-  }
+
+
 
   // ======================================================
 

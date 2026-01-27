@@ -58,10 +58,10 @@ class _MainScreenState extends State<MainScreen> {
                   icon: const Icon(Icons.fastfood_rounded),
                   label: "food",
                   onPressed: () async {
-                    viewModel.resetCount();
+                    viewModel.openSheetandResetCount();
                     viewModel.hideExpandableFab();
+
                     await viewModel.applyFilter(PlaceFilter.restaurant);
-                    viewModel.openSheet();
 
                     if (!context.mounted) return;
 
@@ -71,24 +71,20 @@ class _MainScreenState extends State<MainScreen> {
                   icon: const Icon(Icons.coffee),
                   label: "cafe",
                   onPressed: () async {
-                    viewModel.resetCount();
+                    viewModel.openSheetandResetCount();
                     viewModel.hideExpandableFab();
                     await viewModel.applyFilter(PlaceFilter.cafe);
-                    viewModel.openSheet();
 
                     if (!context.mounted) return;
-
-
                   },
                 ),
                 ActionButton(
                   icon: const Icon(Icons.local_bar),
                   label: "bars",
                   onPressed: () async {
-                    viewModel.resetCount();
+                    viewModel.openSheetandResetCount();
                     viewModel.hideExpandableFab();
                     await viewModel.applyFilter(PlaceFilter.bar);
-                    viewModel.openSheet();
                     if (!context.mounted) return;
                   },
                 ),

@@ -63,6 +63,7 @@ class MapScreen extends StatelessWidget {
                 places: viewModel.filteredPlaces,
                 count: viewModel.visibleCount,
                 addCount: viewModel.addCount,
+                isLoading: viewModel.isLoading,
                 close: () {
                   viewModel.closeSheet();
                   viewModel.showExpandableFabAgain();
