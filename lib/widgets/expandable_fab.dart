@@ -88,11 +88,16 @@ class _ExpandableFabState extends State<ExpandableFab> with SingleTickerProvider
         opacity: _open ? 1.0 : 0.0,
         duration: const Duration(milliseconds: 200),
         child: SizedBox(
-          width: 56,
-          height: 56,
+          width: 40,
+          height: 80,
           child: Center(
             child: Material(
-              shape: const CircleBorder(),
+              shape: const CircleBorder(
+                side: BorderSide(
+                  color: Colors.blueGrey, // border color
+                  width: 2,
+                ),
+              ),
               color: Colors.black54,
               clipBehavior: Clip.antiAlias,
               elevation: 4,
@@ -188,13 +193,10 @@ class _HorizontalExpandingActionButton extends StatelessWidget {
         return Positioned(
           bottom: 0, // wont register if out of parent paint bounds aka negative
           left: MediaQuery.of(context).size.width / 2 - 24 + dx,
-          child: Transform.translate(
-            offset: const Offset(0, 10),
           child: FadeTransition(
             opacity: progress,
             child: child!,
           ),
-        )
         )
         ;
       },

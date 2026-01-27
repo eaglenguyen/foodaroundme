@@ -64,21 +64,9 @@ class MapViewModel extends ChangeNotifier {
 
 
   Place? selectedPlace;
-  Place? get selectedPlaces => selectedPlace;
-
   PlaceFilter? activeFilter;
 
 
-  void showSheetViaMarker(Place place) {
-    selectedPlace = place;
-    notifyListeners();
-  }
-
-  void clearSelectedPlace() {
-    selectedPlace = null;
-    showBottomSheet = false;
-    notifyListeners();
-  }
 
   // ======================================================
   // 📍 Foursquare Places State
@@ -97,6 +85,7 @@ class MapViewModel extends ChangeNotifier {
   bool showFab = true;
 
   int selectedIndex = 0;
+  int visibleCount = 10;
 
 
   // ======================================================
@@ -430,6 +419,18 @@ class MapViewModel extends ChangeNotifier {
       ),
     );
   }
+
+  void addCount() {
+    visibleCount += 5;
+    notifyListeners();
+  }
+  
+  void resetCount() {
+    visibleCount = 10;
+    notifyListeners();
+  }
+
+  // ======================================================
 
   // 🧾 Derived UI Data
   // for map_screen.dart

@@ -61,11 +61,13 @@ class MapScreen extends StatelessWidget {
               child: BottomSheetMap(
                 title: viewModel.sheetTitle,
                 places: viewModel.filteredPlaces,
+                count: viewModel.visibleCount,
+                addCount: viewModel.addCount,
                 close: () {
                   viewModel.closeSheet();
                   viewModel.showExpandableFabAgain();
                 },
-                onSelect: (place) async { // marker not updating
+                 onSelect: (place) async { // marker not updating
                   viewModel.selectPlace(place);
 
                   final details = await viewModel.getPlaceDetails(place.placeId);

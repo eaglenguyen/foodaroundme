@@ -27,7 +27,13 @@ class ActionButton extends StatelessWidget {
         fontWeight: FontWeight.bold,
       ),
       elevation: 3,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+        shape: StadiumBorder(
+          side: BorderSide(
+            color: Colors.black54,
+            width: 1.8,
+          ),
+    ),
     );
   }
 }

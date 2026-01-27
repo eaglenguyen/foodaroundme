@@ -21,6 +21,9 @@ class _MainScreenState extends State<MainScreen> {
   bool isMenuOpen = false;
 
 
+
+
+
   final List<Widget> screens = const [
     MapScreen(key: ValueKey(0)),     // index 0
     ProfileScreen(key: ValueKey(1)), // index 1
@@ -30,6 +33,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<MapViewModel>();
+
 
     return Scaffold(
 
@@ -54,6 +58,7 @@ class _MainScreenState extends State<MainScreen> {
                   icon: const Icon(Icons.fastfood_rounded),
                   label: "food",
                   onPressed: () async {
+                    viewModel.resetCount();
                     viewModel.hideExpandableFab();
                     await viewModel.applyFilter(PlaceFilter.restaurant);
                     viewModel.openSheet();
@@ -66,6 +71,7 @@ class _MainScreenState extends State<MainScreen> {
                   icon: const Icon(Icons.coffee),
                   label: "cafe",
                   onPressed: () async {
+                    viewModel.resetCount();
                     viewModel.hideExpandableFab();
                     await viewModel.applyFilter(PlaceFilter.cafe);
                     viewModel.openSheet();
@@ -79,6 +85,7 @@ class _MainScreenState extends State<MainScreen> {
                   icon: const Icon(Icons.local_bar),
                   label: "bars",
                   onPressed: () async {
+                    viewModel.resetCount();
                     viewModel.hideExpandableFab();
                     await viewModel.applyFilter(PlaceFilter.bar);
                     viewModel.openSheet();

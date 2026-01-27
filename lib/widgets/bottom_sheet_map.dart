@@ -1,7 +1,8 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
 import 'package:foodaroundme/widgets/drag_handles/morph_drag_handle.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import '../model/place.dart';
 
@@ -10,7 +11,9 @@ class BottomSheetMap extends StatefulWidget {
   // changed to function to take place object
   final void Function(Place) onSelect;
   final VoidCallback close;
+  final VoidCallback addCount;
   final List<Place> places;
+  final int count;
 
 
   const BottomSheetMap({
@@ -18,7 +21,9 @@ class BottomSheetMap extends StatefulWidget {
     required this.title,
     required this.onSelect,
     required this.close,
+    required this.addCount,
     required this.places,
+    required this.count,
   });
 
   @override
@@ -28,8 +33,6 @@ class BottomSheetMap extends StatefulWidget {
 class _BottomSheetMapState extends State<BottomSheetMap> {
   late final DraggableScrollableController _controller;
   double _sheetSize = 0.4;
-
-  late final viewModel = context.watch<MapViewModel>();
 
 
 
@@ -71,21 +74,6 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
 
   @override
   Widget build(BuildContext context) {
-
-
-
-    viewModel.filteredPlaces.map(
-          (p) => Marker(
-        markerId: MarkerId(p.name),
-        position: p.location,
-        infoWindow: InfoWindow(
-          title: p.name,
-          onTap: () {debugPrint('Marker tapped: ${p.name}');},
-        ),
-      ),
-    ).toSet();
-
-
 
     return DraggableScrollableSheet(
       expand: false,
@@ -145,7 +133,7 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
                   ] else ...[
                     /// ⭐ The correct way to show the list
                     /// p is the place object clicked
-                  ...widget.places.map( (p) {
+                  ...widget.places.take(widget.count).map( (p) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 3),
                       child: InkWell(
@@ -229,7 +217,30 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
                     );
                   }
                     ),
-              ],
+              if (widget.count < widget.places.length)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Center(
+                    child: TextButton.icon(
+                      onPressed: () {
+                        widget.addCount();
+                      },
+                      icon: const Icon(
+                        Icons.expand_more,
+                        color: Colors.white70,
+                        size: 18,
+                      ),
+                      label: const Text(
+                        "Show more",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
             ],
           ),
             /// CLOSE BUTTON
@@ -244,8 +255,13 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
               ),
             ),
 
+            const SizedBox(height: 2),
+
+
           ],
+
           ),
+
         );
         },
   );
