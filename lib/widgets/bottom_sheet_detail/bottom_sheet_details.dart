@@ -71,7 +71,7 @@ List<String> buildPhotoUrls(PlaceDetails details) {
   if (details.photos.isEmpty) return [];
 
   return details.photos
-      .take(12) // limit for grid
+      .take(6) // limit for grid
       .map((p) =>
   'https://maps.googleapis.com/maps/api/place/photo'
       '?maxwidth=800'

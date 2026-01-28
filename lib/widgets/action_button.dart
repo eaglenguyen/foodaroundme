@@ -30,7 +30,7 @@ class ActionButton extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10),
         shape: StadiumBorder(
           side: BorderSide(
-            color: Colors.black54,
+            color: Colors.blueGrey,
             width: 1.8,
           ),
     ),

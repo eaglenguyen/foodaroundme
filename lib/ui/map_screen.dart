@@ -12,19 +12,18 @@ class MapScreen extends StatelessWidget {
 
   const MapScreen({super.key});
 
-
-
-
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<MapViewModel>();
+
 
     return Scaffold(
       body: Stack(
         children: [
           GoogleMap(
-          onMapCreated: viewModel.onMapCreated,
-          onCameraMove: viewModel.onCameraMove,
+            style: viewModel.darkMapStyle,
+            onMapCreated: viewModel.onMapCreated,
+            onCameraMove: viewModel.onCameraMove,
             onCameraIdle: () {
               viewModel.onCameraIdle();
             },

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:foodaroundme/model/place_foursquare.dart';
 import 'package:foodaroundme/repository/place_repository.dart';
 import 'package:foodaroundme/resources/place_filter.dart';
@@ -41,7 +42,7 @@ class MapViewModel extends ChangeNotifier {
   // ======================================================
 
   GoogleMapController? mapController;
-
+  String? darkMapStyle;
   LatLng center = const LatLng(42.3104, -71.0575);// default coordinate before it is assigned by getCurrentLocation()
   LatLng cameraCenter = const LatLng(42.3104, -71.0575);
   LatLng? userLocation;
@@ -96,6 +97,7 @@ class MapViewModel extends ChangeNotifier {
     required this.placesRepository,
   }) {
     getCurrentLocation();
+    _loadMapStyle();
     // init block via flutter
   }
 
@@ -103,7 +105,7 @@ class MapViewModel extends ChangeNotifier {
 
 
   // ======================================================
-  // 🗺️ Map Lifecycle
+  // 🗺️ Map Lifecycle & theme
   // ======================================================
 
   void onMapCreated(GoogleMapController controller) {
@@ -124,6 +126,11 @@ class MapViewModel extends ChangeNotifier {
     updateUserLocation(center);
   }
 
+  Future<void> _loadMapStyle() async {
+    darkMapStyle =
+    await rootBundle.loadString('assets/map_styles/dark_map.json');
+    notifyListeners();
+  }
 
   // ======================================================
   // 📍 Location

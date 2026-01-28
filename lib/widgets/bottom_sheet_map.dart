@@ -140,7 +140,7 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
                 const Padding(
                     padding: EdgeInsets.symmetric(vertical: 24),
                     child: Text(
-                      "No Restaurants/Cafes Nearby",
+                      "No Restaurants Nearby",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                       fontSize: 16,
