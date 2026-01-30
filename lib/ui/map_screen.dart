@@ -39,9 +39,7 @@ class MapScreen extends StatelessWidget {
             markerId: const MarkerId('currentLocation'),
             position: viewModel.center,
             infoWindow: const InfoWindow(title: "You're here"),
-            icon: BitmapDescriptor.defaultMarkerWithHue(
-              BitmapDescriptor.hueAzure,
-            )
+            icon: viewModel.currentIcon,
         ),
         ...viewModel.markers,
       },

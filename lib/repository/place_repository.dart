@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart' as gmw;
 import 'package:google_place/google_place.dart' as gp;
-import 'package:http/http.dart' as http;
 import '../model/place.dart';
 
 
@@ -84,7 +83,7 @@ class PlacesRepository {
           'website',
           'formatted_phone_number',
           'url',
-          'photos'
+          //'photos'
         ],
       );
       if (!response.isOkay) return null;

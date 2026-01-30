@@ -83,7 +83,7 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
       expand: false,
       controller: _controller,
       initialChildSize: 0.4,
-      minChildSize: 0.15,
+      minChildSize: 0.13,
       maxChildSize: 1,
       builder: (context, scrollController) {
         return Container(

@@ -98,6 +98,9 @@ class MapViewModel extends ChangeNotifier {
   }) {
     getCurrentLocation();
     _loadMapStyle();
+    customMarker();
+    customMarkerCurrent();
+
     // init block via flutter
   }
 
@@ -111,7 +114,7 @@ class MapViewModel extends ChangeNotifier {
   void onMapCreated(GoogleMapController controller) {
     mapController = controller;
     mapController?.animateCamera(
-      CameraUpdate.newCameraPosition(CameraPosition(target: center, zoom: 15)),
+      CameraUpdate.newCameraPosition(CameraPosition(target: center, zoom: 14.8)),
     );
   }
 
@@ -151,7 +154,7 @@ class MapViewModel extends ChangeNotifier {
     center = LatLng(position.latitude, position.longitude);
 
     mapController?.animateCamera(
-      CameraUpdate.newCameraPosition(CameraPosition(target: center, zoom: 15)),
+      CameraUpdate.newCameraPosition(CameraPosition(target: center, zoom: 14.8)),
     );
 
     isLoading = false;
@@ -240,9 +243,26 @@ class MapViewModel extends ChangeNotifier {
   // ======================================================
 
 
+  BitmapDescriptor customIcon = BitmapDescriptor.defaultMarker;
+  BitmapDescriptor currentIcon = BitmapDescriptor.defaultMarker;
 
+  Future<void> customMarkerCurrent()  async {
+    currentIcon = await BitmapDescriptor.asset(
+      const ImageConfiguration(size: Size(40, 40)),
+      "assets/markers/currentHome.png",
+    );
+    notifyListeners();
+  }
 
-
+  void customMarker() {
+    BitmapDescriptor.asset(
+        const ImageConfiguration(size: Size(40, 40)),
+        "assets/markers/locationPurple.png",
+    ).then((icon) {
+      customIcon = icon;
+      notifyListeners();
+    });
+  }
   // --- Convert Places p into markers and notify UI ---
   void updateMarkers() {
     // show one selectedMarker
@@ -255,6 +275,7 @@ class MapViewModel extends ChangeNotifier {
               onTap: () {
         },
           ),
+            icon: customIcon
 
         ),
       };
@@ -269,7 +290,8 @@ class MapViewModel extends ChangeNotifier {
             onTap: () {
             },
           ),
-        ),
+                icon: customIcon
+            ),
       ).toSet();
       notifyListeners();
     }
@@ -300,6 +322,8 @@ class MapViewModel extends ChangeNotifier {
         )
     );
   }
+
+
 
 
   // ======================================================

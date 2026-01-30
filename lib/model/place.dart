@@ -39,9 +39,7 @@ class Place{
       location: LatLng(loc.lat ?? 0.0, loc.lng ?? 0.0),
       address: result.vicinity ?? 'Not Available',
       types: result.types?.cast<String>() ?? [],
-      photoReference: result.photos?.isNotEmpty == true
-        ? result.photos!.first.photoReference
-          : null,
+      photoReference: null,
       isOpen: result.openingHours?.openNow,
       rating: result.rating,
       priceLevel: result.priceLevel
@@ -50,3 +48,6 @@ class Place{
 
 
 }
+//result.photos?.isNotEmpty == true
+//         ? result.photos!.first.photoReference
+//           : null,
