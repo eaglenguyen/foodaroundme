@@ -46,11 +46,11 @@ class _SearchScreenState extends State<SearchScreen> {
                 leading: const Icon(Icons.restaurant),
                 title: Text(place.name),
                 subtitle: Text(
-                  place.types.join(", "),
+                  place.categories.join(", "),
                   ),
                 onTap: () async {
                   final details = await viewModel.getPlaceDetails(
-                      place.placeId);
+                      place.id);
                   if (!context.mounted) return;
 
                   if (details == null) {
@@ -69,8 +69,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                     builder: (_) =>
                         BottomSheetDetails(
-                          place: place,
-                          details: details,
+                          place: details,
                         ),
                   );
                 });

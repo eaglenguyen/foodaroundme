@@ -172,9 +172,9 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
                                 height: 60,
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
-                                child: p.photoReference != null
+                                child: p.photoUrl != null
                                 ? Image.network(
-                                  getPlacePhotoUrl(p.photoReference!)!,
+                                  p.photoUrl!,
                                   fit: BoxFit.cover,
                                 ) : Container( // if null, placeholder icon
                                   width: 60,
@@ -220,7 +220,8 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
 
                                     /// Meta info
                                     Text(
-                                      hoursAndRatings(p),
+                                      "Hours Unknown • ⭐ • \$ ",
+                                      //hoursAndRatings(p),
                                       style: const TextStyle(
                                         fontSize: 13,
                                         color: Colors.white60,
@@ -287,16 +288,8 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
   }
 }
 
-String? getPlacePhotoUrl(String? photoReference) {
-  if (photoReference == null) return null;
 
-  return 'https://maps.googleapis.com/maps/api/place/photo'
-      '?maxwidth=400'
-      '&photo_reference=$photoReference'
-      '&key=${MapViewModel.apiKey}';
-}
-
-
+//Atmosphere Billing
 String hoursAndRatings(Place p) {
   final status = p.isOpen == null
       ? 'Hours Unknown'

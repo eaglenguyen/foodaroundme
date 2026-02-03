@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:foodaroundme/viewmodel/mapViewModel.dart';
 import 'package:foodaroundme/widgets/bottom_sheet_detail/action_row.dart';
 import 'package:foodaroundme/widgets/bottom_sheet_detail/header.dart';
 import 'package:foodaroundme/widgets/bottom_sheet_detail/photo_grid.dart';
@@ -11,12 +10,10 @@ import '../../model/place.dart';
 // When in final production, look at possibility that details.photos can be null. Line 71
 class BottomSheetDetails extends StatelessWidget {
   final Place place;
-  final PlaceDetails details;
 
   const BottomSheetDetails({
     super.key,
     required this.place,
-    required this.details,
   });
 
   @override
@@ -42,9 +39,9 @@ class BottomSheetDetails extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Header(place: place),
-                  ActionRow(place: place, details: details),
+                  ActionRow(place: place),
                   SocialLinks(place: place),
-                  PhotoGrid(photoUrls: buildPhotoUrls(details))
+                  PhotoGrid(photoUrls: place.photoUrls)
                 ],
               ),
             ),
@@ -67,18 +64,4 @@ class BottomSheetDetails extends StatelessWidget {
   }
 }
 
-List<String> buildPhotoUrls(PlaceDetails details) {
-  if (details.photos.isEmpty) return [];
-
-  return details.photos
-      .take(6) // limit for grid
-      .map((p) =>
-  'https://maps.googleapis.com/maps/api/place/photo'
-      '?maxwidth=800'
-      '&photo_reference=${p.photoReference}'
-      '&key=${MapViewModel.apiKey}'
-  )
-      .toList();
-}
-
-
+// Places Photo Billing

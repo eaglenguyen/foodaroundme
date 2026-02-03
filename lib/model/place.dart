@@ -5,28 +5,38 @@ import 'package:google_place/google_place.dart';
 class Place{
   // Fields == properties
   // Properties are empty/null by default
-  final String placeId;
+  final String id;
   final String name;
   final LatLng location;
   final String address;
-  final String? photoReference;
-  final List<String> types;
+
+  // Enrichment fields
+  final String? photoUrl;
+  final List<String> categories;
   final bool? isOpen;
   final double? rating;
   final int? priceLevel;
+  final String? website;
+  final String? phone;
+  final List<String> photoUrls;
+
 
   // Constructor. This fills the fields with value, connects to fields above
   Place({
-    required this.placeId,
+    required this.id,
     required this.name,
     required this.location,
     required this.address,
-    this.photoReference,
-    required this.types,
+    this.photoUrl,
+    required this.categories,
     this.isOpen,
     this.rating,
     this.priceLevel,
-  });
+    this.website,
+    this.phone,
+    this.photoUrls = const [],
+
+});
 
   /// Converts GooglePlace's SearchResult → Place data class
   static Place? fromSearchResult(SearchResult result) {
@@ -34,15 +44,15 @@ class Place{
     if (loc == null) return null;
 
     return Place(
-      placeId: result.placeId!,
+      id: result.placeId!,
       name: result.name ?? 'Unknown',
       location: LatLng(loc.lat ?? 0.0, loc.lng ?? 0.0),
       address: result.vicinity ?? 'Not Available',
-      types: result.types?.cast<String>() ?? [],
-      photoReference: null,
-      isOpen: result.openingHours?.openNow,
-      rating: result.rating,
-      priceLevel: result.priceLevel
+      categories: result.types?.cast<String>() ?? [],
+      photoUrl: null,
+      isOpen: null,
+      rating: null,
+      priceLevel: null
     );
   }
 
@@ -51,3 +61,7 @@ class Place{
 //result.photos?.isNotEmpty == true
 //         ? result.photos!.first.photoReference
 //           : null,
+
+//isOpen: result.openingHours?.openNow,
+//rating: result.rating,
+//priceLevel: result.priceLevel

@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:foodaroundme/model/place_foursquare.dart';
-import 'package:foodaroundme/repository/place_repository.dart';
 import 'package:foodaroundme/resources/place_filter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart' as gmw;
 import '../model/place.dart';
+import '../repository/PlacesRepository.dart';
 import '../service/locationService.dart';
 
 class MapViewModel extends ChangeNotifier {
@@ -31,7 +31,6 @@ class MapViewModel extends ChangeNotifier {
 
   final LocationService _locationService = LocationService();
   // when adding new keys make sure to pass into android build. Run , edit , add to args
-  static const apiKey = String.fromEnvironment("GOOGLE_MAPS_API_KEY");
   static const apiKeyFourSquare = String.fromEnvironment("FOURSQUARE_API_KEY");
 
   Timer? _debounce;
@@ -187,7 +186,7 @@ class MapViewModel extends ChangeNotifier {
   Future<void> loadNearbyRestaurants(String filter) async {
     final places = await placesRepository.getNearbyPlaces(
       center: cameraCenter,
-      type: filter,
+      category: filter,
       radius: searchRadius.toInt()
     );
 
@@ -203,7 +202,7 @@ class MapViewModel extends ChangeNotifier {
 
 
 
-  Future<gmw.PlaceDetails?> getPlaceDetails(String placeId) async {
+  Future<Place?> getPlaceDetails(String placeId)  {
     return placesRepository.getPlaceDetails(placeId);
   }
 
@@ -269,7 +268,7 @@ class MapViewModel extends ChangeNotifier {
     if(selectedPlace != null) {
       markers = { // Update marker to show only one/selected
         Marker(
-          markerId: MarkerId(selectedPlace!.placeId),
+          markerId: MarkerId(selectedPlace!.id),
           position: selectedPlace!.location,
           infoWindow: InfoWindow(title: selectedPlace!.name,
               onTap: () {
@@ -331,11 +330,11 @@ class MapViewModel extends ChangeNotifier {
   // ======================================================
 
   Future<void> fetchPlacesByTextSearch(String query) async {
-    final places = await placesRepository.searchPlacesByName(
+    final places = await placesRepository.searchPlaces(
         center: cameraCenter,
         radius: searchRadius.toInt(),
         query: query,
-        type: "restaurant"
+        category: "restaurant"
     );
 
     allSearchPlaces = places;

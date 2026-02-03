@@ -68,7 +68,7 @@ class MapScreen extends StatelessWidget {
                  onSelect: (place) async { // marker not updating
                   viewModel.selectPlace(place);
 
-                  final details = await viewModel.getPlaceDetails(place.placeId);
+                  final details = await viewModel.getPlaceDetails(place.id);
                   //final overview = details
                   if (!context.mounted || details == null) return;
 
@@ -76,8 +76,7 @@ class MapScreen extends StatelessWidget {
                     context: context,
                     isScrollControlled: true,
                     builder: (_) => BottomSheetDetails(
-                      place: place,
-                      details: details,
+                      place: details,
                     ),
                   );
                 },

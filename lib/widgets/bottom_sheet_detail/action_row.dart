@@ -10,12 +10,10 @@ import '../../model/place.dart';
 
 class ActionRow extends StatelessWidget {
   final Place place;
-  final PlaceDetails details;
 
   const ActionRow({
     super.key,
     required this.place,
-    required this.details,
   });
 
   @override
@@ -34,22 +32,22 @@ class ActionRow extends StatelessWidget {
           _ActionChip(
             icon: Icons.language,
             label: "Website",
-            onTap: details.website == null ? null : () {
-              launchUrl(Uri.parse(details.website!));
+            onTap: place.website == null ? null : () {
+              launchUrl(Uri.parse(place.website!));
             },
           ),
           _ActionChip(
             icon: Icons.call,
             label: "Call",
-            onTap: details.formattedPhoneNumber == null
+            onTap: place.phone == null
                 ? null
-                : () => callPlace(details.formattedPhoneNumber),
+                : () => callPlace(place.phone),
           ),
           _ActionChip(
             icon: Icons.share,
             label: "Share",
             onTap: () {
-              sharePlace(context, place, details);
+              sharePlace(context, place);
             },
           ),
           _ActionChip(
@@ -136,7 +134,6 @@ Future<void> callPlace(String? phone) async {
 void sharePlace(
     BuildContext context,
     Place place,
-    PlaceDetails details,
     ) {
   final box = context.findRenderObject() as RenderBox?;
 
@@ -144,7 +141,7 @@ void sharePlace(
 ${place.name}
 ${place.address}
 
-${details.url ?? ''}
+${place.website ?? ''}
 '''.trim();
 
   Share.share(
