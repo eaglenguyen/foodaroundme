@@ -1,10 +1,10 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_webservice/places.dart';
 
 import '../model/place.dart';
 
 // Interface
 abstract class PlacesRepository {
+
   Future<List<Place>> getNearbyPlaces({
     required LatLng center,
     required int radius,

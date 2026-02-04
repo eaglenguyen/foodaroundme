@@ -64,7 +64,7 @@ class GoogleRepoImpl implements PlacesRepository {
   Future<Place?> getPlaceDetails(String placeId) async {
     final gmw.PlacesDetailsResponse response = await _detailsApi.getDetailsByPlaceId(
       placeId,
-      fields: ['place_id','name'],
+      fields: ['place_id','name', 'geometry'],
     );
 
     if (!response.isOkay) return null;
@@ -74,17 +74,12 @@ class GoogleRepoImpl implements PlacesRepository {
       id: r.placeId,
       name: r.name,
       address: r.formattedAddress ?? '',
-      photoUrl: getPlacePhotoUrl(r.photos.first.photoReference),
       location: LatLng(
         r.geometry!.location.lat,
         r.geometry!.location.lng,
       ),
       categories: [],
-      rating: null,
-      priceLevel: null,
-      website: r.website,
-      phone: r.formattedPhoneNumber,
-      photoUrls: buildPhotoUrls(r),
+
     );
   }
 

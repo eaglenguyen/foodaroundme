@@ -1,5 +1,4 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_place/google_place.dart';
 
 
 class Place{
@@ -39,22 +38,7 @@ class Place{
 });
 
   /// Converts GooglePlace's SearchResult → Place data class
-  static Place? fromSearchResult(SearchResult result) {
-    final loc = result.geometry?.location;
-    if (loc == null) return null;
-
-    return Place(
-      id: result.placeId!,
-      name: result.name ?? 'Unknown',
-      location: LatLng(loc.lat ?? 0.0, loc.lng ?? 0.0),
-      address: result.vicinity ?? 'Not Available',
-      categories: result.types?.cast<String>() ?? [],
-      photoUrl: null,
-      isOpen: null,
-      rating: null,
-      priceLevel: null
-    );
-  }
+  // Moved to googleRepo called _mapSearchResultToPlace
 
 
 }

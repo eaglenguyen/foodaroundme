@@ -2,11 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:foodaroundme/model/place_foursquare.dart';
+import 'package:foodaroundme/repositoryImp/geoapify_repo_impl.dart';
 import 'package:foodaroundme/resources/place_filter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_webservice/places.dart' as gmw;
 import '../model/place.dart';
 import '../repository/PlacesRepository.dart';
 import '../service/locationService.dart';
@@ -31,7 +30,6 @@ class MapViewModel extends ChangeNotifier {
 
   final LocationService _locationService = LocationService();
   // when adding new keys make sure to pass into android build. Run , edit , add to args
-  static const apiKeyFourSquare = String.fromEnvironment("FOURSQUARE_API_KEY");
 
   Timer? _debounce;
 
@@ -71,8 +69,7 @@ class MapViewModel extends ChangeNotifier {
   // ======================================================
   // 📍 Foursquare Places State
   // ======================================================
-  List<PlaceFoursquare> allPlacesFoursquare = [];
-  List<PlaceFoursquare> filteredPlacesFoursquare = [];
+
 
 
 
@@ -397,13 +394,13 @@ class MapViewModel extends ChangeNotifier {
 
     switch(filter) {
       case PlaceFilter.restaurant:
-        await loadNearbyRestaurants("restaurant");
+        await loadNearbyRestaurants(GeoapifyCategories.restaurant);
         break;
       case PlaceFilter.cafe:
-        await loadNearbyRestaurants("cafe");
+        await loadNearbyRestaurants(GeoapifyCategories.cafe);
         break;
       case PlaceFilter.bar:
-        await loadNearbyRestaurants("bar");
+        await loadNearbyRestaurants(GeoapifyCategories.bar);
         break;
       case PlaceFilter.popular:
         await loadNearbyRestaurants("popular");
