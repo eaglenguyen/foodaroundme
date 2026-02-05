@@ -55,6 +55,8 @@ class GeoapifyRepoImpl implements PlacesRepository{
           props['lat'],
           props['lon'],
         ),
+
+        categories: (props['categories'] as List?)?.cast<String>() ?? [],
       );
     }).toList();
   }
@@ -104,3 +106,4 @@ class GeoapifyCategories {
   static const bar = 'catering.bar';
   static const fastFood = 'catering.fast_food';
 }
+

@@ -27,8 +27,7 @@ class Header extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            "Address",
-            //place.address ,
+            cleanAddress(place.address) ,
             style: const TextStyle(color: Colors.black54),
           ),
           const SizedBox(height: 8),
@@ -41,4 +40,18 @@ class Header extends StatelessWidget {
       ),
     );
   }
+}
+
+
+String cleanAddress(String rawAddress) {
+  if (rawAddress.isEmpty) return '';
+
+  final parts = rawAddress.split(',');
+
+  if (parts.length <= 1) return rawAddress; // fallback
+
+  // Remove the first part (the place name) and trim each remaining part
+  final addressOnly = parts.sublist(1).map((p) => p.trim()).join(', ');
+
+  return addressOnly;
 }

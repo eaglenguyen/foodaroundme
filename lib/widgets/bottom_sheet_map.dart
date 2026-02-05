@@ -206,8 +206,11 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
                                     const SizedBox(height: 2),
 
                                     /// Cuisine Info
+                                    ///
+
                                     Text(
-                                      "Restaurant • Food • Drinks ",
+
+                                      formatCuisines(p.categories!),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
@@ -313,3 +316,32 @@ String hoursAndRatings(Place p) {
   return status + ratingText + priceText;
 }
 
+
+String formatCuisines(dynamic rawCategories) {
+  if (rawCategories == null) return 'Restaurant';
+
+  final categories = List<String>.from(rawCategories);
+
+  const allowedPrefixes = [
+    'restaurant.',
+    'catering.',
+  ];
+
+  final cuisines = categories
+      // keep only allowed category types
+      .where((c) => allowedPrefixes.any((p) => c.startsWith(p)))
+      // keep only allowed category types
+      .map((c) => c.split('.').last)
+      .map((c) => c.replaceAll('_', ' '))
+      .map((c) =>
+  c.isEmpty ? c : c[0].toUpperCase() + c.substring(1))
+      .toSet()
+      .toList();
+
+  // Remove 'Restaurant' if there are other cuisines
+  if (cuisines.length > 1) {
+    cuisines.remove('Restaurant');
+  }
+  
+  return cuisines.isEmpty ? 'Restaurant' : cuisines.join(' • ');
+}
