@@ -12,14 +12,15 @@ class GeoapifyRepoImpl implements PlacesRepository{
       : dio = Dio(
     BaseOptions(
       baseUrl: 'https://api.geoapify.com/v2',
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
+      connectTimeout: const Duration(seconds: 10), // Maximum time allowed to establish a connection to the server.
+      receiveTimeout: const Duration(seconds: 10), // Maximum time to wait for data after the connection is established.
     ),
   );
 
+  // async = this will take time, WAIT
+  // await = pause here until its done, does not freeze app. Can still render UI, handle taps, animate maps
   @override
   Future<List<Place>> getNearbyPlaces({required LatLng center, required int radius, required String category,}) async {
-    // TODO: implement getNearbyPlaces
     final response = await dio.get(
       '/places',
       queryParameters: {
@@ -30,7 +31,18 @@ class GeoapifyRepoImpl implements PlacesRepository{
       },
     );
 
-    final features = response.data['features'] as List;
+    // Error handling
+    if (response.statusCode != 200) {
+      return [];
+    }
+
+    final data = response.data;
+    if (data == null || data['features'] == null) {
+      return [];
+    }
+
+
+    final features = data['features'] as List;
 
     return features.map((json) {
       final props = json['properties'];
@@ -42,15 +54,40 @@ class GeoapifyRepoImpl implements PlacesRepository{
         location: LatLng(
           props['lat'],
           props['lon'],
-        ), categories: [],
+        ),
       );
     }).toList();
   }
 
   @override
-  Future<Place?> getPlaceDetails(String placeId) {
-    // TODO: implement getPlaceDetails
-    throw UnimplementedError();
+  Future<Place?> getPlaceDetails(String placeId) async {
+    final response = await dio.get(
+      '/place-details',
+      queryParameters: {
+        'id': placeId,
+        'apiKey': apiKey,
+      },
+    );
+
+    final features = response.data['features'] as List?;
+    if (features == null || features.isEmpty) return null;
+
+    final props = features.first['properties'];
+
+    return Place(
+      id: props['place_id'],
+      name: props['name'] ?? 'Unnamed',
+      address: props['formatted'] ?? '',
+      location: LatLng(
+        props['lat'],
+        props['lon'],
+      ),
+      categories: (props['categories'] as List?)?.cast<String>() ?? [],
+      cuisine: props['cuisine'] ?? 'Food',
+      website: props['website'] ?? '',
+      phone: props['contact']['phone'] ?? '',
+    );
+
   }
 
   @override

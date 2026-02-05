@@ -11,7 +11,8 @@ class Place{
 
   // Enrichment fields
   final String? photoUrl;
-  final List<String> categories;
+  final List<String>? categories;
+  final String? cuisine;
   final bool? isOpen;
   final double? rating;
   final int? priceLevel;
@@ -26,8 +27,9 @@ class Place{
     required this.name,
     required this.location,
     required this.address,
+    this.cuisine,
     this.photoUrl,
-    required this.categories,
+    this.categories,
     this.isOpen,
     this.rating,
     this.priceLevel,

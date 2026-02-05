@@ -46,7 +46,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 leading: const Icon(Icons.restaurant),
                 title: Text(place.name),
                 subtitle: Text(
-                  place.categories.join(", "),
+                  place.categories!.join(", "),
                   ),
                 onTap: () async {
                   final details = await viewModel.getPlaceDetails(

@@ -72,8 +72,6 @@ class MapScreen extends StatelessWidget {
                   //final overview = details
                   if (!context.mounted || details == null) return;
 
-                  viewModel.selectPlace(details);
-
 
                   showModalBottomSheet(
                     context: context,
