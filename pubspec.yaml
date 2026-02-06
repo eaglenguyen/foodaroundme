@@ -46,20 +46,25 @@ dependencies:
   provider: ^6.1.2
   lottie: ^3.0.0
   # local database
-  drift: ^2.8.0
+  drift: ^2.31.0
+  drift_flutter: ^0.2.8
   sqlite3_flutter_libs: ^0.5.40
-  path_provider: ^2.0.14
-  path: ^1.8.3
+  path_provider: ^2.1.5
+  path: ^1.9.0
+
+  # http request
   http: ^0.13.5
   dio: ^5.4.0
   shimmer_animation: ^2.2.2+1
 
 
 
+
+
 dev_dependencies:
   # local database
-  drift_dev: ^2.8.0
-  build_runner: ^2.4.0
+  drift_dev: ^2.31.0
+  build_runner: ^2.10.5
 
   flutter_native_splash: ^2.4.1
   flutter_test:
