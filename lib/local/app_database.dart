@@ -11,7 +11,7 @@ class Places extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
   TextColumn get address => text()();
-  TextColumn get categories => text()();  // JSON String
+  TextColumn get categories => text()();  // JSON Strings
   RealColumn get lat => real()();
   RealColumn get lon => real()();
   IntColumn get lastFetched =>
