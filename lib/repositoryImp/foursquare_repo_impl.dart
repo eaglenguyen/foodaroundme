@@ -71,4 +71,12 @@ class FoursquareRepoImpl  implements PlacesRepository{
     throw UnimplementedError();
   }
 
+
+
+  @override
+  Future<Place?> getCacheDetails(String placeId) {
+    // TODO: implement getCacheDetails
+    throw UnimplementedError();
+  }
+
 }

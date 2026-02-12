@@ -121,6 +121,14 @@ class GoogleRepoImpl implements PlacesRepository {
         '&key=$_apiKey';
   }
 
+  @override
+  Future<Place?> getCacheDetails(String placeId) {
+    // TODO: implement getCacheDetails
+    throw UnimplementedError();
+  }
+
+
+
 
 
 

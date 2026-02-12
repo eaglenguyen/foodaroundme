@@ -1,19 +1,25 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:foodaroundme/model/place.dart' as q;
 import 'package:path/path.dart' as p;
 
 part 'app_database.g.dart';
 
 
-class Places extends Table {
-  TextColumn get id => text()();
+class PlacesDetailTable extends Table {
+  TextColumn get id => text()(); // place_id
   TextColumn get name => text()();
   TextColumn get address => text()();
   TextColumn get categories => text()();  // JSON Strings
+  TextColumn get cuisine => text().nullable()();
+  TextColumn get website => text().nullable()();
+  TextColumn get phone => text().nullable()();
   RealColumn get lat => real()();
-  RealColumn get lon => real()();
+  RealColumn get lng => real()();
   IntColumn get lastFetched =>
       integer().withDefault(const Constant(0))();
 
@@ -22,15 +28,67 @@ class Places extends Table {
 
 }
 
-@DriftDatabase(tables: [Places])
+@DriftDatabase(tables: [PlacesDetailTable])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 3;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (m) async {
+      await m.createAll();
+    },
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.createTable(placesDetailTable);
+      }
+    },
+  );
+
+
+  Future<void> upsertPlaceDetails(q.Place place) async {
+    await into(placesDetailTable).insertOnConflictUpdate(
+      PlacesDetailTableCompanion(
+        id: Value(place.id),
+        name: Value(place.name),
+        address: Value(place.address),
+        categories: Value(jsonEncode(place.categories)),
+        cuisine: Value(place.cuisine),
+        website: Value(place.website),
+        phone: Value(place.phone),
+        lat: Value(place.location.latitude),
+        lng: Value(place.location.longitude),
+        lastFetched: Value(DateTime.now().millisecondsSinceEpoch),
+      ),
+    );
+  }
+
+
+  Future<q.Place?> getCachedDetails(String placeId) async {
+    final row = await (select(placesDetailTable)
+    ..where((tbl) => tbl.id.equals(placeId)))
+        .getSingleOrNull();
+
+    if (row == null) return null;
+
+    return q.Place(
+      id: row.id,
+      name: row.name,
+      address: row.address,
+      categories: (jsonDecode(row.categories) as List).cast<String>(),
+      cuisine: row.cuisine,
+      website: row.website,
+      phone: row.phone,
+      location: LatLng(row.lat, row.lng)
+    );
+  }
 
 
 }
+
+
 
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {

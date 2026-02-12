@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:foodaroundme/local/app_database.dart' as d;
 import 'package:foodaroundme/model/place.dart';
 import 'package:foodaroundme/repository/PlacesRepository.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -7,8 +9,9 @@ class GeoapifyRepoImpl implements PlacesRepository{
 
   final Dio dio;
   final String apiKey;
+  final d.AppDatabase db;
 
-  GeoapifyRepoImpl(this.apiKey)
+  GeoapifyRepoImpl(this.apiKey, this.db)
       : dio = Dio(
     BaseOptions(
       baseUrl: 'https://api.geoapify.com/v2',
@@ -21,6 +24,10 @@ class GeoapifyRepoImpl implements PlacesRepository{
   // await = pause here until its done, does not freeze app. Can still render UI, handle taps, animate maps
   @override
   Future<List<Place>> getNearbyPlaces({required LatLng center, required int radius, required String category,}) async {
+
+
+    debugPrint('🔵 Fetching places from API');
+
     final response = await dio.get(
       '/places',
       queryParameters: {
@@ -44,7 +51,7 @@ class GeoapifyRepoImpl implements PlacesRepository{
 
     final features = data['features'] as List;
 
-    return features.map((json) {
+    final places =  features.map((json) {
       final props = json['properties'];
 
       return Place(
@@ -59,10 +66,23 @@ class GeoapifyRepoImpl implements PlacesRepository{
         categories: (props['categories'] as List?)?.cast<String>() ?? [],
       );
     }).toList();
+
+
+    return places;
   }
 
   @override
   Future<Place?> getPlaceDetails(String placeId) async {
+
+    final cached = await db.getCachedDetails(placeId);
+
+    if (cached != null) {
+      debugPrint('🟢 Place details from CACHE');
+      return cached;
+    }
+
+    debugPrint('🔵 Place details from API');
+
     final response = await dio.get(
       '/place-details',
       queryParameters: {
@@ -74,9 +94,11 @@ class GeoapifyRepoImpl implements PlacesRepository{
     final features = response.data['features'] as List?;
     if (features == null || features.isEmpty) return null;
 
+    // Returns a dynamic
     final props = features.first['properties'];
 
-    return Place(
+    // converts dynamic to Place
+    final place =  Place(
       id: props['place_id'],
       name: props['name'] ?? 'Unnamed',
       address: props['formatted'] ?? '',
@@ -90,6 +112,11 @@ class GeoapifyRepoImpl implements PlacesRepository{
       phone: props['contact']['phone'] ?? '',
     );
 
+    db.upsertPlaceDetails(place);
+
+    return place;
+
+
   }
 
   @override
@@ -97,6 +124,10 @@ class GeoapifyRepoImpl implements PlacesRepository{
     // TODO: implement searchPlaces
     throw UnimplementedError();
   }
+
+
+
+
 
 }
 
