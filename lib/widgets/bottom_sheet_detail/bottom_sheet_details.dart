@@ -4,7 +4,6 @@ import 'package:foodaroundme/widgets/bottom_sheet_detail/header.dart';
 import 'package:foodaroundme/widgets/bottom_sheet_detail/photo_grid.dart';
 import 'package:foodaroundme/widgets/bottom_sheet_detail/social_links.dart';
 import 'package:foodaroundme/widgets/drag_handles/drag_handle_line.dart';
-import 'package:google_maps_webservice/places.dart';
 import '../../model/place.dart';
 
 // When in final production, look at possibility that details.photos can be null. Line 71

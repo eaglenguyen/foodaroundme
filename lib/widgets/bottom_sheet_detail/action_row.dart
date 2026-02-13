@@ -31,9 +31,21 @@ class ActionRow extends StatelessWidget {
           _ActionChip(
             icon: Icons.language,
             label: "Website",
-            onTap: place.website == null ? null : () {
-              launchUrl(Uri.parse(place.website!));
-            },
+            onTap: () {
+              final raw = place.website;
+              if (raw == null || raw.isEmpty) return;
+
+              final url = raw.startsWith('http')
+                ? raw
+                : 'https://$raw';
+
+              final uri = Uri.tryParse(url);
+              if (uri == null) return;
+
+              launchUrl(
+                uri,
+                mode: LaunchMode.externalApplication);
+          },
           ),
           _ActionChip(
             icon: Icons.call,
@@ -75,7 +87,7 @@ class _ActionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDisabled = onTap == null;
+    final isDisabled = onTap == null ;
 
     return InkWell(
       borderRadius: BorderRadius.circular(24),

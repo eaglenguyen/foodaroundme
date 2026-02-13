@@ -66,7 +66,7 @@ class FoursquareRepoImpl  implements PlacesRepository{
   }
 
   @override
-  Future<List<Place>> searchPlaces({required String query, required String category, LatLng? center, int radius = 500}) {
+  Future<List<Place>> searchPlaces({required String query, LatLng? center, int radius = 500}) {
     // TODO: implement searchPlaces
     throw UnimplementedError();
   }

@@ -1,7 +1,7 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 
-class Place{
+class Place {
   // Fields == properties
   // Properties are empty/null by default
   final String id;
@@ -37,17 +37,13 @@ class Place{
     this.phone,
     this.photoUrls = const [],
 
-});
+  });
+}
 
   /// Converts GooglePlace's SearchResult → Place data class
   // Moved to googleRepo called _mapSearchResultToPlace
 
 
-}
 //result.photos?.isNotEmpty == true
 //         ? result.photos!.first.photoReference
 //           : null,
-
-//isOpen: result.openingHours?.openNow,
-//rating: result.rating,
-//priceLevel: result.priceLevel

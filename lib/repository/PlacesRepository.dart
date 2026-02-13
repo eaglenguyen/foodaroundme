@@ -13,7 +13,6 @@ abstract class PlacesRepository {
 
   Future<List<Place>> searchPlaces({
     required String query,
-    required String category,
     LatLng? center,
     int radius = 500,
 });

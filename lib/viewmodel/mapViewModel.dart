@@ -29,8 +29,6 @@ class MapViewModel extends ChangeNotifier {
   // ======================================================
 
   final LocationService _locationService = LocationService();
-  // when adding new keys make sure to pass into android build. Run , edit , add to args
-
   Timer? _debounce;
 
   // state (in android) is value that changes over time
@@ -43,9 +41,7 @@ class MapViewModel extends ChangeNotifier {
   LatLng center = const LatLng(42.3104, -71.0575);// default coordinate before it is assigned by getCurrentLocation()
   LatLng cameraCenter = const LatLng(42.3104, -71.0575);
   LatLng? userLocation;
-
   double cameraZoom = 11.0;
-
   static const double searchRadius = 800;
   Set<Circle> circles = {};
   Set<Marker> markers = {};
@@ -56,22 +52,11 @@ class MapViewModel extends ChangeNotifier {
   // ======================================================
   List<Place> allPlaces = [];
   List<Place> filteredPlaces = [];
-
   List<Place> allSearchPlaces = [];
   List<Place> filteredSearchPlaces = [];
 
-
   Place? selectedPlace;
   PlaceFilter? activeFilter;
-
-
-
-  // ======================================================
-  // 📍 Foursquare Places State
-  // ======================================================
-
-
-
 
   // ======================================================
   // 🧭 UI State
@@ -96,12 +81,7 @@ class MapViewModel extends ChangeNotifier {
     _loadMapStyle();
     customMarker();
     customMarkerCurrent();
-
-    // init block via flutter
   }
-
-
-
 
   // ======================================================
   // 🗺️ Map Lifecycle & theme
@@ -129,6 +109,14 @@ class MapViewModel extends ChangeNotifier {
     darkMapStyle =
     await rootBundle.loadString('assets/map_styles/dark_map.json');
     notifyListeners();
+  }
+
+  void resetCamera() {
+    mapController?.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: center, zoom: 15),
+      ),
+    );
   }
 
   // ======================================================
@@ -197,14 +185,9 @@ class MapViewModel extends ChangeNotifier {
 
 
 
-
-
   Future<Place?> getPlaceDetails(String placeId)  {
     return placesRepository.getPlaceDetails(placeId);
   }
-
-
-
 
 
   // ======================================================
@@ -302,9 +285,6 @@ class MapViewModel extends ChangeNotifier {
   }
 
 
-
-
-
   // zoom in on selectedPlace
   Future<void> _focusOnPlace(Place place) async {
     if (mapController == null) return;
@@ -320,18 +300,50 @@ class MapViewModel extends ChangeNotifier {
   }
 
 
-
-
   // ======================================================
   // 🔎 Search & Filters
   // ======================================================
+
+  Future<void> applyFilter(PlaceFilter filter) async {
+
+    // Update Intent
+    activeFilter = filter;
+    selectedPlace = null;
+    isLoading = true;
+
+    notifyListeners();
+
+    await Future.delayed(const Duration(milliseconds: 2000));
+
+    showBottomSheet = true;
+
+    switch(filter) {
+      case PlaceFilter.restaurant:
+        await loadNearbyRestaurants(GeoapifyCategories.restaurant);
+        break;
+      case PlaceFilter.cafe:
+        await loadNearbyRestaurants(GeoapifyCategories.cafe);
+        break;
+      case PlaceFilter.bar:
+        await loadNearbyRestaurants(GeoapifyCategories.bar);
+        break;
+      case PlaceFilter.popular:
+        await loadNearbyRestaurants("popular");
+        break;
+    }
+    resetCamera();
+    isLoading = false;
+    notifyListeners();
+  }
+
+  /////////////////////////////////////////////////////////////
+
 
   Future<void> fetchPlacesByTextSearch(String query) async {
     final places = await placesRepository.searchPlaces(
         center: cameraCenter,
         radius: searchRadius.toInt(),
         query: query,
-        category: "restaurant"
     );
 
     allSearchPlaces = places;
@@ -362,7 +374,7 @@ class MapViewModel extends ChangeNotifier {
 
     final q = query.trim();
     // If query is short, don't hit the API
-    if (query.trim().length < 2) {
+    if (q.length < 2) {
       filteredSearchPlaces = [];
       allSearchPlaces = [];
       notifyListeners();
@@ -376,40 +388,7 @@ class MapViewModel extends ChangeNotifier {
     await fetchPlacesByTextSearch(query);
   }
 
-  /////////////////////////////////////////////////////////////
 
-  Future<void> applyFilter(PlaceFilter filter) async {
-
-    // Update Intent
-    activeFilter = filter;
-    selectedPlace = null;
-    isLoading = true;
-
-    // final detailTypes = await placesRepository.getPlaceDetailsV1()
-    notifyListeners();
-
-    await Future.delayed(const Duration(milliseconds: 2000));
-
-    showBottomSheet = true;
-
-    switch(filter) {
-      case PlaceFilter.restaurant:
-        await loadNearbyRestaurants(GeoapifyCategories.restaurant);
-        break;
-      case PlaceFilter.cafe:
-        await loadNearbyRestaurants(GeoapifyCategories.cafe);
-        break;
-      case PlaceFilter.bar:
-        await loadNearbyRestaurants(GeoapifyCategories.bar);
-        break;
-      case PlaceFilter.popular:
-        await loadNearbyRestaurants("popular");
-        break;
-    }
-    resetCamera();
-    isLoading = false;
-    notifyListeners();
-  }
 
 
   // ======================================================
@@ -442,13 +421,6 @@ class MapViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void resetCamera() {
-    mapController?.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(target: center, zoom: 15),
-      ),
-    );
-  }
 
   void addCount() {
     visibleCount += 5;
@@ -475,14 +447,6 @@ class MapViewModel extends ChangeNotifier {
       default:
         return "";
     }
-  }
-
-  // Filtering Cuisines
-  List<String> extractCuisineTypes(List<String> types) {
-    return types
-        .where((t) => t.endsWith('_restaurant'))
-        .map((t) => t.replaceAll('_restaurant', '').replaceAll('_', ' '))
-        .toList();
   }
 
 }

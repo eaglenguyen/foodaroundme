@@ -54,7 +54,7 @@ class AppDatabase extends _$AppDatabase {
         id: Value(place.id),
         name: Value(place.name),
         address: Value(place.address),
-        categories: Value(jsonEncode(place.categories)),
+        categories: Value(jsonEncode(place.categories)), // jsonEncode = TypeConverter
         cuisine: Value(place.cuisine),
         website: Value(place.website),
         phone: Value(place.phone),

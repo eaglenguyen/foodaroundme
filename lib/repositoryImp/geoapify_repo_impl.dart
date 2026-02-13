@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:foodaroundme/domain/search_intent_resolver.dart';
 import 'package:foodaroundme/local/app_database.dart' as d;
 import 'package:foodaroundme/model/place.dart';
 import 'package:foodaroundme/repository/PlacesRepository.dart';
@@ -24,7 +25,6 @@ class GeoapifyRepoImpl implements PlacesRepository{
   // await = pause here until its done, does not freeze app. Can still render UI, handle taps, animate maps
   @override
   Future<List<Place>> getNearbyPlaces({required LatLng center, required int radius, required String category,}) async {
-
 
     debugPrint('🔵 Fetching places from API');
 
@@ -67,7 +67,6 @@ class GeoapifyRepoImpl implements PlacesRepository{
       );
     }).toList();
 
-
     return places;
   }
 
@@ -109,24 +108,30 @@ class GeoapifyRepoImpl implements PlacesRepository{
       categories: (props['categories'] as List?)?.cast<String>() ?? [],
       cuisine: props['cuisine'] ?? 'Food',
       website: props['website'] ?? '',
-      phone: props['contact']['phone'] ?? '',
+      phone: props['contact']?['phone'] ?? '',
+      // “Try to get phone from contact.
+      // If contact doesn’t exist, stop and return null.
+      // If the result is still null, use an empty string instead.”
     );
 
     db.upsertPlaceDetails(place);
 
     return place;
-
-
   }
+
 
   @override
-  Future<List<Place>> searchPlaces({required String query, required String category, LatLng? center, int radius = 500}) {
-    // TODO: implement searchPlaces
-    throw UnimplementedError();
+  Future<List<Place>> searchPlaces({required String query, LatLng? center, int radius = 500}) async {
+    final category = SearchIntentResolver.resolveCategory(query) ?? GeoapifyCategories.restaurant;
+
+    return getNearbyPlaces(
+        center: center ?? LatLng(0, 0),
+        radius: radius,
+        category: category
+    );
+
+
   }
-
-
-
 
 
 }

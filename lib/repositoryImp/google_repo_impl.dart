@@ -40,7 +40,6 @@ class GoogleRepoImpl implements PlacesRepository {
   @override
   Future<List<Place>> searchPlaces({
     required String query,
-    required String category,
     LatLng? center,
     int radius = 500,
   }) async {
