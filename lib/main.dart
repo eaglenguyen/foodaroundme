@@ -8,12 +8,19 @@ import 'package:foodaroundme/ui/main_screen.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
 
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'authentication/viewmodel/authViewModel.dart';
 import 'local/app_database.dart';
 
 
 
-void main() {
+void main() async {
+
+  await Supabase.initialize(
+    url: 'https://llxhwworkafjuuokswbq.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxseGh3d29ya2FmanV1b2tzd2JxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyNTQ4ODIsImV4cCI6MjA4NjgzMDg4Mn0.VPUQB0abc3qG6SA6PJwP5hXjPrTrKuvB4ReZWKvtuRI',
+  );
   // when adding new keys make sure to pass into android build. Run , edit , add to args
   const googleApiKey = String.fromEnvironment("GOOGLE_MAPS_API_KEY");
   const apiKeyFourSquare = String.fromEnvironment("FOURSQUARE_API_KEY");
@@ -29,14 +36,17 @@ void main() {
         ),
         // created once the app starts for entire app
         ChangeNotifierProvider(create: (context) => MapViewModel(
-          placesRepository: context.read<PlacesRepository>(),
-        )
-        ),
+          placesRepository: context.read<PlacesRepository>())),
+        ChangeNotifierProvider(create: (_) => AuthViewModel()),
+
       ],
       child: const MyApp(),
     ),
   );
 }
+
+final supabase = Supabase.instance.client;
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

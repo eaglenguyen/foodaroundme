@@ -16,7 +16,7 @@ class AppRoot extends StatelessWidget {
       builder: (_, isLoggedIn, __) {
         return isLoggedIn
             ? const MainScreen()
-            : const AuthScreen();
+            : const SignInScreen();
       },
     );
   }

@@ -1,11 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/app_root.dart';
+import 'package:provider/provider.dart';
 
-class AuthScreen extends StatelessWidget {
-  const AuthScreen({super.key});
+import '../viewmodel/authViewModel.dart';
+
+class SignInScreen extends StatefulWidget {
+  const SignInScreen({super.key});
+
+  @override
+  State<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> {
+  // For future use
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+
+    final authVM = context.watch<AuthViewModel>();
+
     return Scaffold(
       backgroundColor: const Color(0xFFD23B3B), // red background
       body: SafeArea(
@@ -38,7 +60,9 @@ class AuthScreen extends StatelessWidget {
               _AuthButton(
                 icon: Icons.g_mobiledata,
                 label: 'Sign in with Google',
-                onTap: () {},
+                onTap: () {
+                  authVM.signInWithGoogle();
+                },
               ),
               const SizedBox(height: 14),
 
