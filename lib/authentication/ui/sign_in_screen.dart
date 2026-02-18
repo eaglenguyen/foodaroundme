@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/app_root.dart';
+import 'package:foodaroundme/main.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../viewmodel/authViewModel.dart';
 
@@ -12,6 +14,28 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+
+
+  @override
+  void initState() {
+    _setupAuthListener();
+    super.initState();
+  }
+
+  void _setupAuthListener() {
+    supabase.auth.onAuthStateChange.listen((data) {
+      if (data.event == AuthChangeEvent.signedIn) {
+        authState.value = true;
+        navigatorKey.currentState?.pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => const AppRoot(),
+          ),
+        );
+      }
+    });
+  }
+
+
   // For future use
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();

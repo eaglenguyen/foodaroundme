@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-
 import '../widgets/bottom_sheet_detail/bottom_sheet_details.dart';
 import '../widgets/bottom_sheet_map.dart';
 
@@ -31,19 +30,35 @@ class MapScreen extends StatelessWidget {
             target: viewModel.center,
             zoom: 11.0,
       ),
-      circles: viewModel.circles,
-      myLocationButtonEnabled: true,
-      myLocationEnabled: true,
-      markers: {
-        Marker(
-            markerId: const MarkerId('currentLocation'),
-            position: viewModel.center,
-            infoWindow: const InfoWindow(title: "You're here"),
-            icon: viewModel.currentIcon,
-        ),
-        ...viewModel.markers,
+            circles: viewModel.circles,
+            myLocationButtonEnabled: false,
+            myLocationEnabled: true,
+            zoomControlsEnabled: false,
+            markers: {
+              Marker(
+                markerId: const MarkerId('currentLocation'),
+                position: viewModel.center,
+                infoWindow: const InfoWindow(title: "You're here"),
+                icon: viewModel.currentIcon,
+              ),
+              ...viewModel.markers,
       },
     ),
+
+          Positioned(
+            bottom: 40, // 👈 move anywhere you want
+            right: 16,
+            child: FloatingActionButton(
+              mini: true,
+              backgroundColor: Colors.white,
+              elevation: 4,
+              onPressed: viewModel.moveToUserLocation,
+              child: const Icon(
+                Icons.my_location,
+                color: Colors.black,
+              ),
+            ),
+          ),
 
         if(viewModel.isLoading)
           Positioned.fill(

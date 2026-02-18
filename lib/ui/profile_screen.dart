@@ -1,21 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:foodaroundme/authentication/ui/sign_in_screen.dart';
+import 'package:foodaroundme/main.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final user = supabase.auth.currentUser;
+    final fullName = user?.userMetadata?['full_name'];
+    final email = user?.email;
     return Scaffold(
       appBar: AppBar(
         title: const Text(""),
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: Icon(Icons.settings),
-          ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () async {
+              await supabase.auth.signOut();
+              if(context.mounted) {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => const SignInScreen(),
+                  ),
+                );
+              }
+            },
+          )
         ],
       ),
       backgroundColor: Colors.white,
@@ -34,17 +48,17 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 12),
 
             // Name
-            const Text(
-              "John",
+            Text(
+              fullName ?? 'null',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
 
-            // Username
-            const Text(
-              "@john617",
+            // email or username
+            Text(
+              email ?? 'null',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey,

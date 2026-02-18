@@ -46,6 +46,7 @@ void main() async {
 }
 
 final supabase = Supabase.instance.client;
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 
 class MyApp extends StatelessWidget {
@@ -53,9 +54,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: true,
-      home: AppRoot(),
+      home: const AppRoot(),
     );
   }
 }

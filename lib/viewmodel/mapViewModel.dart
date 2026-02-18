@@ -161,6 +161,18 @@ class MapViewModel extends ChangeNotifier {
 
   }
 
+  Future<void> moveToUserLocation() async {
+    final position = await Geolocator.getCurrentPosition();
+
+    mapController?.animateCamera(
+      CameraUpdate.newLatLngZoom(
+        LatLng(position.latitude, position.longitude),
+        14.8,
+      ),
+    );
+  }
+
+
 
   // ======================================================
   // 📍 Places Fetching
@@ -272,8 +284,9 @@ class MapViewModel extends ChangeNotifier {
                 icon: customIcon
             ),
       ).toSet();
-      notifyListeners();
     }
+    notifyListeners();
+
   }
 
 
@@ -293,7 +306,7 @@ class MapViewModel extends ChangeNotifier {
         CameraUpdate.newCameraPosition(
           CameraPosition(
             target: place.location,
-            zoom: 16.5,
+            zoom: 18,
           ),
         )
     );
