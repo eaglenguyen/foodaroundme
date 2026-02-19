@@ -1,5 +1,7 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import 'opening_hours.dart';
+
 
 class Place {
   // Fields == properties
@@ -20,6 +22,9 @@ class Place {
   final String? phone;
   final List<String> photoUrls;
 
+  final OpeningHours? openingHours;
+
+
 
   // Constructor. This fills the fields with value, connects to fields above
   Place({
@@ -36,6 +41,8 @@ class Place {
     this.website,
     this.phone,
     this.photoUrls = const [],
+    this.openingHours,
+
 
   });
 }

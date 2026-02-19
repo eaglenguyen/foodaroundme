@@ -62,7 +62,6 @@ class GeoapifyRepoImpl implements PlacesRepository{
           props['lat'],
           props['lon'],
         ),
-
         categories: (props['categories'] as List?)?.cast<String>() ?? [],
       );
     }).toList();
@@ -109,6 +108,7 @@ class GeoapifyRepoImpl implements PlacesRepository{
       cuisine: props['cuisine'] ?? 'Food',
       website: props['website'] ?? '',
       phone: props['contact']?['phone'] ?? '',
+
       // “Try to get phone from contact.
       // If contact doesn’t exist, stop and return null.
       // If the result is still null, use an empty string instead.”
