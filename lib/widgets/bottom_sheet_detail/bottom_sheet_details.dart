@@ -37,7 +37,7 @@ class BottomSheetDetails extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Header(place: place),
+                  Header(place: place, rawHours: place.openingHours ?? "",),
                   ActionRow(place: place),
                   SocialLinks(place: place),
                   PhotoGrid(photoUrls: place.photoUrls)

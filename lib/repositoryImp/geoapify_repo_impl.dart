@@ -6,6 +6,8 @@ import 'package:foodaroundme/model/place.dart';
 import 'package:foodaroundme/repository/PlacesRepository.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../model/opening_hours.dart';
+
 class GeoapifyRepoImpl implements PlacesRepository{
 
   final Dio dio;
@@ -95,6 +97,8 @@ class GeoapifyRepoImpl implements PlacesRepository{
     // Returns a dynamic
     final props = features.first['properties'];
 
+
+
     // converts dynamic to Place
     final place =  Place(
       id: props['place_id'],
@@ -108,6 +112,7 @@ class GeoapifyRepoImpl implements PlacesRepository{
       cuisine: props['cuisine'] ?? 'Food',
       website: props['website'] ?? '',
       phone: props['contact']?['phone'] ?? '',
+      openingHours: props['opening_hours'] ?? '',
 
       // “Try to get phone from contact.
       // If contact doesn’t exist, stop and return null.

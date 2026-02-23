@@ -9,7 +9,7 @@ class OpeningHours {
 
   factory OpeningHours.fromJson(Map<String, dynamic> json) {
     return OpeningHours(
-      isOpenNow: json['isOpenNow'] ?? false,
+      isOpenNow: json['is_open_now'] ?? false,
       weekdays: (json['weekdays'] as List<dynamic>? ?? [])
           .map((e) => WeekdayHours.fromJson(e))
           .toList(),

@@ -9,7 +9,7 @@ import 'package:path/path.dart' as p;
 
 part 'app_database.g.dart';
 
-
+// run if making changes -> flutter pub run build_runner build --delete-conflicting-outputs.
 class PlacesDetailTable extends Table {
   TextColumn get id => text()(); // place_id
   TextColumn get name => text()();
@@ -18,6 +18,7 @@ class PlacesDetailTable extends Table {
   TextColumn get cuisine => text().nullable()();
   TextColumn get website => text().nullable()();
   TextColumn get phone => text().nullable()();
+  TextColumn get openingHours => text().nullable()();
   RealColumn get lat => real()();
   RealColumn get lng => real()();
   IntColumn get lastFetched =>
@@ -33,7 +34,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -43,6 +44,13 @@ class AppDatabase extends _$AppDatabase {
     onUpgrade: (m, from, to) async {
       if (from < 2) {
         await m.createTable(placesDetailTable);
+      }
+
+      if (from < 4) {
+        await m.addColumn(
+          placesDetailTable,
+          placesDetailTable.openingHours,
+        );
       }
     },
   );
@@ -58,6 +66,7 @@ class AppDatabase extends _$AppDatabase {
         cuisine: Value(place.cuisine),
         website: Value(place.website),
         phone: Value(place.phone),
+        openingHours: Value(place.openingHours),
         lat: Value(place.location.latitude),
         lng: Value(place.location.longitude),
         lastFetched: Value(DateTime.now().millisecondsSinceEpoch),
@@ -81,7 +90,8 @@ class AppDatabase extends _$AppDatabase {
       cuisine: row.cuisine,
       website: row.website,
       phone: row.phone,
-      location: LatLng(row.lat, row.lng)
+      openingHours: row.openingHours,
+      location: LatLng(row.lat, row.lng),
     );
   }
 

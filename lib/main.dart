@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/app_root.dart';
 import 'package:foodaroundme/repository/PlacesRepository.dart';
-import 'package:foodaroundme/repositoryImp/foursquare_repo_impl.dart';
 import 'package:foodaroundme/repositoryImp/geoapify_repo_impl.dart';
-import 'package:foodaroundme/repositoryImp/google_repo_impl.dart';
-import 'package:foodaroundme/ui/main_screen.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
 
 import 'package:provider/provider.dart';

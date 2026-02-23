@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../viewmodel/mapViewModel.dart';
 
 class ToggleIconGroup extends StatefulWidget {
   final List<IconData> icons;

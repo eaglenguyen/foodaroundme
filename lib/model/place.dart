@@ -21,8 +21,7 @@ class Place {
   final String? website;
   final String? phone;
   final List<String> photoUrls;
-
-  final OpeningHours? openingHours;
+  final String? openingHours;
 
 
 
