@@ -62,4 +62,30 @@ class AuthViewModel extends ChangeNotifier{
 
 
   }
+
+  Future<void> signUpEmail (String email, String password) async {
+    final res = await _supabase.auth.signUp(
+      email: email,
+      password: password,
+    );
+
+    if (res.user != null) {
+      throw Exception('Sign-up failed');
+    }
+  }
+
+  Future<void> signInEmail (String email, String password) async {
+    final res = await _supabase.auth.signUp(
+      email: email,
+      password: password,
+    );
+    if (res.user != null) {
+      throw Exception('Wrong credentials');
+    }
+  }
+
+  Future<void> signOut() async {
+    await _supabase.auth.signOut();
+  }
+
 }

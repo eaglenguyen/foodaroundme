@@ -79,7 +79,7 @@ class _HeaderState extends State<Header> {
           TextButton.icon(
             onPressed: () => setState(() => expanded = !expanded),
             icon: Icon(expanded ? Icons.expand_less : Icons.expand_more),
-            label: Text(expanded ? 'Show less' : 'Show all hours'),
+            label: Text(expanded ? '' : 'Show all hours'),
           ),
         ],
       ),

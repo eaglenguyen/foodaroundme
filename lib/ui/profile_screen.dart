@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/authentication/ui/sign_in_screen.dart';
+import 'package:foodaroundme/authentication/viewmodel/authViewModel.dart';
 import 'package:foodaroundme/main.dart';
+import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<AuthViewModel>();
+
     final user = supabase.auth.currentUser;
     final fullName = user?.userMetadata?['full_name'];
     final email = user?.email;
@@ -19,8 +23,8 @@ class ProfileScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () async {
-              await supabase.auth.signOut();
+            onPressed: () {
+              viewModel.signOut();
               if(context.mounted) {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
