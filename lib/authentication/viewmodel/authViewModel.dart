@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
+import 'package:foodaroundme/app_root.dart';
+import 'package:foodaroundme/main.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 
 class AuthViewModel extends ChangeNotifier{
-  final SupabaseClient _supabase = Supabase.instance.client;
 
   bool isLoading = false;
   String? error;
@@ -48,11 +49,19 @@ class AuthViewModel extends ChangeNotifier{
         throw Exception('Missing Google auth token');
       }
 
-      await _supabase.auth.signInWithIdToken(
+      await supabase.auth.signInWithIdToken(
         provider: OAuthProvider.google,
         idToken: idToken,
         accessToken: accessToken,
       );
+
+
+      final session = supabase.auth.currentSession;
+      final user = supabase.auth.currentUser;
+
+      debugPrint('SESSION IS NULL? ${session == null}');
+      debugPrint('USER: ${user?.id}');
+
     } catch (e) {
       error = e.toString();
     } finally {
@@ -64,7 +73,7 @@ class AuthViewModel extends ChangeNotifier{
   }
 
   Future<void> signUpEmail (String email, String password) async {
-    final res = await _supabase.auth.signUp(
+    final res = await supabase.auth.signUp(
       email: email,
       password: password,
     );
@@ -75,7 +84,7 @@ class AuthViewModel extends ChangeNotifier{
   }
 
   Future<void> signInEmail (String email, String password) async {
-    final res = await _supabase.auth.signUp(
+    final res = await supabase.auth.signInWithPassword(
       email: email,
       password: password,
     );
@@ -85,7 +94,7 @@ class AuthViewModel extends ChangeNotifier{
   }
 
   Future<void> signOut() async {
-    await _supabase.auth.signOut();
+    await supabase.auth.signOut();
   }
 
 }

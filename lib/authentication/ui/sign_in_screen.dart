@@ -2,12 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/app_root.dart';
-import 'package:foodaroundme/authentication/ui/email_screen.dart';
-import 'package:foodaroundme/main.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
+import '../../main.dart';
 import '../viewmodel/authViewModel.dart';
+import '../widgets/email_view.dart';
+import '../widgets/landing_view.dart';
+import '../widgets/password_view.dart';
+
+
+
+enum AuthMode { signIn, signUp }
+enum _AuthStep { landing, email, password }
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -17,239 +23,198 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  StreamSubscription<AuthState>? _authSub;
+  _AuthStep _step = _AuthStep.landing;
+  AuthMode _mode = AuthMode.signIn;
 
+  final TextEditingController _emailController = TextEditingController(text: '');
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    _setupAuthListener();
-  }
-
-  void _setupAuthListener() {
-    supabase.auth.onAuthStateChange.listen((data) {
-      if (data.event == AuthChangeEvent.signedIn) {
-        authState.value = true;
-        navigatorKey.currentState?.pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => const AppRoot(),
-          ),
-        );
-      }
-    });
-  }
-
-
-  // For future use
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  bool _loading = false;
+  String? _error;
 
   @override
   void dispose() {
-    _authSub?.cancel();
-    emailController.dispose();
-    passwordController.dispose();
+    _emailController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
     super.dispose();
+  }
+
+  void _goToEmail() {
+    setState(() {
+      _step = _AuthStep.email;
+      _error = null;
+      _loading = false;
+    });
+  }
+
+  Future<void> _continueFromEmail() async {
+    final email = _emailController.text.trim().toLowerCase();
+
+    if (email.isEmpty || !email.contains('@')) {
+      setState(() => _error = 'Please enter a valid email.');
+      return;
+    }
+
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+
+    try {
+      // Your existing "does email exist" logic
+      final row = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', email)
+          .maybeSingle();
+
+      final exists = row != null;
+
+      if (!mounted) return;
+      setState(() {
+        _mode = exists ? AuthMode.signIn : AuthMode.signUp;
+        _step = _AuthStep.password;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _error = 'Could not check email. Try again.');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _submitPassword() async {
+    final supabase = Supabase.instance.client;
+    final email = _emailController.text.trim().toLowerCase();
+    final password = _passwordController.text;
+
+    if (password.length < 6) {
+      setState(() => _error = 'Password must be at least 6 characters.');
+      return;
+    }
+
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+
+    try {
+      if (_mode == AuthMode.signIn) {
+        await supabase.auth.signInWithPassword(email: email, password: password);
+
+        // ✅ NO NAVIGATION HERE
+        // AppRoot will show MainScreen when session != null
+        // Also: if you had guest mode on, you might want:
+        // isGuestMode.value = false;
+
+      } else {
+        final username = _usernameController.text.trim();
+        if (username.isEmpty) {
+          setState(() => _error = 'Username is required.');
+          return;
+        }
+
+        final res = await supabase.auth.signUp(email: email, password: password);
+
+        // If email confirmation is enabled, session may be null.
+
+
+        final user = res.user;
+        if (user == null) throw Exception('Signup failed.');
+
+        await supabase.from('profiles').update({'username': username}).eq('id', user.id);
+
+        // ✅ NO NAVIGATION HERE
+      }
+    } on AuthException catch (e) {
+      setState(() => _error = e.message);
+    } catch (_) {
+      setState(() => _error = 'Something went wrong.');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  bool _handleBack() {
+    if (_loading) return false;
+
+    if (_step == _AuthStep.password) {
+      setState(() {
+        _step = _AuthStep.email;
+        _error = null;
+      });
+      return false;
+    }
+    if (_step == _AuthStep.email) {
+      setState(() {
+        _step = _AuthStep.landing;
+        _error = null;
+      });
+      return false;
+    }
+    return true; // allow pop of the route
   }
 
   @override
   Widget build(BuildContext context) {
     final authVM = context.watch<AuthViewModel>();
 
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF1C1622), // dark purple/black
-              Color(0xFF0F0B14), // darker
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Spacer(flex: 3),
-
-                // Title
-                const Center(
-                  child: Text(
-                    'FoodAroundMe',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                ),
-
-                const Spacer(flex: 4),
-
-                // Bottom card section
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1A1422),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.06),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Sign in or sign up',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      const Text(
-                        'Choose a method to continue.',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white70,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Phone (primary)
-                      _AuthButtonDark(
-                        icon: Icons.email,
-                        label: 'Sign in with Email',
-                        variant: _AuthButtonVariant.primary,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const EmailScreen(),
-                            )
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 12),
-
-                      // Google
-                      _AuthButtonDark(
-                        icon: Icons.g_mobiledata_outlined,
-                        label: 'Sign in with Google',
-                        variant: _AuthButtonVariant.secondary,
-                        onTap: () {
-                          authVM.signInWithGoogle();
-                        },
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      // Optional Email (kept for future but styled)
-                    ],
-                  ),
-                ),
-
-                const Spacer(flex: 2),
-
-                // Skip
-                Center(
-                  child: TextButton(
-                    onPressed: () {
-                      authState.value = true;
-                    },
-                    child: const Text(
-                      'Skip',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 12),
+    return WillPopScope(
+      onWillPop: () async => _handleBack(),
+      child: Scaffold(
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFF1C1622),
+                Color(0xFF0F0B14),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-
-
-enum _AuthButtonVariant { primary, secondary }
-
-class _AuthButtonDark extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final _AuthButtonVariant variant;
-
-  const _AuthButtonDark({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    required this.variant,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isPrimary = variant == _AuthButtonVariant.primary;
-
-    final Color bgColor = isPrimary
-        ? const Color(0xFFF5C518) // yellow primary
-        : const Color(0xFF241C2E); // dark input-like
-
-    final Color fgColor = isPrimary ? Colors.black : Colors.white;
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(14),
-      onTap: onTap,
-      child: Container(
-        height: 52,
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isPrimary ? Colors.transparent : Colors.white.withOpacity(0.08),
-          ),
-          boxShadow: isPrimary
-              ? [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.25),
-              blurRadius: 14,
-              offset: const Offset(0, 10),
-            ),
-          ]
-              : [],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 20, color: fgColor),
-            const SizedBox(width: 10),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: fgColor,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 180),
+                child: switch (_step) {
+                  _AuthStep.landing => LandingView(
+                    key: const ValueKey('landing'),
+                    onEmailTap: _goToEmail,
+                    onGoogleTap: () => authVM.signInWithGoogle(),
+                    onSkipTap: () => isGuestMode.value = true,
+                  ),
+                  _AuthStep.email => EmailView(
+                    key: const ValueKey('email'),
+                    controller: _emailController,
+                    loading: _loading,
+                    error: _error,
+                    onBack: _handleBack,
+                    onContinue: _continueFromEmail,
+                  ),
+                  _AuthStep.password => PasswordView(
+                    key: const ValueKey('password'),
+                    email: _emailController.text.trim().toLowerCase(),
+                    mode: _mode,
+                    usernameController: _usernameController,
+                    passwordController: _passwordController,
+                    loading: _loading,
+                    error: _error,
+                    onBack: _handleBack,
+                    onSubmit: _submitPassword,
+                  ),
+                },
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
+

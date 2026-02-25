@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:foodaroundme/ui/main_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'authentication/ui/sign_in_screen.dart';
 
-
-final authState = ValueNotifier<bool>(false);
+final ValueNotifier<bool> isGuestMode = ValueNotifier(false); // for skip button
 
 class AppRoot extends StatelessWidget {
   const AppRoot({super.key});
@@ -12,11 +12,20 @@ class AppRoot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<bool>(
-      valueListenable: authState,
-      builder: (_, isLoggedIn, __) {
-        return isLoggedIn
-            ? const MainScreen()
-            : const SignInScreen();
+      valueListenable: isGuestMode,
+      builder: (context, isGuest, _) {
+        return StreamBuilder<AuthState>(
+          stream: Supabase.instance.client.auth.onAuthStateChange,
+          builder: (context, snapshot) {
+            final session = Supabase.instance.client.auth.currentSession;
+
+            if (session != null || isGuest) {
+              return const MainScreen();
+            } else {
+              return const SignInScreen();
+            }
+          },
+        );
       },
     );
   }

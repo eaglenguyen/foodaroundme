@@ -21,9 +21,9 @@ class _MainScreenState extends State<MainScreen> {
   bool isMenuOpen = false;
 
   final List<Widget> screens = const [
-    MapScreen(key: ValueKey(0)),     // index 0
-    ProfileScreen(key: ValueKey(1)), // index 1
-    SearchScreen(key: ValueKey(2)),  // index 2
+    MapScreen(key: ValueKey(0)),
+    ProfileScreen(key: ValueKey(1)),
+    SearchScreen(key: ValueKey(2)),
   ];
 
   @override
