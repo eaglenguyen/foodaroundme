@@ -11,10 +11,10 @@ import '../widgets/landing_view.dart';
 import '../widgets/password_view.dart';
 
 
-
+//enum vs sealed classes
 enum AuthMode { signIn, signUp }
 enum _AuthStep { landing, email, password }
-
+// One route that can show 1 of 3 widgets
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
@@ -23,8 +23,8 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  _AuthStep _step = _AuthStep.landing;
-  AuthMode _mode = AuthMode.signIn;
+  _AuthStep _step = _AuthStep.landing; // widget screens
+  AuthMode _mode = AuthMode.signIn; // sign in / out screen
 
   final TextEditingController _emailController = TextEditingController(text: '');
   final TextEditingController _usernameController = TextEditingController();
@@ -43,7 +43,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   void _goToEmail() {
     setState(() {
-      _step = _AuthStep.email;
+      _step = _AuthStep.email; // Navigate widgets via setState
       _error = null;
       _loading = false;
     });
@@ -70,11 +70,11 @@ class _SignInScreenState extends State<SignInScreen> {
           .eq('email', email)
           .maybeSingle();
 
-      final exists = row != null;
+      final emailExists = row != null;
 
       if (!mounted) return;
       setState(() {
-        _mode = exists ? AuthMode.signIn : AuthMode.signUp;
+        _mode = emailExists ? AuthMode.signIn : AuthMode.signUp; //
         _step = _AuthStep.password;
       });
     } catch (_) {
@@ -86,7 +86,6 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   Future<void> _submitPassword() async {
-    final supabase = Supabase.instance.client;
     final email = _emailController.text.trim().toLowerCase();
     final password = _passwordController.text;
 
@@ -103,12 +102,8 @@ class _SignInScreenState extends State<SignInScreen> {
     try {
       if (_mode == AuthMode.signIn) {
         await supabase.auth.signInWithPassword(email: email, password: password);
-
-        // ✅ NO NAVIGATION HERE
-        // AppRoot will show MainScreen when session != null
         // Also: if you had guest mode on, you might want:
         // isGuestMode.value = false;
-
       } else {
         final username = _usernameController.text.trim();
         if (username.isEmpty) {
@@ -124,12 +119,24 @@ class _SignInScreenState extends State<SignInScreen> {
         final user = res.user;
         if (user == null) throw Exception('Signup failed.');
 
-        await supabase.from('profiles').update({'username': username}).eq('id', user.id);
+        await supabase.auth.updateUser(
+          UserAttributes(
+            data: {
+              'full_name': username, // sets username as display name in supabase
+            }
+          )
+        );
+
+        await supabase
+            .from('profiles')
+            .update({'username': username}) // saves username to profiles table
+            .eq('id', user.id);
 
         // ✅ NO NAVIGATION HERE
       }
     } on AuthException catch (e) {
-      setState(() => _error = e.message);
+      setState(() => _error = e.message
+      );
     } catch (_) {
       setState(() => _error = 'Something went wrong.');
     } finally {
@@ -137,7 +144,9 @@ class _SignInScreenState extends State<SignInScreen> {
     }
   }
 
-  bool _handleBack() {
+  /////////// Back Navigation Logic
+
+  bool handleBack() {
     if (_loading) return false;
 
     if (_step == _AuthStep.password) {
@@ -157,12 +166,37 @@ class _SignInScreenState extends State<SignInScreen> {
     return true; // allow pop of the route
   }
 
+  void _handleSystemPop(bool didPop, Object? result) {
+    if (didPop) return; // system already popped
+
+    if (_loading) return;
+
+    if (_step == _AuthStep.password) {
+      setState(() {
+        _step = _AuthStep.email;
+        _error = null;
+      });
+      return;
+    }
+
+    if (_step == _AuthStep.email) {
+      setState(() {
+        _step = _AuthStep.landing;
+        _error = null;
+      });
+      return;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authVM = context.watch<AuthViewModel>();
 
-    return WillPopScope(
-      onWillPop: () async => _handleBack(),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        _handleSystemPop(didPop, result);
+      } ,
       child: Scaffold(
         body: Container(
           width: double.infinity,
@@ -194,7 +228,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     controller: _emailController,
                     loading: _loading,
                     error: _error,
-                    onBack: _handleBack,
+                    onBack: handleBack,
                     onContinue: _continueFromEmail,
                   ),
                   _AuthStep.password => PasswordView(
@@ -205,7 +239,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     passwordController: _passwordController,
                     loading: _loading,
                     error: _error,
-                    onBack: _handleBack,
+                    onBack: handleBack,
                     onSubmit: _submitPassword,
                   ),
                 },

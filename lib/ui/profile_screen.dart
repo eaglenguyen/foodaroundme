@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/app_root.dart';
-import 'package:foodaroundme/authentication/ui/sign_in_screen.dart';
 import 'package:foodaroundme/authentication/viewmodel/authViewModel.dart';
 import 'package:foodaroundme/main.dart';
+import 'package:foodaroundme/ui/update_profile_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../viewmodel/mapViewModel.dart';
@@ -84,12 +84,28 @@ class ProfileScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             // "View my saves"
-            _profileOptionButton(Icons.bookmark, "View my saves"),
+            _profileOptionButton(
+              Icons.bookmark,
+              "View my saves",
+              onTap: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const UpdateProfileScreen())
+                );
+              },
+            ),
 
             const SizedBox(height: 12),
 
             // Bio
-            _profileOptionButton(Icons.edit, "Bio"),
+            _profileOptionButton(
+              Icons.edit,
+              "Bio",
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const UpdateProfileScreen())
+                );
+            },
+            ),
 
             const SizedBox(height: 25),
 
@@ -149,8 +165,15 @@ class ProfileScreen extends StatelessWidget {
   }
 
   // ⭐ Profile option button
-  Widget _profileOptionButton(IconData icon, String text) {
-    return Container(
+  Widget _profileOptionButton(
+      IconData icon,
+      String text,
+      {VoidCallback? onTap,
+      }) {
+    return InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+      child: Container(
       height: 48,
       width: double.infinity,
       decoration: BoxDecoration(
@@ -165,6 +188,7 @@ class ProfileScreen extends StatelessWidget {
           Text(text),
         ],
       ),
+      )
     );
   }
 }
