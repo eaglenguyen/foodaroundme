@@ -122,14 +122,14 @@ class _SignInScreenState extends State<SignInScreen> {
         await supabase.auth.updateUser(
           UserAttributes(
             data: {
-              'full_name': username, // sets username as display name in supabase
+              'full_name': username, //
             }
           )
         );
 
         await supabase
             .from('profiles')
-            .update({'username': username}) // saves username to profiles table
+            .update({'username': username}) // changes username in profiles table
             .eq('id', user.id);
 
         // ✅ NO NAVIGATION HERE

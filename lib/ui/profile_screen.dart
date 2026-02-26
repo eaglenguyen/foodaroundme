@@ -16,9 +16,11 @@ class ProfileScreen extends StatelessWidget {
     final mapVm = context.watch<MapViewModel>();
 
 
+    // Single source of truth is from profiles table via supabase
     final user = supabase.auth.currentUser;
-    final fullName = user?.userMetadata?['full_name'];
+    final fullName = authVm.username ?? '';
     final email = user?.email;
+    final bio = authVm.bio ?? '';
     return Scaffold(
       appBar: AppBar(
         title: const Text(""),
@@ -69,6 +71,15 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
 
+            // Bio
+            Text(
+              bio ?? 'null',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+              ),
+            ),
+
             const SizedBox(height: 16),
 
             // ❤️ Likes & Dislikes row
@@ -88,10 +99,11 @@ class ProfileScreen extends StatelessWidget {
               Icons.bookmark,
               "View my saves",
               onTap: () {
+                isGuestMode.value ? null :
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const UpdateProfileScreen())
                 );
-              },
+                },
             ),
 
             const SizedBox(height: 12),
@@ -101,10 +113,11 @@ class ProfileScreen extends StatelessWidget {
               Icons.edit,
               "Bio",
               onTap: () {
+                isGuestMode.value ? null :
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const UpdateProfileScreen())
+                    MaterialPageRoute(builder: (_) => const UpdateProfileScreen())
                 );
-            },
+              },
             ),
 
             const SizedBox(height: 25),

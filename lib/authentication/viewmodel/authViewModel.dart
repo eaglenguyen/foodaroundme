@@ -10,6 +10,52 @@ class AuthViewModel extends ChangeNotifier{
   bool isLoading = false;
   String? error;
 
+  String? username;
+  String? bio;
+
+  Future<void> loadProfileTable() async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return;
+
+    final row = await supabase
+      .from('profiles')
+      .select('username, bio')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    username = row?['username'] as String?;
+    bio = row?['bio'] as String?;
+    notifyListeners();
+  }
+
+  Future<void> seedProfileIfMissingFromGoogle() async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return;
+
+    // Load current profile row
+    final row = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', user.id)
+        .maybeSingle();
+
+    final existing = (row?['username'] as String?)?.trim();
+
+    // Pull google name from metadata as a one-time seed
+    final googleName = (user.userMetadata?['full_name'] ?? 'null')?.toString().trim();
+
+    // If these conditions are met, make the username (in profiles table) as google name
+    if ((existing == null || existing.isEmpty) &&
+        googleName != null &&
+        googleName.isNotEmpty) {
+      await supabase
+          .from('profiles')
+          .update({'username': googleName})
+          .eq('id', user.id);
+    }
+  }
+
+
   Future<void> signInWithGoogle() async {
     /// TODO: update the Web client ID with your own.
     ///
@@ -55,12 +101,8 @@ class AuthViewModel extends ChangeNotifier{
         accessToken: accessToken,
       );
 
-
-      final session = supabase.auth.currentSession;
-      final user = supabase.auth.currentUser;
-
-      debugPrint('SESSION IS NULL? ${session == null}');
-      debugPrint('USER: ${user?.id}');
+      await seedProfileIfMissingFromGoogle();
+      await loadProfileTable();
 
     } catch (e) {
       error = e.toString();
@@ -71,6 +113,8 @@ class AuthViewModel extends ChangeNotifier{
 
 
   }
+
+
 
   Future<void> signUpEmail (String email, String password) async {
     final res = await supabase.auth.signUp(

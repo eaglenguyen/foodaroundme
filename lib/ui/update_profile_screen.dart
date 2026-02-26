@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:foodaroundme/main.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+
 class UpdateProfileScreen extends StatefulWidget {
   const UpdateProfileScreen({super.key});
 
@@ -10,10 +11,27 @@ class UpdateProfileScreen extends StatefulWidget {
 }
 
 class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
-  final _userName = TextEditingController(text: 'Eagle Nguyen');
-  final _email = TextEditingController(text: 'itgmaster617@gmail.com');
-  final _bio = TextEditingController(text: '');
+  final _userName = TextEditingController();
+  final _email = TextEditingController();
+  final _bio = TextEditingController();
   bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState(); // loading the profile from supabase here instead of above
+    _prefill();
+  }
+
+  Future<void> _prefill() async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return;
+
+    _email.text = user.email ?? '';
+    _userName.text = user.userMetadata?['full_name'] ?? '';
+    _bio.text = user.userMetadata?['bio'] ?? '';
+
+
+  }
 
   @override
   void dispose() {
@@ -40,8 +58,13 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       await supabase.from('profiles').update({
         'username': userName,
         'bio': bio,
-
       }).eq('id', user.id);
+
+      await supabase.auth.updateUser(
+        UserAttributes(
+          data: {'full_name': userName, 'bio': bio},
+        ),
+      );
 
       if (!mounted) return;
       Navigator.of(context).pop(true); // should tell previous screen "updated" and visually
