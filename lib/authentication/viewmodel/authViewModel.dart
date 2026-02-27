@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:foodaroundme/app_root.dart';
 import 'package:foodaroundme/main.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../model/place.dart';
 
 
 class AuthViewModel extends ChangeNotifier{
@@ -12,6 +15,9 @@ class AuthViewModel extends ChangeNotifier{
 
   String? username;
   String? bio;
+
+  final List<Place> savedPlaces = [];
+
 
   Future<void> loadProfileTable() async {
     final user = supabase.auth.currentUser;
@@ -114,25 +120,90 @@ class AuthViewModel extends ChangeNotifier{
 
   }
 
+  Future<void> savePlace(Place place) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return;
+
+    await supabase.from('saved_places').upsert({
+      'user_id': supabase.auth.currentUser!.id,
+      'provider_place_id': place.id,
+      'name': place.name,
+      'address': place.address,
+      'categories': place.categories,
+    });
+  }
+
+  Future<void> deleteSavedPlace(String placeId) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return;
+
+    // optimistic remove
+    final removedIndex = savedPlaces.indexWhere((p) => p.id == placeId);
+    Place? removed;
+    if (removedIndex != -1) {
+      removed = savedPlaces.removeAt(removedIndex);
+    }
 
 
-  Future<void> signUpEmail (String email, String password) async {
-    final res = await supabase.auth.signUp(
-      email: email,
-      password: password,
-    );
+      await supabase
+          .from('saved_places')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('provider_place_id', placeId);
+    }
 
-    if (res.user != null) {
-      throw Exception('Sign-up failed');
+
+  Future<void> fetchSavedPlaces() async {
+    final user = supabase.auth.currentUser;
+
+    if (user == null) {
+      return;
+    }
+
+    isLoading = true;
+    error = null;
+    notifyListeners();
+
+    try {
+      final rows = await supabase
+          .from('saved_places')
+          .select('provider_place_id, name, address, categories, created_at')
+          .eq('user_id', user.id)
+          .order('created_at', ascending: false);
+
+      final list = (rows as List).cast<Map<String, dynamic>>();
+
+      savedPlaces
+        ..clear()
+        ..addAll(list.map((r) {
+          return Place(
+            id: r['provider_place_id'] as String,
+            name: (r['name'] as String?) ?? 'Unnamed',
+            address: (r['address'] as String?) ?? '',
+            location: const LatLng(0, 0),
+            categories: (r['categories'] as List?)?.cast<String>() ?? [],
+          );
+        }));
+
+
+    } catch (e) {
+      error = e.toString();
+    } finally {
+      isLoading = false;
+      notifyListeners();
     }
   }
+
+
+
+
 
   Future<void> signInEmail (String email, String password) async {
     final res = await supabase.auth.signInWithPassword(
       email: email,
       password: password,
     );
-    if (res.user != null) {
+    if (res.user == null) {
       throw Exception('Wrong credentials');
     }
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:foodaroundme/app_root.dart';
 import 'package:foodaroundme/authentication/viewmodel/authViewModel.dart';
 import 'package:foodaroundme/main.dart';
+import 'package:foodaroundme/ui/saved_places_screen.dart';
 import 'package:foodaroundme/ui/update_profile_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -101,7 +102,7 @@ class ProfileScreen extends StatelessWidget {
               onTap: () {
                 isGuestMode.value ? null :
                 Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const UpdateProfileScreen())
+                    MaterialPageRoute(builder: (_) => const SavedPlacesScreen())
                 );
                 },
             ),

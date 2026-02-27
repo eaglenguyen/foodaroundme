@@ -101,7 +101,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
     try {
       if (_mode == AuthMode.signIn) {
-        await supabase.auth.signInWithPassword(email: email, password: password);
+        await context.read<AuthViewModel>().signInEmail(email, password);
         // Also: if you had guest mode on, you might want:
         // isGuestMode.value = false;
       } else {

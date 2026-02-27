@@ -1,7 +1,11 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../authentication/viewmodel/authViewModel.dart';
+import '../../main.dart';
 import '../../model/place.dart';
 
 
@@ -16,18 +20,21 @@ class ActionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authVm = context.watch<AuthViewModel>();
+
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Wrap(
         spacing: 8,
         runSpacing: 8,
         children: [
-          _ActionChip(
+          CustomActionChip(
             icon: Icons.directions,
             label: "Directions",
             onTap: () => showDirectionsPicker(context, place),
           ),
-          _ActionChip(
+          CustomActionChip(
             icon: Icons.language,
             label: "Website",
             onTap: () {
@@ -46,25 +53,25 @@ class ActionRow extends StatelessWidget {
                 mode: LaunchMode.externalApplication);
           },
           ),
-          _ActionChip(
+          CustomActionChip(
             icon: Icons.call,
             label: "Call",
             onTap: place.phone == null
                 ? null
                 : () => callPlace(place.phone),
           ),
-          _ActionChip(
+          CustomActionChip(
             icon: Icons.share,
             label: "Share",
             onTap: () {
               sharePlace(context, place);
             },
           ),
-          _ActionChip(
+          CustomActionChip(
             icon: Icons.bookmark_border,
             label: "Save",
-            onTap: () {
-              // save place
+            onTap: ()  {
+              authVm.savePlace(place);
             },
           ),
         ],
@@ -73,12 +80,13 @@ class ActionRow extends StatelessWidget {
   }
 }
 
-class _ActionChip extends StatelessWidget {
+class CustomActionChip extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback? onTap;
 
-  const _ActionChip({
+  const CustomActionChip({
+    super.key,
     required this.icon,
     required this.label,
     this.onTap,
@@ -86,40 +94,40 @@ class _ActionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDisabled = onTap == null ;
+    final isDisabled = onTap == null;
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(24),
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: isDisabled ? Colors.grey.shade200 : Colors.teal.shade50,
-          borderRadius: BorderRadius.circular(24),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 18,
-              color: isDisabled ? Colors.grey : Colors.teal,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                color: isDisabled ? Colors.grey : Colors.teal,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
+    return ActionChip(
+      onPressed: onTap,
+      elevation: 0,
+      pressElevation: 2,
+      backgroundColor: isDisabled
+          ? const Color(0xFF2A2233)
+          : const Color(0xFF241C2E),
+      disabledColor: const Color(0xFF2A2233),
+      side: BorderSide(
+        color: isDisabled
+            ? Colors.white.withOpacity(0.05)
+            : Colors.white.withOpacity(0.08),
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+      ),
+      avatar: Icon(
+        icon,
+        size: 18,
+        color: isDisabled ? Colors.white38 : const Color(0xFFF5C518),
+      ),
+      label: Text(
+        label,
+        style: TextStyle(
+          color: isDisabled ? Colors.white38 : Colors.white,
+          fontWeight: FontWeight.w600,
         ),
       ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
     );
   }
 }
-
 
 
 Future<void> callPlace(String? phone) async {
