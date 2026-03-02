@@ -1,16 +1,17 @@
+import 'package:google_maps_cluster_manager_2/google_maps_cluster_manager_2.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'opening_hours.dart';
 
 
-class Place {
+class Place with ClusterItem{
   // Fields == properties
   // Properties are empty/null by default
   final String id;
   final String name;
-  final LatLng location;
   final String address;
-
+  @override
+  final LatLng location;
   // Enrichment fields
   final String? photoUrl;
   final List<String>? categories;
@@ -44,7 +45,10 @@ class Place {
 
 
   });
+
+
 }
+
 
   /// Converts GooglePlace's SearchResult → Place data class
   // Moved to googleRepo called _mapSearchResultToPlace

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +10,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../model/place.dart';
 import '../repository/PlacesRepository.dart';
 import '../service/locationService.dart';
+import 'package:google_maps_cluster_manager_2/google_maps_cluster_manager_2.dart' as cm2;
+
 
 class MapViewModel extends ChangeNotifier {
   final PlacesRepository placesRepository;
@@ -31,10 +34,109 @@ class MapViewModel extends ChangeNotifier {
   final LocationService _locationService = LocationService();
   Timer? _debounce;
 
+  // ======================================================
+  // 🗺️ Cluster Logic
+  // ======================================================
+
+
+  late final cm2.ClusterManager clusterManager;
+  final List<Place> clusterItems = [];
+
+  void _onMarkersUpdated(Set<Marker> newMarkers) {
+    markers = newMarkers;
+    notifyListeners();
+  }
+
+  Future<Marker> _markerBuilder(cm2.Cluster cluster) async {
+    if (cluster.isMultiple) {
+      return Marker(
+        markerId: MarkerId('cluster_${cluster.getId()}'),
+        position: cluster.location,
+        icon: await _getClusterIcon(cluster.count),
+        infoWindow: InfoWindow(title: '${cluster.count} places'),
+        onTap: () async {
+          final nextZoom = (await mapController?.getZoomLevel() ?? cameraZoom) + 1.5;
+          await mapController?.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(target: cluster.location, zoom: nextZoom),
+            ),
+          );
+        }
+      );
+    }
+
+    final place = cluster.items.first as Place;
+
+    return Marker(
+      markerId: MarkerId(place.id),
+      position: place.location,
+      infoWindow: InfoWindow(title: place.name),
+      icon: customIcon,
+      onTap: () => selectPlace(place),
+    );
+  }
+
+  final Map<int, BitmapDescriptor> _clusterIconCache = {};
+
+  Future<BitmapDescriptor> _getClusterIcon(int count) async {
+    // cache by "bucket" so we don't generate thousands of unique images
+    int bucket;
+    if (count < 10) {
+      bucket = count;
+    } else if (count < 50) {
+      bucket = 50;
+    } else if (count < 100) {
+      bucket = 100;
+    } else {
+      bucket = 999; }
+
+      final cached = _clusterIconCache[bucket];
+      if (cached != null) return cached;
+
+      const int size = 140; // pixels (bigger = sharper)
+      final ui.PictureRecorder recorder = ui.PictureRecorder();
+      final Canvas canvas = Canvas(recorder);
+
+      // Background circle
+      final Paint outer = Paint()..color = const Color(0xFFF5C518); // your accent
+      final Paint inner = Paint()..color = const Color(0xFF1A1422); // dark center
+
+      final Offset c = const Offset(size / 2, size / 2);
+      canvas.drawCircle(c, size * 0.42, outer);
+      canvas.drawCircle(c, size * 0.33, inner);
+
+      // Count text
+      final String text = bucket == 999 ? '99+' : (bucket == 50 ? '10+' : bucket.toString());
+      final TextPainter tp = TextPainter(
+        text: TextSpan(
+          text: text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 46,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.ltr,
+      )..layout();
+
+      tp.paint(canvas, c - Offset(tp.width / 2, tp.height / 2));
+
+      final ui.Image image = await recorder.endRecording().toImage(size, size);
+      final ByteData? bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+      final descriptor = BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
+
+      _clusterIconCache[bucket] = descriptor;
+      return descriptor;
+    }
+
+
   // state (in android) is value that changes over time
   // ======================================================
   // 🗺️ Map State
   // ======================================================
+
+
 
   GoogleMapController? mapController;
   String? darkMapStyle;
@@ -77,11 +179,18 @@ class MapViewModel extends ChangeNotifier {
   MapViewModel({
     required this.placesRepository,
   }) {
+    clusterManager = cm2.ClusterManager(
+      clusterItems,
+      _onMarkersUpdated,
+      markerBuilder: _markerBuilder,
+    );
     getCurrentLocation();
     _loadMapStyle();
     customMarker();
     customMarkerCurrent();
   }
+
+
 
   // ======================================================
   // 🗺️ Map Lifecycle & theme
@@ -89,6 +198,8 @@ class MapViewModel extends ChangeNotifier {
 
   void onMapCreated(GoogleMapController controller) {
     mapController = controller;
+
+    clusterManager.setMapId(controller.mapId);
     mapController?.animateCamera(
       CameraUpdate.newCameraPosition(CameraPosition(target: center, zoom: 14.8)),
     );
@@ -98,11 +209,15 @@ class MapViewModel extends ChangeNotifier {
   void onCameraMove(CameraPosition position) {
     cameraCenter = position.target;
     cameraZoom = position.zoom;
+
+    clusterManager.onCameraMove(position);
   }
   // Fire when map stops moving
   void onCameraIdle() {
     center = cameraCenter;
     updateUserLocation(center);
+
+    clusterManager.updateMap();
   }
 
   Future<void> _loadMapStyle() async {
@@ -157,7 +272,8 @@ class MapViewModel extends ChangeNotifier {
       ),
     };
 
-    updateMarkers();
+    //updateMarkers();
+    updateClusterItems();
 
   }
 
@@ -192,7 +308,7 @@ class MapViewModel extends ChangeNotifier {
 
 
     sortPlacesByDistance();
-    updateMarkers(); // convert filteredPlaces → markers
+    updateClusterItems(); // convert filteredPlaces → markers
   }
 
 
@@ -287,6 +403,12 @@ class MapViewModel extends ChangeNotifier {
     }
     notifyListeners();
 
+  }
+
+  void updateClusterItems() {
+    // if user selected a place, we only cluster that one (effectively single marker)
+    clusterManager.setItems(filteredPlaces);
+    clusterManager.updateMap();
   }
 
 

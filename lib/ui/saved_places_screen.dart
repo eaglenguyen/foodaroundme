@@ -82,6 +82,9 @@ class SavedPlacesScreen extends StatefulWidget {
                   );
 
                 },
+                onDelete: () {
+                  context.read<AuthViewModel>().deleteSavedPlace(place.id);
+                },
               );
             },
           ),
@@ -96,12 +99,14 @@ class _SavedPlaceCard extends StatelessWidget {
   final String cuisine;
   final String address;
   final VoidCallback onTap;
+  final VoidCallback onDelete;
 
   const _SavedPlaceCard({
     required this.name,
     required this.cuisine,
     required this.address,
     required this.onTap,
+    required this.onDelete,
   });
 
   @override
@@ -170,9 +175,22 @@ class _SavedPlaceCard extends StatelessWidget {
               ),
             ),
 
-            const Icon(
-              Icons.chevron_right,
-              color: Colors.white38,
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    color: Colors.white38,
+                  ),
+                  splashRadius: 20,
+                  onPressed: onDelete,
+                ),
+                const Icon(
+                  Icons.chevron_right,
+                  color: Colors.white38,
+                ),
+              ],
             ),
           ],
         ),
