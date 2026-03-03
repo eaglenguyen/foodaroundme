@@ -41,11 +41,29 @@ class MapViewModel extends ChangeNotifier {
   void Function(Place place)? onPlaceTap;
   late final cm2.ClusterManager clusterManager;
   final List<Place> clusterItems = [];
+  final Map<int, BitmapDescriptor> _clusterIconCache = {};
+
+  // Marker tapped logic
+  String? _openDetailsForId;
+
+  void requestOpenDetails(String placeId) {
+    _openDetailsForId = placeId;
+    notifyListeners();
+  }
+
+  String? consumeOpenDetailsRequest() {
+    final id = _openDetailsForId;
+    _openDetailsForId = null;
+    return id;
+  }
+
+
 
   void _onMarkersUpdated(Set<Marker> newMarkers) {
     markers = newMarkers;
     notifyListeners();
   }
+
 
   Future<Marker> _markerBuilder(cm2.Cluster cluster) async {
     if (cluster.isMultiple) {
@@ -79,7 +97,6 @@ class MapViewModel extends ChangeNotifier {
     );
   }
 
-  final Map<int, BitmapDescriptor> _clusterIconCache = {};
 
   Future<BitmapDescriptor> _getClusterIcon(int count) async {
     // cache by "bucket" so we don't generate thousands of unique images
@@ -132,19 +149,6 @@ class MapViewModel extends ChangeNotifier {
       _clusterIconCache[bucket] = descriptor;
       return descriptor;
     }
-
-  String? _openDetailsForId;
-
-  void requestOpenDetails(String placeId) {
-    _openDetailsForId = placeId;
-    notifyListeners();
-  }
-
-  String? consumeOpenDetailsRequest() {
-    final id = _openDetailsForId;
-    _openDetailsForId = null;
-    return id;
-  }
 
 
   // state (in android) is value that changes over time
@@ -288,7 +292,7 @@ class MapViewModel extends ChangeNotifier {
       ),
     };
 
-    //updateMarkers();
+    // updateMarkers()
     updateClusterItems();
 
   }

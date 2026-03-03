@@ -73,8 +73,15 @@ class _ExpandableFabState extends State<ExpandableFab> with SingleTickerProvider
         alignment: Alignment.bottomRight,
         clipBehavior: Clip.none,
         children: [
+          IgnorePointer(
+            ignoring: !_open, // ✅ blocks taps when closed
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.bottomRight,
+              children: _buildExpandingActionButtons(),
+            ),
+          ),
           _buildTapToCloseFab(),
-          ..._buildExpandingActionButtons(),
           _buildTapToOpenFab(),
         ],
       ),

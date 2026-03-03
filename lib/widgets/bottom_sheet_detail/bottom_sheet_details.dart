@@ -4,7 +4,9 @@ import 'package:foodaroundme/widgets/bottom_sheet_detail/header.dart';
 import 'package:foodaroundme/widgets/bottom_sheet_detail/photo_grid.dart';
 import 'package:foodaroundme/widgets/bottom_sheet_detail/social_links.dart';
 import 'package:foodaroundme/widgets/drag_handles/drag_handle_line.dart';
+import 'package:provider/provider.dart';
 import '../../model/place.dart';
+import '../../viewmodel/mapViewModel.dart';
 
 // When in final production, look at possibility that details.photos can be null. Line 71
 class BottomSheetDetails extends StatelessWidget {
@@ -17,10 +19,12 @@ class BottomSheetDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<MapViewModel>();
+
     return DraggableScrollableSheet(
       expand: false,
       initialChildSize: 0.6,
-      minChildSize: 0.25,
+      minChildSize: 0.1,
       maxChildSize: 0.95,
       builder: (context, scrollController) {
         return Container(
@@ -51,6 +55,31 @@ class BottomSheetDetails extends StatelessWidget {
                 right: 0,
                 child: Center(
                   child: DragHandleLine(color: Colors.black26)
+                ),
+              ),
+              // Close Button (Top Right)
+              Positioned(
+                top: 12,
+                right: 15,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    viewModel.closeSheet();
+                    viewModel.showExpandableFabAgain();
+
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      size: 20,
+                      color: Colors.black87,
+                    ),
+                  ),
                 ),
               ),
 

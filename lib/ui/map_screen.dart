@@ -77,6 +77,21 @@ class MapScreen extends StatelessWidget {
             ),
           ),
 
+          Positioned(
+            bottom: 40,
+            left: 16,
+            child: FloatingActionButton(
+            mini: true,
+            backgroundColor: Colors.white,
+            elevation: 4,
+            onPressed: viewModel.resetCamera,
+            child: const Icon(
+              Icons.refresh_sharp,
+              color: Colors.black,
+            ),
+          ),
+          ),
+
         if(viewModel.isLoading)
           Positioned.fill(
               child: const Center(
@@ -102,6 +117,8 @@ class MapScreen extends StatelessWidget {
                 },
               ),
             ),
+
+
       ],
     )
     );
