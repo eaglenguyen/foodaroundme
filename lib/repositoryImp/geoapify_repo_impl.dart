@@ -6,7 +6,6 @@ import 'package:foodaroundme/model/place.dart';
 import 'package:foodaroundme/repository/PlacesRepository.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import '../model/opening_hours.dart';
 
 class GeoapifyRepoImpl implements PlacesRepository{
 

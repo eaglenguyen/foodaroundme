@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../authentication/viewmodel/authViewModel.dart';
-import '../../main.dart';
 import '../../model/place.dart';
 
 
