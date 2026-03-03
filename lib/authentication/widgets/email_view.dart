@@ -27,21 +27,19 @@ class EmailView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Test this
-          IconButton(
-            onPressed: loading ? null : onBack,
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.black54, // background color
-              ),
-              child: const Icon(
+          Material(
+            color: Colors.black54,
+            shape: const CircleBorder(),
+            child: IconButton(
+              onPressed: loading ? null : onBack,
+              icon: const Icon(
                 Icons.arrow_back_ios_new,
                 color: Colors.white70,
                 size: 18,
               ),
             ),
           ),
+
           const SizedBox(height: 8),
 
           const Text(
