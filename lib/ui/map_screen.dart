@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:foodaroundme/viewmodel/mapViewModel.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import '../model/place.dart';
 import '../widgets/bottom_sheet_detail/bottom_sheet_details.dart';
 import '../widgets/bottom_sheet_map.dart';
 
@@ -14,6 +15,22 @@ class MapScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<MapViewModel>();
+
+    return Consumer<MapViewModel>(
+      builder: (context, vm, _) {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          final id = vm.consumeOpenDetailsRequest();
+          if (id == null) return;
+
+          final details = await vm.getPlaceDetails(id);
+          if (!context.mounted || details == null) return;
+
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            builder: (_) => BottomSheetDetails(place: details),
+          );
+        });
 
 
     return Scaffold(
@@ -80,21 +97,8 @@ class MapScreen extends StatelessWidget {
                   viewModel.closeSheet();
                   viewModel.showExpandableFabAgain();
                 },
-                 onSelect: (place) async { // marker not updating
-                  viewModel.selectPlace(place);
-
-                  final details = await viewModel.getPlaceDetails(place.id);
-                  //final overview = details
-                  if (!context.mounted || details == null) return;
-
-
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (_) => BottomSheetDetails(
-                      place: details,
-                    ),
-                  );
+                 onSelect: (place)  {
+                  _openPlaceDetails(context, place);
                 },
               ),
             ),
@@ -104,4 +108,21 @@ class MapScreen extends StatelessWidget {
 
 
   }
+  );
+}
+}
+
+Future<void> _openPlaceDetails(BuildContext context, Place place) async {
+  final vm = context.read<MapViewModel>();
+
+  vm.selectPlace(place);
+
+  final details = await vm.getPlaceDetails(place.id);
+  if (!context.mounted || details == null) return;
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    builder: (_) => BottomSheetDetails(place: details),
+  );
 }

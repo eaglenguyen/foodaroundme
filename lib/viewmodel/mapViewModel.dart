@@ -38,7 +38,7 @@ class MapViewModel extends ChangeNotifier {
   // 🗺️ Cluster Logic
   // ======================================================
 
-
+  void Function(Place place)? onPlaceTap;
   late final cm2.ClusterManager clusterManager;
   final List<Place> clusterItems = [];
 
@@ -72,7 +72,10 @@ class MapViewModel extends ChangeNotifier {
       position: place.location,
       infoWindow: InfoWindow(title: place.name),
       icon: customIcon,
-      onTap: () => selectPlace(place),
+      onTap: () {
+        selectPlace(place);
+        requestOpenDetails(place.id);
+      },
     );
   }
 
@@ -129,6 +132,19 @@ class MapViewModel extends ChangeNotifier {
       _clusterIconCache[bucket] = descriptor;
       return descriptor;
     }
+
+  String? _openDetailsForId;
+
+  void requestOpenDetails(String placeId) {
+    _openDetailsForId = placeId;
+    notifyListeners();
+  }
+
+  String? consumeOpenDetailsRequest() {
+    final id = _openDetailsForId;
+    _openDetailsForId = null;
+    return id;
+  }
 
 
   // state (in android) is value that changes over time
