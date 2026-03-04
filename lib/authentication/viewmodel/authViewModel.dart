@@ -185,6 +185,7 @@ class AuthViewModel extends ChangeNotifier{
             address: (r['address'] as String?) ?? '',
             location: const LatLng(0, 0),
             categories: (r['categories'] as List?)?.cast<String>() ?? [],
+            cuisine: (r['catering']['cuisine'] as List?)?.cast<String>() ?? [],
           );
         }));
 

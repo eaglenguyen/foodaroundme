@@ -7,19 +7,24 @@ class ActionButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final Widget icon;
   final String label;
+  final bool showIcon;
 
   const ActionButton({
     super.key,
     this.onPressed,
     required this.icon,
     required this.label,
+    this.showIcon = false,
   });
 
 
   @override
   Widget build(BuildContext context) {
+    final bool iconOnly = label.isEmpty; // ✅ detect icon-only mode
+
     return ActionChip(
-      label: Text(label),
+      avatar: showIcon ? icon : null,
+      label:  iconOnly ? const SizedBox.shrink() : Text(label),
       onPressed: onPressed,
       backgroundColor: Colors.black87,
       labelStyle: TextStyle(
@@ -27,6 +32,8 @@ class ActionButton extends StatelessWidget {
         fontWeight: FontWeight.bold,
       ),
       elevation: 3,
+      labelPadding: iconOnly ? EdgeInsets.zero : null, // ✅ removes extra padding
+
       padding: const EdgeInsets.symmetric(horizontal: 10),
         shape: StadiumBorder(
           side: BorderSide(

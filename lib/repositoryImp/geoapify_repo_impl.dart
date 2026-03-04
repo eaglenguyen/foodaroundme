@@ -52,6 +52,7 @@ class GeoapifyRepoImpl implements PlacesRepository{
 
     final features = data['features'] as List;
 
+
     final places =  features.map((json) {
       final props = json['properties'];
 
@@ -64,6 +65,7 @@ class GeoapifyRepoImpl implements PlacesRepository{
           props['lon'],
         ),
         categories: (props['categories'] as List?)?.cast<String>() ?? [],
+        cuisine: [],
       );
     }).toList();
 
@@ -95,8 +97,7 @@ class GeoapifyRepoImpl implements PlacesRepository{
 
     // Returns a dynamic
     final props = features.first['properties'];
-
-
+    final cuisineTags = parseCuisine(props['catering']?['cuisine']);
 
     // converts dynamic to Place
     final place =  Place(
@@ -108,7 +109,7 @@ class GeoapifyRepoImpl implements PlacesRepository{
         props['lon'],
       ),
       categories: (props['categories'] as List?)?.cast<String>() ?? [],
-      cuisine: props['cuisine'] ?? 'Food',
+      cuisine: cuisineTags,
       website: props['website'] ?? '',
       phone: props['contact']?['phone'] ?? '',
       openingHours: props['opening_hours'] ?? '',
@@ -143,7 +144,30 @@ class GeoapifyRepoImpl implements PlacesRepository{
 class GeoapifyCategories {
   static const restaurant = 'catering.restaurant';
   static const cafe = 'catering.cafe';
+  static const dessert = 'catering.cafe.dessert';
   static const bar = 'catering.bar';
+
   static const fastFood = 'catering.fast_food';
 }
 
+List<String> parseCuisine(dynamic value) {
+  if (value == null) return const [];
+
+  // If API ever returns list
+  if (value is List) {
+    return value
+        .map((e) => e.toString().trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+  }
+
+  // Most common: "burger" or "vietnamese;dessert"
+  final s = value.toString().trim();
+  if (s.isEmpty) return const [];
+
+  return s
+      .split(';')
+      .map((e) => e.trim())
+      .where((e) => e.isNotEmpty)
+      .toList();
+}

@@ -2,5 +2,5 @@ enum PlaceFilter {
   restaurant,
   cafe,
   bar,
-  popular,
+  dessert,
 }

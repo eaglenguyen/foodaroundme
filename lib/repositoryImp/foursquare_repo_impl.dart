@@ -53,7 +53,7 @@ class FoursquareRepoImpl  implements PlacesRepository{
         ),
         categories: (r['categories'] as List)
             .map((c) => c['name'] as String)
-            .toList(),
+            .toList(), cuisine: [],
       );
     }).toList();
   }

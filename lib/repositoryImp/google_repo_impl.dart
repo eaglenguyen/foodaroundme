@@ -78,6 +78,7 @@ class GoogleRepoImpl implements PlacesRepository {
         r.geometry!.location.lng,
       ),
       categories: [],
+      cuisine: [],
 
     );
   }
@@ -92,6 +93,7 @@ class GoogleRepoImpl implements PlacesRepository {
       address: r.vicinity ?? '',
       location: LatLng(loc.lat!, loc.lng!),
       categories: r.types?.cast<String>() ?? [],
+      cuisine: [],
 
     );
   }

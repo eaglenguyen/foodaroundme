@@ -8,6 +8,7 @@ import 'package:foodaroundme/viewmodel/mapViewModel.dart';
 import 'package:provider/provider.dart';
 import '../widgets/action_button.dart';
 import '../widgets/expandable_fab.dart';
+import '../widgets/slider.dart';
 
 
 class MainScreen extends StatefulWidget {
@@ -84,6 +85,7 @@ class _MainScreenState extends State<MainScreen> {
                     if (!context.mounted) return;
                   },
                 ),
+
               ],
             ),
           ),
@@ -106,6 +108,23 @@ class _MainScreenState extends State<MainScreen> {
             child: screens[viewModel.selectedIndex]
           ),
 
+
+          // ✅ Slider positioned to the left of the FAB
+          Positioned(
+            bottom: 130, // aligns vertically with FAB (90 padding + ~15 adjustment)
+            left: 10,   // sits just to the left of the FAB
+            child: AnimatedOpacity(
+              opacity: viewModel.selectedIndex == 0 && viewModel.showFab && !isMenuOpen ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 200),
+              child: IgnorePointer(
+                ignoring: viewModel.selectedIndex != 0 || !viewModel.showFab || isMenuOpen,
+                child: Sliders(
+                  value: viewModel.searchRadius,
+                  onChanged: (v) => viewModel.setSearchRadiusKm(v),
+                ),
+              ),
+            ),
+          ),
           // ToggleButtonGroup
           Positioned(
             right: 0,

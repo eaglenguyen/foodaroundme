@@ -209,7 +209,7 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
 
                                     Text(
 
-                                      formatCuisines(p.categories!),
+                                      formatCategories(p.categories!),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
@@ -316,7 +316,7 @@ String hoursAndRatings(Place p) {
 }
 
 
-String formatCuisines(dynamic rawCategories) {
+String formatCategories(dynamic rawCategories) {
   if (rawCategories == null) return 'Restaurant';
 
   final categories = List<String>.from(rawCategories);

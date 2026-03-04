@@ -42,6 +42,7 @@ class _HeaderState extends State<Header> {
 
           const SizedBox(height: 6),
 
+
           // Address
           Text(
             cleanAddress(widget.place.address),
@@ -50,24 +51,69 @@ class _HeaderState extends State<Header> {
 
           const SizedBox(height: 8),
 
+
+
           // Hours section
           if (!expanded)
           // Today only
-            Text(
-              '${dayNames[todayKey]}  ${parsed[todayKey]?.join(', ') ?? 'Closed'}',
-              style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.bold),
-            )
+    // Today only
+    Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${dayNames[todayKey]}  ',
+          style: const TextStyle(
+            color: Colors.black54,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            parsed[todayKey]?.isNotEmpty == true
+                ? parsed[todayKey]!.join(', ')
+                : 'Closed/Unavailable',
+            style: const TextStyle(
+              color: Colors.black54,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    )
           else
-          // All days
+// All days (expanded)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: dayOrder.map((d) {
                 final hours = parsed[d];
-                return Text(
-                  '${dayNames[d]}  ${hours!.isNotEmpty ? hours.join(', ') : 'Closed'}',
-                  style: TextStyle(
-                    fontWeight: d == todayKey ? FontWeight.bold : FontWeight.normal,
-                    color: d == todayKey ? Colors.blue : Colors.black54,
+                final isToday = d == todayKey;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 1),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: 48, // fixed width keeps all hours aligned
+                        child: Text(
+                          '${dayNames[d]}  ',
+                          style: TextStyle(
+                            fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+                            color: isToday ? Colors.blue : Colors.black54,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          hours != null && hours.isNotEmpty
+                              ? hours.join(', ')
+                              : 'Closed/Unavailable',
+                          style: TextStyle(
+                            fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+                            color: isToday ? Colors.blue : Colors.black54,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 );
               }).toList(),
@@ -187,28 +233,25 @@ Map<String, List<String>> parseOpeningHours(String raw) {
 
   final timeRangeRegex = RegExp(r'(\d{1,2}:\d{2})-(\d{1,2}:\d{2})');
 
-  // ✅ Split on commas that are followed by a day abbreviation (Mo,Tu,We,Th,Fr,Sa,Su)
-  final segments = raw
-      .split(RegExp(r',\s*(?=Mo|Tu|We|Th|Fr|Sa|Su)'))
-      .map((s) => s.trim())
-      .where((s) => s.isNotEmpty)
-      .toList();
+  // ✅ Match any segment that starts with a day abbreviation followed by times
+  // Handles both ";" and "," as segment separators
+  final segmentRegex = RegExp(
+    r'((?:Mo|Tu|We|Th|Fr|Sa|Su)(?:[-,](?:Mo|Tu|We|Th|Fr|Sa|Su))*)\s+'
+    r'((?:\d{1,2}:\d{2}-\d{1,2}:\d{2}(?:,\s*)?)+)',
+  );
 
-  for (final segmentRaw in segments) {
-    final segment = segmentRaw.trim();
-    if (segment.isEmpty) continue;
-
-    final firstSpace = segment.indexOf(' ');
-    if (firstSpace == -1) continue;
-
-    final daysPart = segment.substring(0, firstSpace).replaceAll(' ', '');
-    final timesPart = segment.substring(firstSpace + 1).trim();
+  for (final match in segmentRegex.allMatches(raw)) {
+    final daysPart = match.group(1)!.trim();
+    final timesPart = match.group(2)!.trim();
 
     final dayIndexes = expandDays(daysPart);
 
-    for (final match in timeRangeRegex.allMatches(timesPart)) {
-      final rawStart = match.group(1)!.trim();
-      final rawEnd = match.group(2)!.trim();
+    debugPrint('daysPart: "$daysPart" → indexes: $dayIndexes');
+    debugPrint('timesPart: "$timesPart"');
+
+    for (final timeMatch in timeRangeRegex.allMatches(timesPart)) {
+      final rawStart = timeMatch.group(1)!.trim();
+      final rawEnd = timeMatch.group(2)!.trim();
 
       final start = normalizeTime(rawStart);
       final end = normalizeTime(rawEnd);
@@ -228,4 +271,6 @@ Map<String, List<String>> parseOpeningHours(String raw) {
   }
 
   return schedule;
+
 }
+

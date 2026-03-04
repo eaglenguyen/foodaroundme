@@ -26,6 +26,17 @@ class MapViewModel extends ChangeNotifier {
   // affects multiple widgets
   // affects behavior
 
+  // ======================================================
+  // Slider Logic
+  // ======================================================
+
+  double searchRadiusKm = 600;
+
+  void setSearchRadiusKm(double v) {
+    searchRadius = v;
+    _rebuildCircle();
+    notifyListeners();
+  }
 
   // ======================================================
   // 🔧 Services & APIs
@@ -164,7 +175,7 @@ class MapViewModel extends ChangeNotifier {
   LatLng cameraCenter = const LatLng(42.3104, -71.0575);
   LatLng? userLocation;
   double cameraZoom = 11.0;
-  static const double searchRadius = 800;
+  double searchRadius = 600; // in meters. 800 meters = .5 miles
   Set<Circle> circles = {};
   Set<Marker> markers = {};
 
@@ -280,6 +291,20 @@ class MapViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void _rebuildCircle() {
+    center = cameraCenter;
+    circles = {
+      Circle(
+        circleId: const CircleId('search-radius'),
+        center: center,
+        radius: searchRadius,
+        strokeWidth: 2,
+        strokeColor: Colors.blue.withOpacity(0.6),
+        fillColor: Colors.blue.withOpacity(0.15),
+      ),
+    };
+  }
+
   void updateUserLocation(LatLng location) {
     circles = {
       Circle(
@@ -294,6 +319,7 @@ class MapViewModel extends ChangeNotifier {
 
     // updateMarkers()
     updateClusterItems();
+
 
   }
 
@@ -482,8 +508,8 @@ class MapViewModel extends ChangeNotifier {
       case PlaceFilter.bar:
         await loadNearbyRestaurants(GeoapifyCategories.bar);
         break;
-      case PlaceFilter.popular:
-        await loadNearbyRestaurants("popular");
+      case PlaceFilter.dessert:
+        await loadNearbyRestaurants(GeoapifyCategories.dessert);
         break;
     }
     resetCamera();
@@ -597,8 +623,8 @@ class MapViewModel extends ChangeNotifier {
         return "Cafés";
       case PlaceFilter.bar:
         return "Bars";
-      case PlaceFilter.popular:
-        return "Popular";
+      case PlaceFilter.dessert:
+        return "Dessert";
       default:
         return "";
     }

@@ -10,6 +10,7 @@ import 'package:path/path.dart' as p;
 part 'app_database.g.dart';
 
 // run if making changes -> flutter pub run build_runner build --delete-conflicting-outputs.
+// also add to onUpgrade
 class PlacesDetailTable extends Table {
   TextColumn get id => text()(); // place_id
   TextColumn get name => text()();
@@ -34,7 +35,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -47,10 +48,11 @@ class AppDatabase extends _$AppDatabase {
       }
 
       if (from < 4) {
-        await m.addColumn(
-          placesDetailTable,
-          placesDetailTable.openingHours,
-        );
+        await m.addColumn(placesDetailTable, placesDetailTable.openingHours);
+      }
+
+      if (from < 5) {
+        await m.addColumn(placesDetailTable, placesDetailTable.cuisine);
       }
     },
   );
@@ -63,7 +65,7 @@ class AppDatabase extends _$AppDatabase {
         name: Value(place.name),
         address: Value(place.address),
         categories: Value(jsonEncode(place.categories)), // jsonEncode = TypeConverter
-        cuisine: Value(place.cuisine),
+        cuisine: Value(jsonEncode(place.cuisine)),
         website: Value(place.website),
         phone: Value(place.phone),
         openingHours: Value(place.openingHours),
@@ -87,7 +89,7 @@ class AppDatabase extends _$AppDatabase {
       name: row.name,
       address: row.address,
       categories: (jsonDecode(row.categories) as List).cast<String>(),
-      cuisine: row.cuisine,
+      cuisine: (jsonDecode(row.cuisine ?? '[]') as List).cast<String>(),
       website: row.website,
       phone: row.phone,
       openingHours: row.openingHours,
