@@ -130,24 +130,25 @@ class CustomActionChip extends StatelessWidget {
 
 
 Future<void> callPlace(String? phone) async {
-  if (phone == null || phone.isEmpty) return;
+  final raw = phone?.trim();
+  if (raw == null || raw.isEmpty) return;
+  debugPrint("Phone number: $phone");
 
-  // Keep digits and plus only
-  var cleaned = phone.replaceAll(RegExp(r'[^\d+]'), '');
-
-  // Ensure only one leading +
+  // keep digits and one leading +
+  var cleaned = raw.replaceAll(RegExp(r'[^\d+]'), '');
   if (cleaned.startsWith('+')) {
     cleaned = '+${cleaned.substring(1).replaceAll('+', '')}';
+  } else {
+    cleaned = cleaned.replaceAll('+', '');
   }
 
-  final uri = Uri(scheme: 'tel', path: cleaned);
+  final uri = Uri.parse('tel:$cleaned');
 
-  if (!await canLaunchUrl(uri)) {
-    debugPrint('Could not launch phone dialer');
-    return;
+  // canLaunchUrl is sometimes overly strict; try launching directly
+  final ok = await launchUrl(uri, mode: LaunchMode.platformDefault);
+  if (!ok) {
+    debugPrint('Dialer failed for $uri (raw="$raw", cleaned="$cleaned")');
   }
-
-  await launchUrl(uri, mode: LaunchMode.externalApplication);
 }
 
 // IOS/IPad requires a source rectangle for popovers/anchor, hence the context parameter

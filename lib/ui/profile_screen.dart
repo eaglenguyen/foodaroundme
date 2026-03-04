@@ -7,6 +7,7 @@ import 'package:foodaroundme/ui/update_profile_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../viewmodel/mapViewModel.dart';
+import '../widgets/logout_dialog.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -31,11 +32,13 @@ class ProfileScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () {
+            onPressed: () async {
+              final confirmed = await showLogoutDialog(context);
+              if (confirmed == true) {
               mapVm.selectedIndex = 0;
               isGuestMode.value = false;
-              authVm.signOut();
-            },
+            }
+              },
           )
         ],
       ),

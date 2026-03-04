@@ -86,6 +86,8 @@ class AuthViewModel extends ChangeNotifier{
         serverClientId: webClientId,
       );
 
+      await googleSignIn.signOut();
+
       final googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
         isLoading = false;
