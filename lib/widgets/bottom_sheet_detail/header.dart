@@ -117,7 +117,12 @@ const dayNames = {
 
 const dayOrder = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
-String normalizeTime(String t) => t == '24:00' ? '00:00' : t;
+String normalizeTime(String t) {
+  t = t.trim();
+  if (t == '24:00') return '00:00';
+  if (RegExp(r'^\d{1,2}$').hasMatch(t)) return '$t:00';
+  return t;
+}
 
 bool isOvernight(String rawStart, String rawEnd) {
   if (rawEnd == '24:00') return false;
@@ -128,14 +133,14 @@ List<int> expandDays(String dayPart) {
   final result = <int>[];
 
   for (final token in dayPart.split(',')) {
-    if (token.contains('-')) {
-      final parts = token.split('-');
-      final start = dayOrder.indexOf(parts[0]);
-      final end = dayOrder.indexOf(parts[1]);
+    final trimmed = token.trim();
+    if (trimmed.contains('-')) {
+      final parts = trimmed.split('-');
+      final start = dayOrder.indexOf(parts[0].trim());
+      final end = dayOrder.indexOf(parts[1].trim());
 
       if (start == -1 || end == -1) continue;
 
-      // Handle wrap-around (Su-Mo etc)
       if (start <= end) {
         for (int i = start; i <= end; i++) {
           result.add(i);
@@ -149,7 +154,7 @@ List<int> expandDays(String dayPart) {
         }
       }
     } else {
-      final index = dayOrder.indexOf(token);
+      final index = dayOrder.indexOf(trimmed);
       if (index != -1) result.add(index);
     }
   }
@@ -158,17 +163,21 @@ List<int> expandDays(String dayPart) {
 }
 
 String formatTime(String time) {
-  final parts = normalizeTime(time).split(':');
-  int hour = int.parse(parts[0]);
-  final minute = parts[1];
+  final t = normalizeTime(time).trim();
+  final m = RegExp(r'^(\d{1,2}):(\d{2})$').firstMatch(t);
+  if (m == null) {
+    debugPrint('Invalid time token: "$time"');
+    return time; // graceful fallback instead of throwing
+  }
+
+  var hour = int.parse(m.group(1)!);
+  final minute = m.group(2)!;
 
   final suffix = hour >= 12 ? 'PM' : 'AM';
   hour = hour % 12;
   if (hour == 0) hour = 12;
 
-  return minute == '00'
-      ? '$hour $suffix'
-      : '$hour:$minute $suffix';
+  return minute == '00' ? '$hour $suffix' : '$hour:$minute $suffix';
 }
 
 Map<String, List<String>> parseOpeningHours(String raw) {
@@ -176,43 +185,43 @@ Map<String, List<String>> parseOpeningHours(String raw) {
     for (var d in dayOrder) d: <String>[],
   };
 
-  final segments = raw.split(';');
+  final timeRangeRegex = RegExp(r'(\d{1,2}:\d{2})-(\d{1,2}:\d{2})');
 
-  for (final segment in segments) {
-    final match = RegExp(r'^([\w,-]+)\s+(.+)$').firstMatch(segment.trim());
-    if (match == null) continue;
+  // ✅ Split on commas that are followed by a day abbreviation (Mo,Tu,We,Th,Fr,Sa,Su)
+  final segments = raw
+      .split(RegExp(r',\s*(?=Mo|Tu|We|Th|Fr|Sa|Su)'))
+      .map((s) => s.trim())
+      .where((s) => s.isNotEmpty)
+      .toList();
 
-    final daysPart = match.group(1)!;
-    final timesPart = match.group(2)!;
+  for (final segmentRaw in segments) {
+    final segment = segmentRaw.trim();
+    if (segment.isEmpty) continue;
+
+    final firstSpace = segment.indexOf(' ');
+    if (firstSpace == -1) continue;
+
+    final daysPart = segment.substring(0, firstSpace).replaceAll(' ', '');
+    final timesPart = segment.substring(firstSpace + 1).trim();
 
     final dayIndexes = expandDays(daysPart);
 
-    for (final range in timesPart.split(',')) {
-      final t = range.split('-');
-      if (t.length != 2) continue;
-
-      final rawStart = t[0];
-      final rawEnd = t[1];
+    for (final match in timeRangeRegex.allMatches(timesPart)) {
+      final rawStart = match.group(1)!.trim();
+      final rawEnd = match.group(2)!.trim();
 
       final start = normalizeTime(rawStart);
       final end = normalizeTime(rawEnd);
 
       final overnight = isOvernight(rawStart, rawEnd);
 
-
-
       for (final i in dayIndexes) {
         final day = dayOrder[i];
+        schedule[day]!.add('${formatTime(start)}–${formatTime(end)}');
 
-        schedule[day]!
-            .add('${formatTime(start)}–${formatTime(end)}');
-
-
-        // spill into next day if overnight
         if (overnight) {
           final nextDay = dayOrder[(i + 1) % 7];
-          schedule[nextDay]!
-              .add('12 AM–${formatTime(end)}');
+          schedule[nextDay]!.add('12 AM–${formatTime(end)}');
         }
       }
     }
@@ -220,15 +229,3 @@ Map<String, List<String>> parseOpeningHours(String raw) {
 
   return schedule;
 }
-
-List<String> formatForUI(String raw) {
-  final parsed = parseOpeningHours(raw);
-
-  return dayOrder
-      .where((d) => parsed[d]!.isNotEmpty)
-      .map((d) => '${dayNames[d]}  ${parsed[d]!.join(', ')}')
-      .toList();
-}
-
-
-

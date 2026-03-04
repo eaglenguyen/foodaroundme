@@ -144,6 +144,7 @@ class AuthViewModel extends ChangeNotifier{
     Place? removed;
     if (removedIndex != -1) {
       removed = savedPlaces.removeAt(removedIndex);
+      notifyListeners();
     }
 
 
