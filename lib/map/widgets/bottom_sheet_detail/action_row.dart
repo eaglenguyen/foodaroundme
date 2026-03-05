@@ -1,10 +1,9 @@
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../authentication/viewmodel/authViewModel.dart';
+import '../../../authentication/viewmodel/authViewModel.dart';
 import '../../model/place.dart';
 
 
@@ -24,56 +23,50 @@ class ActionRow extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: [
-          CustomActionChip(
-            icon: Icons.directions,
-            label: "Directions",
-            onTap: () => showDirectionsPicker(context, place),
-          ),
-          CustomActionChip(
-            icon: Icons.language,
-            label: "Website",
-            onTap: () {
-              final raw = place.website;
-              if (raw == null || raw.isEmpty) return;
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            CustomActionChip(
+              icon: Icons.directions,
+              label: "Directions",
+              onTap: () => showDirectionsPicker(context, place),
+            ),
+            const SizedBox(width: 8),
+            CustomActionChip(
+              icon: Icons.language,
+              label: "Website",
+              onTap: () {
+                final raw = place.website;
+                if (raw == null || raw.isEmpty) return;
 
-              final url = raw.startsWith('http')
-                ? raw
-                : 'https://$raw';
+                final url = raw.startsWith('http') ? raw : 'https://$raw';
+                final uri = Uri.tryParse(url);
+                if (uri == null) return;
 
-              final uri = Uri.tryParse(url);
-              if (uri == null) return;
-
-              launchUrl(
-                uri,
-                mode: LaunchMode.externalApplication);
-          },
-          ),
-          CustomActionChip(
-            icon: Icons.call,
-            label: "Call",
-            onTap: place.phone == null
-                ? null
-                : () => callPlace(place.phone),
-          ),
-          CustomActionChip(
-            icon: Icons.share,
-            label: "Share",
-            onTap: () {
-              sharePlace(context, place);
-            },
-          ),
-          CustomActionChip(
-            icon: Icons.bookmark_border,
-            label: "Save",
-            onTap: ()  {
-              authVm.savePlace(place);
-            },
-          ),
-        ],
+                launchUrl(uri, mode: LaunchMode.externalApplication);
+              },
+            ),
+            const SizedBox(width: 8),
+            CustomActionChip(
+              icon: Icons.call,
+              label: "Call",
+              onTap: place.phone == null ? null : () => callPlace(place.phone),
+            ),
+            const SizedBox(width: 8),
+            CustomActionChip(
+              icon: Icons.share,
+              label: "Share",
+              onTap: () => sharePlace(context, place),
+            ),
+            const SizedBox(width: 8),
+            CustomActionChip(
+              icon: Icons.bookmark_border,
+              label: "Save",
+              onTap: () => authVm.savePlace(place),
+            ),
+          ],
+        ),
       ),
     );
   }

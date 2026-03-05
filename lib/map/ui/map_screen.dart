@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:foodaroundme/viewmodel/mapViewModel.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import '../model/place.dart';
+import '../viewmodel/mapViewModel.dart';
 import '../widgets/bottom_sheet_detail/bottom_sheet_details.dart';
-import '../widgets/bottom_sheet_map.dart';
+import '../widgets/bottom_sheet/bottom_sheet_map.dart';
 
 
 class MapScreen extends StatelessWidget {

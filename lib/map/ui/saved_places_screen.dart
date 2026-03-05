@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../authentication/viewmodel/authViewModel.dart';
+import '../../authentication/viewmodel/authViewModel.dart';
 import '../viewmodel/mapViewModel.dart';
 import '../widgets/bottom_sheet_detail/bottom_sheet_details.dart';
 

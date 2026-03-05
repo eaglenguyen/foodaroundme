@@ -3,13 +3,13 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:foodaroundme/repositoryImp/geoapify_repo_impl.dart';
 import 'package:foodaroundme/resources/place_filter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../../domain/geoapify_categories.dart';
+import '../../service/locationService.dart';
 import '../model/place.dart';
 import '../repository/PlacesRepository.dart';
-import '../service/locationService.dart';
 import 'package:google_maps_cluster_manager_2/google_maps_cluster_manager_2.dart' as cm2;
 
 
@@ -232,7 +232,7 @@ class MapViewModel extends ChangeNotifier {
 
     clusterManager.setMapId(controller.mapId);
     mapController?.animateCamera(
-      CameraUpdate.newCameraPosition(CameraPosition(target: center, zoom: 14.8)),
+      CameraUpdate.newCameraPosition(CameraPosition(target: center, zoom: 15)),
     );
   }
 
@@ -258,13 +258,32 @@ class MapViewModel extends ChangeNotifier {
   }
 
   void resetCamera() {
+    searchRadius = 600;
     mapController?.animateCamera(
       CameraUpdate.newCameraPosition(
-        CameraPosition(target: center, zoom: 15),
+        CameraPosition(target: center, zoom: 15.3),
       ),
     );
   }
 
+
+  void updateCameraZoomForRadius(double radiusMeters) {
+    if (mapController == null) return;
+
+    const double baseZoom = 15.3;
+    const double minRadius = 600;
+    const double stepSize = 100;  // (1600 - 600) / 10 divisions
+    const double zoomPerStep = 0.14;
+
+    final int steps = ((radiusMeters - minRadius) / stepSize).round();
+    final double zoom = (baseZoom - (steps * zoomPerStep)).clamp(10.0, 20.0);
+
+    mapController!.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: center, zoom: zoom),
+      ),
+    );
+  }
   // ======================================================
   // 📍 Location
   // ======================================================

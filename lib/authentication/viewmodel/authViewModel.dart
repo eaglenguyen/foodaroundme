@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
-import 'package:foodaroundme/app_root.dart';
 import 'package:foodaroundme/main.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../model/place.dart';
+import '../../map/model/place.dart';
+
 
 
 class AuthViewModel extends ChangeNotifier{
@@ -185,7 +185,6 @@ class AuthViewModel extends ChangeNotifier{
             address: (r['address'] as String?) ?? '',
             location: const LatLng(0, 0),
             categories: (r['categories'] as List?)?.cast<String>() ?? [],
-            cuisine: (r['catering']['cuisine'] as List?)?.cast<String>() ?? [],
           );
         }));
 
@@ -216,4 +215,78 @@ class AuthViewModel extends ChangeNotifier{
     await supabase.auth.signOut();
   }
 
+
+
+  // Votes aka Likes/Dislike logic
+  final Map<String, String?> _userVotes = {};
+  final Map<String, ({int likes, int dislikes})> _counts = {};
+
+  String? getUserVote(String providerPlaceId) => _userVotes[providerPlaceId];
+  int getLikes(String providerPlaceId) => _counts[providerPlaceId]?.likes ?? 0;
+  int getDislikes(String providerPlaceId) => _counts[providerPlaceId]?.dislikes ?? 0;
+
+  Future<void> loadVotes(String providerPlaceId) async {
+    final userId = supabase.auth.currentUser?.id;
+
+    final votesRes = await supabase
+        .from('place_votes')
+        .select('vote, user_id')
+        .eq('provider_place_id', providerPlaceId);
+
+    final list = votesRes as List;
+
+    _counts[providerPlaceId] = (
+    likes: list.where((r) => r['vote'] == 'like').length,
+    dislikes: list.where((r) => r['vote'] == 'dislike').length,
+    );
+
+    if (userId != null) {
+      final userVote = list
+          .where((r) => r['user_id'] == userId)
+          .map((r) => r['vote'] as String?)
+          .firstOrNull;
+      _userVotes[providerPlaceId] = userVote;
+    }
+    notifyListeners();
+  }
+
+  Future<void> vote(String providerPlaceId, String vote) async {
+    final userId = supabase.auth.currentUser?.id;
+    if (userId == null) return;
+
+    final current = _userVotes[providerPlaceId];
+
+    if (current == vote) {
+      await supabase
+          .from('place_votes')
+          .delete()
+          .eq('user_id', userId)
+          .eq('provider_place_id', providerPlaceId);
+      _userVotes[providerPlaceId] = null;
+    } else {
+      await supabase.from('place_votes').upsert(
+        {
+          'user_id': userId,
+          'provider_place_id': providerPlaceId,
+          'vote': vote,
+        },
+        onConflict: 'user_id, provider_place_id',
+      );
+      _userVotes[providerPlaceId] = vote;
+    }
+
+    // Refresh counts
+    final updatedRes = await supabase
+        .from('place_votes')
+        .select('vote')
+        .eq('provider_place_id', providerPlaceId);
+
+    final updated = updatedRes as List;
+    _counts[providerPlaceId] = (
+    likes: updated.where((r) => r['vote'] == 'like').length,
+    dislikes: updated.where((r) => r['vote'] == 'dislike').length,
+    );
+
+    notifyListeners();
+  }
 }

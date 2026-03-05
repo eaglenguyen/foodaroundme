@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
-import 'package:foodaroundme/ui/main_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:provider/provider.dart';
 
 import 'authentication/ui/sign_in_screen.dart';
 import 'authentication/viewmodel/authViewModel.dart';
+import 'map/ui/main_screen.dart';
 
 final ValueNotifier<bool> isGuestMode = ValueNotifier(false); // for skip button
 

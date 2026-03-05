@@ -2,9 +2,10 @@
 
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:foodaroundme/model/place.dart';
-import 'package:foodaroundme/repository/PlacesRepository.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import '../model/place.dart';
+import '../repository/PlacesRepository.dart';
 
 class FoursquareRepoImpl  implements PlacesRepository{
 
@@ -53,7 +54,7 @@ class FoursquareRepoImpl  implements PlacesRepository{
         ),
         categories: (r['categories'] as List)
             .map((c) => c['name'] as String)
-            .toList(), cuisine: [],
+            .toList(),
       );
     }).toList();
   }

@@ -1,11 +1,11 @@
 
 import 'package:flutter/material.dart';
-import 'package:foodaroundme/viewmodel/mapViewModel.dart';
-import 'package:foodaroundme/widgets/drag_handles/morph_drag_handle.dart';
-import 'package:foodaroundme/widgets/skeleton_row.dart';
+import 'package:foodaroundme/map/widgets/skeleton_row.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
-import '../model/place.dart';
+import '../../model/place.dart';
+import '../../viewmodel/mapViewModel.dart';
+import 'morph_drag_handle.dart';
 
 class BottomSheetMap extends StatefulWidget {
   final String title;
@@ -36,9 +36,6 @@ class BottomSheetMap extends StatefulWidget {
 class _BottomSheetMapState extends State<BottomSheetMap> {
   late final DraggableScrollableController _controller;
   double _sheetSize = 0.4;
-
-
-
 
 
   @override

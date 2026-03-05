@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/app_root.dart';
-import 'package:foodaroundme/repository/PlacesRepository.dart';
-import 'package:foodaroundme/repositoryImp/geoapify_repo_impl.dart';
-import 'package:foodaroundme/viewmodel/mapViewModel.dart';
-
+import 'package:foodaroundme/map/repositoryImp/geoapify_repo_impl.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 import 'authentication/viewmodel/authViewModel.dart';
-import 'local/app_database.dart';
+import 'map/local/app_database.dart';
+import 'map/repository/PlacesRepository.dart';
+import 'map/viewmodel/mapViewModel.dart';
 
 
 

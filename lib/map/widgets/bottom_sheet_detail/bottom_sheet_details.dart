@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:foodaroundme/widgets/bottom_sheet_detail/action_row.dart';
-import 'package:foodaroundme/widgets/bottom_sheet_detail/header.dart';
-import 'package:foodaroundme/widgets/bottom_sheet_detail/photo_grid.dart';
-import 'package:foodaroundme/widgets/bottom_sheet_detail/social_links.dart';
-import 'package:foodaroundme/widgets/drag_handles/drag_handle_line.dart';
+import 'package:foodaroundme/map/widgets/bottom_sheet_detail/like_button/like_dislike.dart';
+import 'package:foodaroundme/map/widgets/bottom_sheet_detail/photo_grid.dart';
+import 'package:foodaroundme/map/widgets/bottom_sheet_detail/social_links.dart';
 import 'package:provider/provider.dart';
 import '../../model/place.dart';
 import '../../viewmodel/mapViewModel.dart';
+import 'drag_handle_line.dart';
+import 'action_row.dart';
+import 'header.dart';
 
 // When in final production, look at possibility that details.photos can be null. Line 71
 class BottomSheetDetails extends StatelessWidget {
@@ -19,7 +20,7 @@ class BottomSheetDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<MapViewModel>();
+    final mapVm = context.watch<MapViewModel>();
 
     return DraggableScrollableSheet(
       expand: false,
@@ -57,31 +58,41 @@ class BottomSheetDetails extends StatelessWidget {
                   child: DragHandleLine(color: Colors.black26)
                 ),
               ),
-              // Close Button (Top Right)
+              // Close Button + Like/Dislike (Top Right)
               Positioned(
                 top: 12,
                 right: 15,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    viewModel.closeSheet();
-                    viewModel.showExpandableFabAgain();
+                child: Row(
+                  children: [
+                    // Dislike button
+                    Column(
+                      children: [
+                        LikeButtons(providerPlaceId: place.id)
+                      ],
+                    ),
 
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.1),
-                      shape: BoxShape.circle,
+                    const SizedBox(width: 8),
+
+                    // Close button
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        mapVm.closeSheet();
+                        mapVm.showExpandableFabAgain();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.close, size: 20, color: Colors.black87),
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.close,
-                      size: 20,
-                      color: Colors.black87,
-                    ),
-                  ),
+                  ],
                 ),
               ),
+
 
             ]
             )
@@ -91,5 +102,3 @@ class BottomSheetDetails extends StatelessWidget {
       );
   }
 }
-
-// Places Photo Billing

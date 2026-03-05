@@ -2,7 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../authentication/viewmodel/authViewModel.dart';
+import '../../authentication/viewmodel/authViewModel.dart';
+
 
 Future<bool?> showLogoutDialog(BuildContext context) {
   return showGeneralDialog<bool>(

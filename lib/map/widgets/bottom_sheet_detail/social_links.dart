@@ -20,6 +20,7 @@ class SocialLinks extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
             _SocialLink(
               label: "see more on tiktok",
@@ -41,7 +42,8 @@ class SocialLinks extends StatelessWidget {
                 if (confirmed == true) {
                   openInstagramTag(place.name);
                 }
-              },            ),
+              },
+            ),
         ],
       ),
     );
@@ -72,7 +74,7 @@ class _SocialLink extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 4),
-          Icon(icon, size: 16),
+          Icon(icon, size: 20),
         ],
       ),
     );
@@ -109,7 +111,7 @@ Future<bool?> showHashtagDisclaimer(BuildContext context) {
   return showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
-      title: const Text("Heads up"),
+      title: const Text("Disclaimer"),
       content: const Text(
         "Since the hashtags are based off the restaurant's name, "
             "results may vary for TikToks and Instagram Reels.",

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:foodaroundme/app_root.dart';
 import 'package:foodaroundme/authentication/viewmodel/authViewModel.dart';
 import 'package:foodaroundme/main.dart';
-import 'package:foodaroundme/ui/saved_places_screen.dart';
-import 'package:foodaroundme/ui/update_profile_screen.dart';
+import 'package:foodaroundme/map/ui/saved_places_screen.dart';
+import 'package:foodaroundme/map/ui/update_profile_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../viewmodel/mapViewModel.dart';
@@ -91,8 +91,6 @@ class ProfileScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _iconStatButton(Icons.thumb_up_alt, "Likes"),
-                const SizedBox(width: 10),
-                _iconStatButton(Icons.thumb_down_alt, "Dislikes"),
               ],
             ),
 

@@ -4,8 +4,8 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:foodaroundme/model/place.dart' as q;
 import 'package:path/path.dart' as p;
+import '../model/place.dart' as q;
 
 part 'app_database.g.dart';
 
@@ -16,7 +16,6 @@ class PlacesDetailTable extends Table {
   TextColumn get name => text()();
   TextColumn get address => text()();
   TextColumn get categories => text()();  // JSON Strings
-  TextColumn get cuisine => text().nullable()();
   TextColumn get website => text().nullable()();
   TextColumn get phone => text().nullable()();
   TextColumn get openingHours => text().nullable()();
@@ -51,9 +50,6 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(placesDetailTable, placesDetailTable.openingHours);
       }
 
-      if (from < 5) {
-        await m.addColumn(placesDetailTable, placesDetailTable.cuisine);
-      }
     },
   );
 
@@ -65,7 +61,6 @@ class AppDatabase extends _$AppDatabase {
         name: Value(place.name),
         address: Value(place.address),
         categories: Value(jsonEncode(place.categories)), // jsonEncode = TypeConverter
-        cuisine: Value(jsonEncode(place.cuisine)),
         website: Value(place.website),
         phone: Value(place.phone),
         openingHours: Value(place.openingHours),
@@ -89,7 +84,6 @@ class AppDatabase extends _$AppDatabase {
       name: row.name,
       address: row.address,
       categories: (jsonDecode(row.categories) as List).cast<String>(),
-      cuisine: (jsonDecode(row.cuisine ?? '[]') as List).cast<String>(),
       website: row.website,
       phone: row.phone,
       openingHours: row.openingHours,

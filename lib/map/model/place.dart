@@ -14,7 +14,6 @@ class Place with ClusterItem{
   // Enrichment fields
   final String? photoUrl;
   final List<String>? categories;
-  final List<String> cuisine;
   final bool? isOpen;
   final double? rating;
   final int? priceLevel;
@@ -31,7 +30,6 @@ class Place with ClusterItem{
     required this.name,
     required this.location,
     required this.address,
-    required this.cuisine,
     this.photoUrl,
     this.categories,
     this.isOpen,

@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:foodaroundme/domain/search_intent_resolver.dart';
-import 'package:foodaroundme/local/app_database.dart' as d;
-import 'package:foodaroundme/model/place.dart';
-import 'package:foodaroundme/repository/PlacesRepository.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../local/app_database.dart' as d;
+import '../model/place.dart';
+import '../repository/PlacesRepository.dart';
 
 
 class GeoapifyRepoImpl implements PlacesRepository{
@@ -65,7 +65,6 @@ class GeoapifyRepoImpl implements PlacesRepository{
           props['lon'],
         ),
         categories: (props['categories'] as List?)?.cast<String>() ?? [],
-        cuisine: [],
       );
     }).toList();
 
@@ -109,7 +108,6 @@ class GeoapifyRepoImpl implements PlacesRepository{
         props['lon'],
       ),
       categories: (props['categories'] as List?)?.cast<String>() ?? [],
-      cuisine: cuisineTags,
       website: props['website'] ?? '',
       phone: props['contact']?['phone'] ?? '',
       openingHours: props['opening_hours'] ?? '',

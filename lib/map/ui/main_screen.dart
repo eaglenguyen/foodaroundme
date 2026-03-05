@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:foodaroundme/map/ui/profile_screen.dart';
+import 'package:foodaroundme/map/ui/search_screen.dart';
 import 'package:foodaroundme/resources/place_filter.dart';
-import 'package:foodaroundme/ui/map_screen.dart';
-import 'package:foodaroundme/ui/profile_screen.dart';
-import 'package:foodaroundme/ui/search_screen.dart';
-import 'package:foodaroundme/viewmodel/mapViewModel.dart';
-
 import 'package:provider/provider.dart';
+import '../viewmodel/mapViewModel.dart';
 import '../widgets/action_button.dart';
 import '../widgets/expandable_fab.dart';
 import '../widgets/slider.dart';
+import 'map_screen.dart';
 
 
 class MainScreen extends StatefulWidget {
@@ -120,7 +119,10 @@ class _MainScreenState extends State<MainScreen> {
                 ignoring: viewModel.selectedIndex != 0 || !viewModel.showFab || isMenuOpen,
                 child: Sliders(
                   value: viewModel.searchRadius,
-                  onChanged: (v) => viewModel.setSearchRadiusKm(v),
+                  onChanged: (v) {
+                    viewModel.setSearchRadiusKm(v);
+                    viewModel.updateCameraZoomForRadius(v);
+                    },
                 ),
               ),
             ),
