@@ -19,6 +19,7 @@ class ActionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authVm = context.watch<AuthViewModel>();
+    final saved = authVm.isSaved(place.id);
 
 
     return Padding(
@@ -61,7 +62,7 @@ class ActionRow extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             CustomActionChip(
-              icon: Icons.bookmark_border,
+              icon: saved ? Icons.bookmark : Icons.bookmark_border,
               label: "Save",
               onTap: () => authVm.savePlace(place),
             ),

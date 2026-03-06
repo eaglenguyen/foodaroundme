@@ -111,6 +111,7 @@ class AuthViewModel extends ChangeNotifier{
 
       await seedProfileIfMissingFromGoogle();
       await loadProfileTable();
+      await fetchSavedPlaces();
 
     } catch (e) {
       error = e.toString();
@@ -122,17 +123,34 @@ class AuthViewModel extends ChangeNotifier{
 
   }
 
+  bool isSaved(String providerPlaceId) =>
+      savedPlaces.any((p) => p.id == providerPlaceId);
+
   Future<void> savePlace(Place place) async {
     final user = supabase.auth.currentUser;
     if (user == null) return;
+    final userId = user.id;
 
-    await supabase.from('saved_places').upsert({
-      'user_id': supabase.auth.currentUser!.id,
-      'provider_place_id': place.id,
-      'name': place.name,
-      'address': place.address,
-      'categories': place.categories,
-    });
+
+    if (isSaved(place.id)) {
+      await supabase
+          .from('saved_places')
+          .delete()
+          .eq('user_id', userId)
+          .eq('provider_place_id', place.id);
+      savedPlaces.removeWhere((p) => p.id == place.id); // ✅ remove from list
+    } else {
+      await supabase.from('saved_places').upsert({
+        'user_id': userId,
+        'provider_place_id': place.id,
+        'name': place.name,
+        'address': place.address,
+        'categories': place.categories,
+      });
+      savedPlaces.add(place); // ✅ add to list
+    }
+
+    notifyListeners();
   }
 
   Future<void> deleteSavedPlace(String placeId) async {
@@ -199,13 +217,12 @@ class AuthViewModel extends ChangeNotifier{
 
 
 
-
-
   Future<void> signInEmail (String email, String password) async {
     final res = await supabase.auth.signInWithPassword(
       email: email,
       password: password,
     );
+    await fetchSavedPlaces();
     if (res.user == null) {
       throw Exception('Wrong credentials');
     }

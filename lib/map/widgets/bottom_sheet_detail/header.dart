@@ -33,7 +33,9 @@ class _HeaderState extends State<Header> {
         children: [
           // Place name
           Text(
-            widget.place.name,
+            widget.place.name.length > 17
+            ? '${widget.place.name.substring(0, 17)}..'
+            : widget.place.name,
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,

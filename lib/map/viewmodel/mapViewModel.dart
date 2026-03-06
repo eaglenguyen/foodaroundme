@@ -289,12 +289,8 @@ class MapViewModel extends ChangeNotifier {
   // ======================================================
 
   Future<void> getCurrentLocation() async {
-    isLoading = true;
-    notifyListeners();
-
     final position = await _locationService.getCurrentPosition();
     if (position == null) {
-      isLoading = false;
       notifyListeners();
       return;
     }
@@ -305,8 +301,6 @@ class MapViewModel extends ChangeNotifier {
     mapController?.animateCamera(
       CameraUpdate.newCameraPosition(CameraPosition(target: center, zoom: 14.8)),
     );
-
-    isLoading = false;
     notifyListeners();
   }
 
@@ -362,6 +356,7 @@ class MapViewModel extends ChangeNotifier {
 
 
   Future<void> loadNearbyRestaurants(String filter) async {
+
     final places = await placesRepository.getNearbyPlaces(
       center: cameraCenter,
       category: filter,
@@ -374,6 +369,8 @@ class MapViewModel extends ChangeNotifier {
 
     sortPlacesByDistance();
     updateClusterItems(); // convert filteredPlaces → markers
+
+
   }
 
 
@@ -474,6 +471,7 @@ class MapViewModel extends ChangeNotifier {
     // if user selected a place, we only cluster that one (effectively single marker)
     clusterManager.setItems(filteredPlaces);
     clusterManager.updateMap();
+
   }
 
 

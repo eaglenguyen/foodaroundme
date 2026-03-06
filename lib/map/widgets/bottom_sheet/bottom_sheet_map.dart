@@ -74,6 +74,8 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
 
   @override
   Widget build(BuildContext context) {
+    final mapVm = context.watch<MapViewModel>();
+
 
     return DraggableScrollableSheet(
       expand: false,
@@ -270,7 +272,7 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
                 icon: const Icon(Icons.close),
                 color: Colors.white70,
                 splashRadius: 20,
-                onPressed: widget.close,
+                onPressed: mapVm.isLoading ? null : widget.close,
               ),
             ),
 

@@ -47,7 +47,7 @@ class LikeButtonsState extends State<LikeButtons> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  userVote == 'like' ? Icons.favorite : Icons.favorite_border,
+                userVote == 'like' ? Icons.favorite : Icons.favorite_border,
                   size: 20,
                   color: userVote == 'like' ? Colors.red : Colors.black87,
                 ),
