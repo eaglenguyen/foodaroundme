@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/app_root.dart';
 import 'package:provider/provider.dart';
@@ -144,6 +143,21 @@ class _SignInScreenState extends State<SignInScreen> {
     }
   }
 
+  Future<void> _forgetPassword() async {
+    final email = _emailController.text.trim().toLowerCase();
+
+    await supabase.auth.resetPasswordForEmail(
+      email,
+      redirectTo: 'com.foodaroundme://reset-password', // ✅ always mobile deep link
+    );
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password reset email sent')),
+      );
+    }
+  }
+
   /////////// Back Navigation Logic
 
   bool handleBack() {
@@ -241,6 +255,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     error: _error,
                     onBack: handleBack,
                     onSubmit: _submitPassword,
+                    onForgetPassword: _forgetPassword,
                   ),
                 },
               ),

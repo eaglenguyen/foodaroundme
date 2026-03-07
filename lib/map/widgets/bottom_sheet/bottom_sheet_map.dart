@@ -165,24 +165,6 @@ class _BottomSheetMapState extends State<BottomSheetMap> {
                           child: Row(
                             children: [
                               /// LEFT IMAGE
-                              SizedBox(
-                                width: 60,
-                                height: 60,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: p.photoUrl != null
-                                ? Image.network(
-                                  p.photoUrl!,
-                                  fit: BoxFit.cover,
-                                ) : Container( // if null, placeholder icon
-                                  width: 60,
-                                  height: 60,
-                                  color: Colors.grey,
-                                  child: const Icon(Icons.restaurant, color: Colors.white),
-                                )
-                              )
-                              ),
-                              const SizedBox(width: 12),
 
                               /// CENTER TEXT
                               Expanded(

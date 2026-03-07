@@ -52,12 +52,6 @@ class MapScreen extends StatelessWidget {
             myLocationEnabled: true,
             zoomControlsEnabled: false,
             markers: {
-              Marker(
-                markerId: const MarkerId('currentLocation'),
-                position: viewModel.center,
-                infoWindow: const InfoWindow(title: "You're here"),
-                icon: viewModel.currentIcon,
-              ),
               ...viewModel.markers,
       },
     ),

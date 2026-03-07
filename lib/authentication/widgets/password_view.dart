@@ -6,6 +6,18 @@ import '../ui/sign_in_screen.dart';
 
 
 class PasswordView extends StatelessWidget {
+
+  final String email;
+  final AuthMode mode;
+  final TextEditingController usernameController;
+  final TextEditingController passwordController;
+  final bool loading;
+  final String? error;
+  final VoidCallback onBack;
+  final Future<void> Function() onSubmit;
+  final Future<void> Function() onForgetPassword;
+
+
   const PasswordView({
     super.key,
     required this.email,
@@ -16,16 +28,9 @@ class PasswordView extends StatelessWidget {
     required this.error,
     required this.onBack,
     required this.onSubmit,
+    required this.onForgetPassword,
   });
 
-  final String email;
-  final AuthMode mode;
-  final TextEditingController usernameController;
-  final TextEditingController passwordController;
-  final bool loading;
-  final String? error;
-  final VoidCallback onBack;
-  final Future<void> Function() onSubmit;
 
   @override
   Widget build(BuildContext context) {
@@ -123,6 +128,29 @@ class PasswordView extends StatelessWidget {
               ],
             ),
           ),
+
+          if (!isSignUp) ...[
+            const SizedBox(height: 10),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton(
+                onPressed: loading ? null : () => onForgetPassword(),
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  foregroundColor: const Color(0xFFF5C518),
+                ),
+                child: const Text(
+                  'Forgot password?',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ],
 
           const SizedBox(height: 14),
 

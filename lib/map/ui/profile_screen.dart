@@ -84,17 +84,10 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 16),
 
             // ❤️ Likes & Dislikes row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _iconStatButton(Icons.thumb_up_alt, "Likes"),
-              ],
-            ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 5),
 
             // "View my saves"
             _profileOptionButton(

@@ -11,6 +11,7 @@ import 'map/viewmodel/mapViewModel.dart';
 
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
   await Supabase.initialize(
     url: 'https://llxhwworkafjuuokswbq.supabase.co',

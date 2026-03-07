@@ -62,7 +62,7 @@ class ActionRow extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             CustomActionChip(
-              icon: saved ? Icons.bookmark : Icons.bookmark_border,
+              icon: saved ? Icons.bookmark : Icons.bookmark_border, // clicked == true
               label: "Save",
               onTap: () => authVm.savePlace(place),
             ),

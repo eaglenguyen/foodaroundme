@@ -84,7 +84,7 @@ class MapViewModel extends ChangeNotifier {
         icon: await _getClusterIcon(cluster.count),
         infoWindow: InfoWindow(title: '${cluster.count} places'),
         onTap: () async {
-          final nextZoom = (await mapController?.getZoomLevel() ?? cameraZoom) + 1.5;
+          final nextZoom = (await mapController?.getZoomLevel() ?? cameraZoom) + 1;
           await mapController?.animateCamera(
             CameraUpdate.newCameraPosition(
               CameraPosition(target: cluster.location, zoom: nextZoom),
@@ -232,7 +232,7 @@ class MapViewModel extends ChangeNotifier {
 
     clusterManager.setMapId(controller.mapId);
     mapController?.animateCamera(
-      CameraUpdate.newCameraPosition(CameraPosition(target: center, zoom: 15)),
+      CameraUpdate.newCameraPosition(CameraPosition(target: center, zoom: 15.3)),
     );
   }
 
@@ -342,7 +342,7 @@ class MapViewModel extends ChangeNotifier {
     mapController?.animateCamera(
       CameraUpdate.newLatLngZoom(
         LatLng(position.latitude, position.longitude),
-        14.8,
+        15.3,
       ),
     );
   }
@@ -418,7 +418,7 @@ class MapViewModel extends ChangeNotifier {
   Future<void> customMarkerCurrent()  async {
     currentIcon = await BitmapDescriptor.asset(
       const ImageConfiguration(size: Size(40, 40)),
-      "assets/markers/currentHome.png",
+      "assets/markers/circle.png",
     );
     notifyListeners();
   }
@@ -529,7 +529,6 @@ class MapViewModel extends ChangeNotifier {
         await loadNearbyRestaurants(GeoapifyCategories.dessert);
         break;
     }
-    resetCamera();
     isLoading = false;
     notifyListeners();
   }

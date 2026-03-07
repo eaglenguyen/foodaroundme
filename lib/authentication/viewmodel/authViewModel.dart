@@ -122,9 +122,9 @@ class AuthViewModel extends ChangeNotifier{
 
 
   }
-
   bool isSaved(String providerPlaceId) =>
       savedPlaces.any((p) => p.id == providerPlaceId);
+
 
   Future<void> savePlace(Place place) async {
     final user = supabase.auth.currentUser;
@@ -216,6 +216,7 @@ class AuthViewModel extends ChangeNotifier{
   }
 
 
+  // Auth logic
 
   Future<void> signInEmail (String email, String password) async {
     final res = await supabase.auth.signInWithPassword(

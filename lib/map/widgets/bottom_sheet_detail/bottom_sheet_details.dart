@@ -24,7 +24,7 @@ class BottomSheetDetails extends StatelessWidget {
 
     return DraggableScrollableSheet(
       expand: false,
-      initialChildSize: 0.6,
+      initialChildSize: 0.4,
       minChildSize: 0.1,
       maxChildSize: 0.95,
       builder: (context, scrollController) {
