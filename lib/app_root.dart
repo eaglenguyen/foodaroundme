@@ -9,6 +9,7 @@ import 'authentication/viewmodel/authViewModel.dart';
 import 'map/ui/main_screen.dart';
 
 final ValueNotifier<bool> isGuestMode = ValueNotifier(false); // for skip button
+bool isResettingPassword = false;
 
 class AppRoot extends StatefulWidget {
   const AppRoot({super.key});
@@ -54,6 +55,13 @@ class _AppRootState extends State<AppRoot> {
 
             if(snapshot.data?.event == AuthChangeEvent.passwordRecovery) { // what triggers this
               return const ResetPasswordScreen();
+            }
+
+            // ✅ ignore auth changes while resetting password
+            if (isResettingPassword) {
+              if (snapshot.data?.event == AuthChangeEvent.userUpdated) {
+                return const ResetPasswordScreen(); // stay on reset screen
+              }
             }
 
             final session = Supabase.instance.client.auth.currentSession;

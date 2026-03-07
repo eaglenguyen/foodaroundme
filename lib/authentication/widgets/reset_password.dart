@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:foodaroundme/authentication/widgets/success_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../app_root.dart';
+
 class ResetPasswordScreen extends StatefulWidget {
 
   const ResetPasswordScreen({super.key});
@@ -14,6 +16,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
   bool _isLoading = false;
+
 
   @override
   void dispose() {
@@ -32,7 +35,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
     setState(() => _isLoading = true);
 
+
+
     try {
+      isResettingPassword = true;
       await Supabase.instance.client.auth.updateUser(
         UserAttributes(password: _passwordController.text.trim()),
       );
@@ -46,6 +52,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
         // ✅ after dialog is dismissed, sign out and go back to landing
         await Supabase.instance.client.auth.signOut();
+        isResettingPassword = false;
+
       }
     } catch (e) {
       if (context.mounted) {

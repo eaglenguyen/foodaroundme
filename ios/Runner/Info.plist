@@ -67,7 +67,7 @@
             <string>Editor</string>
             <key>CFBundleURLSchemes</key>
             <array>
-              <string>com.googleusercontent.apps.960770120495-21i2r9h3cml61lsvhqk4fg1gs74fm4he</string>
+              <string>com.foodaroundme</string>
             </array>
           </dict>
         </array>

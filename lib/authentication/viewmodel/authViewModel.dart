@@ -34,6 +34,7 @@ class AuthViewModel extends ChangeNotifier{
     notifyListeners();
   }
 
+  // Also handles duplicate Emails
   Future<void> seedProfileIfMissingFromGoogle() async {
     final user = supabase.auth.currentUser;
     if (user == null) return;
@@ -63,14 +64,9 @@ class AuthViewModel extends ChangeNotifier{
 
 
   Future<void> signInWithGoogle() async {
-    /// TODO: update the Web client ID with your own.
-    ///
-    /// Web Client ID that you registered with Google Cloud.
+
     const webClientId = '960770120495-d6d049dnh3do3s9ag3msavu7mp202roi.apps.googleusercontent.com';
 
-    /// TODO: update the iOS client ID with your own.
-    ///
-    /// iOS Client ID that you registered with Google Cloud.
     const iosClientId = '960770120495-21i2r9h3cml61lsvhqk4fg1gs74fm4he.apps.googleusercontent.com';
 
     // Google sign in on Android will work without providing the Android
@@ -119,9 +115,9 @@ class AuthViewModel extends ChangeNotifier{
       isLoading = false;
       notifyListeners();
     }
-
-
   }
+
+
   bool isSaved(String providerPlaceId) =>
       savedPlaces.any((p) => p.id == providerPlaceId);
 
