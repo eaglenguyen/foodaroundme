@@ -16,17 +16,19 @@ class AuthViewModel extends ChangeNotifier{
   String? username;
   String? bio;
 
+  User? get currentUser => supabase.auth.currentUser;
+
+
   final List<Place> savedPlaces = [];
 
 
   Future<void> loadProfileTable() async {
-    final user = supabase.auth.currentUser;
-    if (user == null) return;
+    if (currentUser == null) return;
 
     final row = await supabase
       .from('profiles')
       .select('username, bio')
-      .eq('id', user.id)
+      .eq('id', currentUser!.id)
       .maybeSingle();
 
     username = row?['username'] as String?;
@@ -36,20 +38,19 @@ class AuthViewModel extends ChangeNotifier{
 
   // Also handles duplicate Emails
   Future<void> seedProfileIfMissingFromGoogle() async {
-    final user = supabase.auth.currentUser;
-    if (user == null) return;
+    if (currentUser == null) return;
 
     // Load current profile row
     final row = await supabase
         .from('profiles')
         .select('username')
-        .eq('id', user.id)
+        .eq('id', currentUser!.id)
         .maybeSingle();
 
     final existing = (row?['username'] as String?)?.trim();
 
     // Pull google name from metadata as a one-time seed
-    final googleName = (user.userMetadata?['full_name'] ?? 'null')?.toString().trim();
+    final googleName = (currentUser!.userMetadata?['full_name'] ?? 'null')?.toString().trim();
 
     // If these conditions are met, make the username (in profiles table) as google name
     if ((existing == null || existing.isEmpty) &&
@@ -58,7 +59,7 @@ class AuthViewModel extends ChangeNotifier{
       await supabase
           .from('profiles')
           .update({'username': googleName})
-          .eq('id', user.id);
+          .eq('id', currentUser!.id);
     }
   }
 
@@ -123,9 +124,8 @@ class AuthViewModel extends ChangeNotifier{
 
 
   Future<void> savePlace(Place place) async {
-    final user = supabase.auth.currentUser;
-    if (user == null) return;
-    final userId = user.id;
+    if (currentUser == null) return;
+    final userId = currentUser!.id;
 
 
     if (isSaved(place.id)) {
@@ -150,8 +150,7 @@ class AuthViewModel extends ChangeNotifier{
   }
 
   Future<void> deleteSavedPlace(String placeId) async {
-    final user = supabase.auth.currentUser;
-    if (user == null) return;
+    if (currentUser == null) return;
 
     // optimistic remove
     final removedIndex = savedPlaces.indexWhere((p) => p.id == placeId);
@@ -165,15 +164,14 @@ class AuthViewModel extends ChangeNotifier{
       await supabase
           .from('saved_places')
           .delete()
-          .eq('user_id', user.id)
+          .eq('user_id', currentUser!.id)
           .eq('provider_place_id', placeId);
     }
 
 
   Future<void> fetchSavedPlaces() async {
-    final user = supabase.auth.currentUser;
 
-    if (user == null) {
+    if (currentUser == null) {
       return;
     }
 
@@ -185,7 +183,7 @@ class AuthViewModel extends ChangeNotifier{
       final rows = await supabase
           .from('saved_places')
           .select('provider_place_id, name, address, categories, created_at')
-          .eq('user_id', user.id)
+          .eq('user_id', currentUser!.id)
           .order('created_at', ascending: false);
 
       final list = (rows as List).cast<Map<String, dynamic>>();
@@ -231,6 +229,8 @@ class AuthViewModel extends ChangeNotifier{
 
 
 
+
+
   // Votes aka Likes/Dislike logic
   final Map<String, String?> _userVotes = {};
   final Map<String, ({int likes, int dislikes})> _counts = {};
@@ -266,7 +266,7 @@ class AuthViewModel extends ChangeNotifier{
 
   Future<void> vote(String providerPlaceId, String vote) async {
     final userId = supabase.auth.currentUser?.id;
-    if (userId == null) return;
+    if (userId == null) return; // click is null if not logged in
 
     final current = _userVotes[providerPlaceId];
 

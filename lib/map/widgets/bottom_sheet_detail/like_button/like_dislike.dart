@@ -1,7 +1,10 @@
 
 import 'package:flutter/material.dart';
+import 'package:foodaroundme/app_root.dart';
+import 'package:foodaroundme/main.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../authentication/ui/sign_in_screen.dart';
 import '../../../../authentication/viewmodel/authViewModel.dart';
 
 
@@ -26,6 +29,7 @@ class LikeButtonsState extends State<LikeButtons> {
   @override
   Widget build(BuildContext context) {
     final voteVm = context.watch<AuthViewModel>();
+    final user = voteVm.currentUser;
     final userVote = voteVm.getUserVote(widget.providerPlaceId);
 
     return Row(
@@ -34,7 +38,12 @@ class LikeButtonsState extends State<LikeButtons> {
       children: [
         // Like button
         GestureDetector(
-          onTap: () => voteVm.vote(widget.providerPlaceId, 'like'),
+          onTap: () {
+            if (user == null) {
+            _showLoginDialog(context);
+            }
+            voteVm.vote(widget.providerPlaceId, 'like');
+          },
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
@@ -65,7 +74,12 @@ class LikeButtonsState extends State<LikeButtons> {
 
         // Dislike button
         GestureDetector(
-          onTap: () => voteVm.vote(widget.providerPlaceId, 'dislike'),
+          onTap: () {
+            if (user == null) {
+              _showLoginDialog(context);
+            }
+            voteVm.vote(widget.providerPlaceId, 'dislike');
+          },
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
@@ -93,6 +107,38 @@ class LikeButtonsState extends State<LikeButtons> {
         ),
       ],
     );
-  }
-}
 
+
+  }
+
+
+
+}
+void _showLoginDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: const Text(
+        'Account Required',
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      content: const Text('You need an account to like or dislike places.'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+            isGuestMode.value = false;
+          },
+
+          child: const Text('Sign In'),
+        ),
+      ],
+    ),
+  );
+}

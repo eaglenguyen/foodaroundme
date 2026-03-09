@@ -64,7 +64,6 @@ class BottomSheetDetails extends StatelessWidget {
                 right: 15,
                 child: Row(
                   children: [
-                    // Dislike button
                     Column(
                       children: [
                         LikeButtons(providerPlaceId: place.id)
