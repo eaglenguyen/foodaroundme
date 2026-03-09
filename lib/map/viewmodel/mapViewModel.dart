@@ -95,12 +95,13 @@ class MapViewModel extends ChangeNotifier {
     }
 
     final place = cluster.items.first as Place;
+    final isSelected = selectedPlace?.id == place.id; // ✅ check if this place is selected
 
     return Marker(
       markerId: MarkerId(place.id),
       position: place.location,
       infoWindow: InfoWindow(title: place.name),
-      icon: customIcon,
+      icon: isSelected ? customIconSelect : customIcon,
       onTap: () {
         selectPlace(place);
         requestOpenDetails(place.id);
@@ -218,7 +219,7 @@ class MapViewModel extends ChangeNotifier {
     getCurrentLocation();
     _loadMapStyle();
     customMarker();
-    customMarkerCurrent();
+    customMarkerSelected();
   }
 
 
@@ -413,9 +414,10 @@ class MapViewModel extends ChangeNotifier {
 
 
   BitmapDescriptor customIcon = BitmapDescriptor.defaultMarker;
+  BitmapDescriptor customIconSelect = BitmapDescriptor.defaultMarker;
   BitmapDescriptor currentIcon = BitmapDescriptor.defaultMarker;
 
-  Future<void> customMarkerCurrent()  async {
+  Future<void> customMarkerCurrent()  async { // current location + moving
     currentIcon = await BitmapDescriptor.asset(
       const ImageConfiguration(size: Size(40, 40)),
       "assets/markers/circle.png",
@@ -423,49 +425,22 @@ class MapViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void customMarker() {
-    BitmapDescriptor.asset(
-        const ImageConfiguration(size: Size(40, 40)),
-        "assets/markers/locationPurple.png",
-    ).then((icon) {
-      customIcon = icon;
-      notifyListeners();
-    });
-  }
-  // --- Convert Places p into markers and notify UI ---
-  void updateMarkers() {
-    // show one selectedMarker
-    if(selectedPlace != null) {
-      markers = { // Update marker to show only one/selected
-        Marker(
-          markerId: MarkerId(selectedPlace!.id),
-          position: selectedPlace!.location,
-          infoWindow: InfoWindow(title: selectedPlace!.name,
-              onTap: () {
-        },
-          ),
-            icon: customIcon
-
-        ),
-      };
-    } else {
-      // show all (filtered) markers
-      markers = filteredPlaces.map(
-            (p) => Marker(
-              markerId: MarkerId(p.name),
-          position: p.location,
-          infoWindow: InfoWindow(
-              title: p.name,
-            onTap: () {
-            },
-          ),
-                icon: customIcon
-            ),
-      ).toSet();
-    }
+  Future<void> customMarker()  async {
+    customIcon = await BitmapDescriptor.asset(
+      const ImageConfiguration(size: Size(40, 40)),
+      "assets/markers/locationFilled.png",
+    );
     notifyListeners();
-
   }
+
+  Future<void> customMarkerSelected() async {
+    customIconSelect = await BitmapDescriptor.asset(
+      const ImageConfiguration(size: Size(40, 40)),
+      "assets/markers/locationOutline.png",
+    );
+    notifyListeners();
+  }
+
 
   void updateClusterItems() {
     // if user selected a place, we only cluster that one (effectively single marker)

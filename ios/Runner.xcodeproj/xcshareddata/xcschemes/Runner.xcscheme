@@ -73,6 +73,20 @@
             ReferencedContainer = "container:Runner.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "--dart-define=SUPABASE_URL=https://llxhwworkafjuuokswbq.supabase.co"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--dart-define=SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxseGh3d29ya2FmanV1b2tzd2JxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyNTQ4ODIsImV4cCI6MjA4NjgzMDg4Mn0.VPUQB0abc3qG6SA6PJwP5hXjPrTrKuvB4ReZWKvtuRI"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--dart-define=GEOAPIFY_API_KEY=0faf7e00ca07489f9d633cc86bb1f12f"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Profile"
