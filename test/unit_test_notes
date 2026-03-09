@@ -1,0 +1,11 @@
+Situation: A few months from now your app is growing and you get a new data format
+from your places API. Instead of semicolons it now uses a pipe | as a separator:
+
+"Mo-Fr 09:00-17:00 | Sa-Su 10:00-15:00"
+
+
+You go into parseOpeningHours and update the segmentRegex to handle the new format.
+While fixing it you accidentally break the existing comma separator logic.
+
+
+That's the core value — tests act as a safety net when you change existing code.

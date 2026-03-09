@@ -20,7 +20,7 @@ class ProfileScreen extends StatelessWidget {
 
     // Single source of truth is from profiles table via supabase
     final user = supabase.auth.currentUser;
-    final fullName = authVm.username ?? '';
+    final fullName = authVm.username;
     final email = user?.email;
     final bio = authVm.bio ?? '';
     return Scaffold(
@@ -59,7 +59,7 @@ class ProfileScreen extends StatelessWidget {
 
             // Name
             Text(
-              fullName ?? 'null',
+              fullName ?? 'Guest',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -68,7 +68,7 @@ class ProfileScreen extends StatelessWidget {
 
             // email or username
             Text(
-              email ?? 'null',
+              email ?? 'guest@guest.com',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey,

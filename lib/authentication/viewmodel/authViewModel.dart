@@ -12,14 +12,13 @@ class AuthViewModel extends ChangeNotifier{
 
   bool isLoading = false;
   String? error;
-
   String? username;
   String? bio;
-
   User? get currentUser => supabase.auth.currentUser;
-
-
   final List<Place> savedPlaces = [];
+  bool isSaved(String providerPlaceId) =>
+      savedPlaces.any((p) => p.id == providerPlaceId);
+
 
 
   Future<void> loadProfileTable() async {
@@ -67,7 +66,6 @@ class AuthViewModel extends ChangeNotifier{
   Future<void> signInWithGoogle() async {
 
     const webClientId = '960770120495-d6d049dnh3do3s9ag3msavu7mp202roi.apps.googleusercontent.com';
-
     const iosClientId = '960770120495-21i2r9h3cml61lsvhqk4fg1gs74fm4he.apps.googleusercontent.com';
 
     // Google sign in on Android will work without providing the Android
@@ -119,8 +117,6 @@ class AuthViewModel extends ChangeNotifier{
   }
 
 
-  bool isSaved(String providerPlaceId) =>
-      savedPlaces.any((p) => p.id == providerPlaceId);
 
 
   Future<void> savePlace(Place place) async {

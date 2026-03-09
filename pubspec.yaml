@@ -72,7 +72,6 @@ dev_dependencies:
   drift_dev: ^2.31.0
   build_runner: ^2.10.5
 
-  flutter_native_splash: ^2.4.1
   flutter_test:
     sdk: flutter
 
