@@ -1,5 +1,8 @@
 # foodaroundme
 
+### Bye Google maps! - a new way to find restaurants nearby! 
+
+
 A new Flutter project.
 
 ## Getting Started
