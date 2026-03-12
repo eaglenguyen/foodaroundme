@@ -1,19 +1,27 @@
-# foodaroundme
+## foodaroundme
 
-### Bye Google maps! - a new way to find restaurants nearby! 
+Open the app and find a solid food option in less than 5 minutes! Unlike Google Maps, which prioritizes navigation and excessive information, this app focuses purely on nearby food & drink places with a clean, simple interface that is easy for anyone to use. 
 
 
-A new Flutter project.
+## Quick Look
+<img src="" alt="fluttermap" width="400"  />
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+## Features
 
-A few resources to get you started if this is your first Flutter project:
+* Nearby Restaurant Discovery – Find restaurants, cafes, and bars around your current location.
+* Slider to adjust Walking -> Driving distance.
+* View restaurant information including ratings, photos, and opening hours.
+* Crowd-Sourced Feedback – Like or dislike restaurants to contribute to a community-driven dataset.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Technologies Used
+* Flutter – Cross-platform mobile development for iOS and Android
+* Dart – Primary programming language
+* Geoapify APIs – Place search, location data, and photos
+* Supabase – Authentication and database services
+* SQL – Used for storing and querying restaurant interactions (likes/dislikes)
+* Dio - Http client for flutter for making API request
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Contributing
+Contributions are welcome! If you find any bugs or want to suggest improvements, please open an issue or submit a pull request.
+
