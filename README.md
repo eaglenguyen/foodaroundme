@@ -1,6 +1,6 @@
 ## foodaroundme
 
-Unlike Google Maps, which prioritizes navigation and excessive information, this app focuses purely on nearby food & drink places with a clean, simple interface that is easy for anyone to use. 
+Unlike Google Maps, which prioritizes navigation and excessive information, this app focuses purely on nearby food & drink places with a clean, ad-free, and simple interface that is easy for anyone to use. 
 
 
 ## Quick Look
