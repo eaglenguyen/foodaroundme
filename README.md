@@ -4,7 +4,7 @@ Unlike Google Maps, which prioritizes navigation and excessive information, this
 
 
 ## Quick Look
-<img src="" alt="fluttermap" width="400"  />
+<img src="" alt="ComingSoon" width="400"  />
 
 
 ## Features
