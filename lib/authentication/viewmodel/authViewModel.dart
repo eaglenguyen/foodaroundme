@@ -9,12 +9,17 @@ import '../../map/model/place.dart';
 
 
 class AuthViewModel extends ChangeNotifier{
+  final SupabaseClient _supabase; // ✅ injected, not global
+
+  AuthViewModel({SupabaseClient? supabaseClient})
+      : _supabase = supabaseClient ?? Supabase.instance.client; // ✅ defaults to real client
+
 
   bool isLoading = false;
   String? error;
   String? username;
   String? bio;
-  User? get currentUser => supabase.auth.currentUser;
+  User? get currentUser => _supabase.auth.currentUser;
   final List<Place> savedPlaces = [];
   bool isSaved(String providerPlaceId) =>
       savedPlaces.any((p) => p.id == providerPlaceId);
@@ -98,7 +103,7 @@ class AuthViewModel extends ChangeNotifier{
         throw Exception('Missing Google auth token');
       }
 
-      await supabase.auth.signInWithIdToken(
+      await _supabase.auth.signInWithIdToken(
         provider: OAuthProvider.google,
         idToken: idToken,
         accessToken: accessToken,
@@ -176,7 +181,7 @@ class AuthViewModel extends ChangeNotifier{
     notifyListeners();
 
     try {
-      final rows = await supabase
+      final rows = await _supabase
           .from('saved_places')
           .select('provider_place_id, name, address, categories, created_at')
           .eq('user_id', currentUser!.id)
@@ -209,7 +214,7 @@ class AuthViewModel extends ChangeNotifier{
   // Auth logic
 
   Future<void> signInEmail (String email, String password) async {
-    final res = await supabase.auth.signInWithPassword(
+    final res = await _supabase.auth.signInWithPassword(
       email: email,
       password: password,
     );
@@ -220,7 +225,7 @@ class AuthViewModel extends ChangeNotifier{
   }
 
   Future<void> signOut() async {
-    await supabase.auth.signOut();
+    await _supabase.auth.signOut();
   }
 
 
@@ -236,9 +241,9 @@ class AuthViewModel extends ChangeNotifier{
   int getDislikes(String providerPlaceId) => _counts[providerPlaceId]?.dislikes ?? 0;
 
   Future<void> loadVotes(String providerPlaceId) async {
-    final userId = supabase.auth.currentUser?.id;
+    final userId = _supabase.auth.currentUser?.id;
 
-    final votesRes = await supabase
+    final votesRes = await _supabase
         .from('place_votes')
         .select('vote, user_id')
         .eq('provider_place_id', providerPlaceId);
@@ -261,7 +266,7 @@ class AuthViewModel extends ChangeNotifier{
   }
 
   Future<void> vote(String providerPlaceId, String vote) async {
-    final userId = supabase.auth.currentUser?.id;
+    final userId = _supabase.auth.currentUser?.id;
     if (userId == null) return; // click is null if not logged in
 
     final current = _userVotes[providerPlaceId];
@@ -299,4 +304,18 @@ class AuthViewModel extends ChangeNotifier{
 
     notifyListeners();
   }
+
+  // ✅ Only used in tests
+  @visibleForTesting
+  void testSetVote(String providerPlaceId, String? vote) {
+    _userVotes[providerPlaceId] = vote;
+  }
+
+  @visibleForTesting
+  void testSetCounts(String providerPlaceId, {required int likes, required int dislikes}) {
+    _counts[providerPlaceId] = (likes: likes, dislikes: dislikes);
+  }
+
+  bool get isLoggedIn => _supabase.auth.currentUser != null;
+
 }

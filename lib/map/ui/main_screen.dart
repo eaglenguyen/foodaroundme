@@ -44,48 +44,17 @@ class _MainScreenState extends State<MainScreen> {
           child: Padding(
             padding: const EdgeInsets.only(bottom: 90), // moves FAB up
             child: ExpandableFab(
-              distance: 64, // controls the spread of icons
               onOpenChanged: (isOpen) {
                 setState(() => isMenuOpen = isOpen // setState similar to LaunchedEffect/mutableStateof
                 );
               },
-              children: [
-                ActionButton(
-                  icon: const Icon(Icons.fastfood_rounded),
-                  label: "food",
-                  onPressed: () async {
-                    viewModel.openSheetandResetCount();
-                    viewModel.hideExpandableFab();
-
-                    await viewModel.applyFilter(PlaceFilter.restaurant);
-
-                    if (!context.mounted) return;
-
-                  },
-                ),
-                ActionButton(
-                  icon: const Icon(Icons.coffee),
-                  label: "cafe",
-                  onPressed: () async {
-                    viewModel.openSheetandResetCount();
-                    viewModel.hideExpandableFab();
-                    await viewModel.applyFilter(PlaceFilter.cafe);
-
-                    if (!context.mounted) return;
-                  },
-                ),
-                ActionButton(
-                  icon: const Icon(Icons.local_bar),
-                  label: "bars",
-                  onPressed: () async {
-                    viewModel.openSheetandResetCount();
-                    viewModel.hideExpandableFab();
-                    await viewModel.applyFilter(PlaceFilter.bar);
-                    if (!context.mounted) return;
-                  },
-                ),
-
-              ],
+              sliderChild: Sliders(
+                value: viewModel.searchRadius,
+                onChanged: (v) {
+                  viewModel.setSearchRadiusKm(v);
+                  viewModel.updateCameraZoomForRadius(v);
+                },
+              ),
             ),
           ),
         ),
@@ -108,22 +77,52 @@ class _MainScreenState extends State<MainScreen> {
           ),
 
 
-          // ✅ Slider positioned to the left of the FAB
+          // ✅ Chips positioned to the left of the FAB
           Positioned(
             bottom: 130, // aligns vertically with FAB (90 padding + ~15 adjustment)
-            left: 10,   // sits just to the left of the FAB
+            left: 80,   // sits just to the left of the FAB
             child: AnimatedOpacity(
               opacity: viewModel.selectedIndex == 0 && viewModel.showFab && !isMenuOpen ? 1.0 : 0.0,
               duration: const Duration(milliseconds: 200),
               child: IgnorePointer(
                 ignoring: viewModel.selectedIndex != 0 || !viewModel.showFab || isMenuOpen,
-                child: Sliders(
-                  value: viewModel.searchRadius,
-                  onChanged: (v) {
-                    viewModel.setSearchRadiusKm(v);
-                    viewModel.updateCameraZoomForRadius(v);
-                    },
-                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ActionButton(
+                      icon: const Icon(Icons.fastfood_rounded),
+                      label: "food",
+                      onPressed: () async {
+                        viewModel.openSheetandResetCount();
+                        viewModel.hideExpandableFab();
+                        await viewModel.applyFilter(PlaceFilter.restaurant);
+                        if (!context.mounted) return;
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    ActionButton(
+                      icon: const Icon(Icons.coffee),
+                      label: "cafe",
+                      onPressed: () async {
+                        viewModel.openSheetandResetCount();
+                        viewModel.hideExpandableFab();
+                        await viewModel.applyFilter(PlaceFilter.cafe);
+                        if (!context.mounted) return;
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    ActionButton(
+                      icon: const Icon(Icons.local_bar),
+                      label: "bars",
+                      onPressed: () async {
+                        viewModel.openSheetandResetCount();
+                        viewModel.hideExpandableFab();
+                        await viewModel.applyFilter(PlaceFilter.bar);
+                        if (!context.mounted) return;
+                      },
+                    ),
+                  ],
+                )
               ),
             ),
           ),

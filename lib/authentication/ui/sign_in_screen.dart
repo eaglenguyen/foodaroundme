@@ -4,6 +4,7 @@ import 'package:foodaroundme/app_root.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../main.dart';
+import '../util/auth_validators.dart';
 import '../viewmodel/authViewModel.dart';
 import '../widgets/email_view.dart';
 import '../widgets/landing_view.dart';
@@ -50,15 +51,19 @@ class _SignInScreenState extends State<SignInScreen> {
 
   Future<void> _continueFromEmail() async {
     final email = _emailController.text.trim().toLowerCase();
+    final error = validateEmail(email);
 
-    if (email.isEmpty || !email.contains('@')) {
-      setState(() => _error = 'Please enter a valid email.');
+    if(error != null) {
+      setState(() {
+        _error = error;
+      });
       return;
     }
 
     setState(() {
       _loading = true;
       _error = null;
+
     });
 
     try {
@@ -87,9 +92,12 @@ class _SignInScreenState extends State<SignInScreen> {
   Future<void> _submitPassword() async {
     final email = _emailController.text.trim().toLowerCase();
     final password = _passwordController.text;
+    final passwordError = validatePassword(password);
 
-    if (password.length < 6) {
-      setState(() => _error = 'Password must be at least 6 characters.');
+    if (passwordError != null) {
+      setState(() {
+        _error = passwordError;
+      });
       return;
     }
 
@@ -105,6 +113,13 @@ class _SignInScreenState extends State<SignInScreen> {
         // isGuestMode.value = false;
       } else {
         final username = _usernameController.text.trim();
+        final usernameError = validateUsername(username); // ✅ use validator
+        if (usernameError != null) {
+          setState(() {
+            _error = usernameError;
+          });
+          return;
+        }
         if (username.isEmpty) {
           setState(() => _error = 'Username is required.');
           return;

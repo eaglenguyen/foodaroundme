@@ -179,7 +179,5 @@ void main() {
       expect(result.keys.toList(), dayOrder);
     });
   });
-
-  // ─── formatForUI ─────────────────────────────────────────────────
-
+  
 }

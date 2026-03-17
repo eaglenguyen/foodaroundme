@@ -3,6 +3,7 @@ import 'package:foodaroundme/authentication/widgets/success_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../app_root.dart';
+import '../util/auth_validators.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
 
@@ -26,13 +27,24 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   }
 
   Future<void> _updatePassword() async {
-    if (_passwordController.text != _confirmController.text) {
+    final passwordError = validatePassword(_passwordController.text);
+    if(passwordError != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
+        SnackBar(content: Text(passwordError)),
       );
       return;
     }
 
+    final confirmError = validateConfirmPassword(
+      _passwordController.text,
+      _confirmController.text,
+    );
+    if (confirmError != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(confirmError)),
+      );
+      return;
+    }
     setState(() => _isLoading = true);
 
 
