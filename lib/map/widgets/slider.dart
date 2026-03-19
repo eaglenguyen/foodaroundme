@@ -59,6 +59,8 @@ class Sliders extends StatelessWidget {
                       max: max,
                       divisions: 10,
                       onChanged: onChanged,
+                      activeColor: Colors.blueGrey,
+                      inactiveColor: Colors.grey,
                     ),
                   ),
                 ),
