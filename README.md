@@ -1,4 +1,4 @@
-## foodaroundme
+## 🍔 foodaroundme
 
 Unlike Google Maps, which prioritizes navigation and excessive information, this app focuses purely on nearby food & drink places with a clean, and simple interface that is easy for anyone to use. The main goal was to create an ad-free experience for users.
 
