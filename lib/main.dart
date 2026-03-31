@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/app_root.dart';
 import 'package:foodaroundme/map/repositoryImp/geoapify_repo_impl.dart';
+import 'package:foodaroundme/service/subscription/revenuecat_service.dart';
 import 'package:foodaroundme/service/subscription/subscription_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -15,16 +16,23 @@ import 'map/viewmodel/map_viewmodel.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // RevenueCat
-  await Purchases.setLogLevel(LogLevel.debug);
-  await Purchases.configure(
-      PurchasesConfiguration('test_FgGjtcDHcSGCgniFhddvdYPPlss')
-  );
+
 
   await Supabase.initialize(
     url: 'https://llxhwworkafjuuokswbq.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxseGh3d29ya2FmanV1b2tzd2JxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyNTQ4ODIsImV4cCI6MjA4NjgzMDg4Mn0.VPUQB0abc3qG6SA6PJwP5hXjPrTrKuvB4ReZWKvtuRI',
   );
+
+  final rcService = RevenueCatService();
+  await rcService.init();
+  final user = supabase.auth.currentUser;
+
+  // ✅ restore identity BEFORE UI starts
+  if (user != null) {
+    await Purchases.logIn(user.id);
+  }
+
+
   // when adding new keys make sure to pass into android build. Run , edit , add to args
   const googleApiKey = String.fromEnvironment("GOOGLE_MAPS_API_KEY");
   const apiKeyFourSquare = String.fromEnvironment("FOURSQUARE_API_KEY");
@@ -34,6 +42,8 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        Provider<RevenueCatService>.value(value: rcService), // ✅ add this
+
         Provider<AppDatabase>.value(value: database),
         Provider<PlacesRepository>(
         create: (context) => GeoapifyRepoImpl(geoapifyKey, context.read<AppDatabase>()), // switch apis here

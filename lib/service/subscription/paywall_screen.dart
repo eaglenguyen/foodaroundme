@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../app_root.dart';
+
 
 class PaywallScreen extends StatelessWidget {
   final VoidCallback onPurchase;
@@ -34,35 +36,46 @@ class PaywallScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: onPurchase,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black87,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+          ValueListenableBuilder<bool>(
+            valueListenable: isGuestMode,
+            builder: (context, isGuest, _) {
+              return Column(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: isGuest ? null : onPurchase, // ✅ disable if guest
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black87,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: const Text(
+                        'Subscribe — 4.99/mo',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
                     ),
                   ),
-                  child: const Text(
-                    'Subscribe — 4.99/mo',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+
+                  const SizedBox(height: 12),
+
+                  TextButton(
+                    onPressed: isGuest ? null : onRestore,
+                    child: const Text(
+                      'Restore purchases',
+                      style: TextStyle(color: Colors.black45),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: onRestore,
-                child: const Text(
-                  'Restore purchases',
-                  style: TextStyle(color: Colors.black45),
-                ),
-              ),
+                ],
+              );
+            },
+          )
             ],
           ),
         ),

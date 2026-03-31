@@ -6,6 +6,7 @@ import 'package:foodaroundme/map/ui/saved_places_screen.dart';
 import 'package:foodaroundme/map/ui/update_profile_screen.dart';
 import 'package:provider/provider.dart';
 
+import '../../service/subscription/subscription_viewmodel.dart';
 import '../viewmodel/map_viewmodel.dart';
 import '../widgets/logout_dialog.dart';
 
@@ -16,6 +17,8 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final authVm = context.watch<AuthViewModel>();
     final mapVm = context.watch<MapViewModel>();
+
+
 
 
     // Single source of truth is from profiles table via supabase
@@ -35,8 +38,8 @@ class ProfileScreen extends StatelessWidget {
             onPressed: () async {
               final confirmed = await showLogoutDialog(context);
               if (confirmed == true) {
-              mapVm.selectedIndex = 0;
-              isGuestMode.value = false;
+                mapVm.selectedIndex = 0;
+                isGuestMode.value = false;
             }
               },
           )

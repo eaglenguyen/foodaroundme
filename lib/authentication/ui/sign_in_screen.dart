@@ -4,6 +4,7 @@ import 'package:foodaroundme/app_root.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../main.dart';
+import '../../service/subscription/subscription_viewmodel.dart';
 import '../util/auth_validators.dart';
 import '../viewmodel/authViewModel.dart';
 import '../widgets/email_view.dart';
@@ -220,6 +221,7 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     final authVM = context.watch<AuthViewModel>();
+    final subscriptionVM = context.watch<SubscriptionViewModel>();
 
     return PopScope(
       canPop: false,
@@ -250,7 +252,10 @@ class _SignInScreenState extends State<SignInScreen> {
                     key: const ValueKey('landing'),
                     onEmailTap: _goToEmail,
                     onGoogleTap: () => authVM.signInWithGoogle(),
-                    onSkipTap: () => isGuestMode.value = true,
+                    onSkipTap: () {
+                      isGuestMode.value = true;
+                      subscriptionVM.checkSubscription();
+                    }
                   ),
                   _AuthStep.email => EmailView(
                     key: const ValueKey('email'),

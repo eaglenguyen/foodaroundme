@@ -11,10 +11,19 @@ class SubscriptionViewModel extends ChangeNotifier {
     await checkSubscription();
   }
 
+  Future<void> refreshAfterLogin() async {
+    isLoading = true;
+    notifyListeners();
+    await checkSubscription();
+  }
+
   Future<void> checkSubscription() async {
     try {
       final customerInfo = await Purchases.getCustomerInfo();
-      debugPrint('Active entitlements: ${customerInfo.entitlements.active}');
+
+      debugPrint('User ID: ${customerInfo.originalAppUserId}');
+      debugPrint('Aliases: ${customerInfo.allPurchasedProductIdentifiers}');
+
 
       _isPro = customerInfo.entitlements.active.containsKey('foodAroundMe Pro');
     } catch (e) {
@@ -31,7 +40,7 @@ class SubscriptionViewModel extends ChangeNotifier {
       notifyListeners();
 
       final offerings = await Purchases.getOfferings();
-      final package = offerings.current?.availablePackages.first;
+      final package = offerings.current?.lifetime;
       if (package == null) return;
 
       await Purchases.purchase(

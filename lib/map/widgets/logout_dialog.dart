@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../authentication/viewmodel/authViewModel.dart';
+import '../../service/subscription/subscription_viewmodel.dart';
 
 
 Future<bool?> showLogoutDialog(BuildContext context) {

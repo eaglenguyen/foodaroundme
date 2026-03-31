@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:foodaroundme/authentication/widgets/reset_password.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:provider/provider.dart';
-
 import 'authentication/ui/sign_in_screen.dart';
 import 'authentication/viewmodel/authViewModel.dart';
 import 'map/ui/main_screen.dart';

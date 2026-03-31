@@ -2,10 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:foodaroundme/main.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../map/model/place.dart';
+import '../../service/subscription/subscription_viewmodel.dart';
 
 
 
@@ -14,9 +16,6 @@ class AuthViewModel extends ChangeNotifier{
 
   AuthViewModel({SupabaseClient? supabaseClient})
       : _supabase = supabaseClient ?? Supabase.instance.client; // ✅ defaults to real client
-
-  bool _isPro = false;
-  bool get isPro => _isPro;
 
 
   bool isLoading = false;
@@ -33,13 +32,6 @@ class AuthViewModel extends ChangeNotifier{
   Future<void> loadProfileTable() async {
     if (currentUser == null) return;
 
-    debugPrint('loadProfileTable - logging into RevenueCat with: ${currentUser!.id}');
-    final loginResult = await Purchases.logIn(currentUser!.id);
-    debugPrint('RevenueCat entitlements: ${loginResult.customerInfo.entitlements.active}');
-
-    final isPro = loginResult.customerInfo.entitlements.active
-        .containsKey('foodAroundMe Pro');
-    debugPrint('isPro after login: $isPro');
 
     final row = await supabase
       .from('profiles')
@@ -121,10 +113,13 @@ class AuthViewModel extends ChangeNotifier{
         idToken: idToken,
         accessToken: accessToken,
       );
+      final user = _supabase.auth.currentUser;
 
-      await Purchases.logIn(currentUser!.id);
-      await checkSubscription();
+      if (user == null) {
+        throw Exception('Google sign-in failed');
+      }
 
+      await _handlePostLogin(user);
 
       await seedProfileIfMissingFromGoogle();
       await loadProfileTable();
@@ -236,25 +231,20 @@ class AuthViewModel extends ChangeNotifier{
       password: password,
     );
 
-    debugPrint('Supabase user ID: ${res.user!.id}');
+    final user = res.user;
 
-    await Purchases.logOut();
-    final loginResult = await Purchases.logIn(res.user!.id);
-    debugPrint('RevenueCat created new: ${loginResult.created}');
-    debugPrint('RevenueCat user ID: ${loginResult.customerInfo.originalAppUserId}');
-    debugPrint('Active entitlements after login: ${loginResult.customerInfo.entitlements.active}');
-
-
-    await fetchSavedPlaces();
-    if (res.user == null) {
+    if (user == null) {
       throw Exception('Wrong credentials');
     }
+
+    await _handlePostLogin(user);
+
+    await fetchSavedPlaces();
 
 
   }
 
   Future<void> signOut() async {
-    await Purchases.logOut();
     await _supabase.auth.signOut();
   }
 
@@ -335,19 +325,19 @@ class AuthViewModel extends ChangeNotifier{
     notifyListeners();
   }
 
-  Future<void> checkSubscription() async {
-    try {
-      final customerInfo = await Purchases.getCustomerInfo();
-      debugPrint('Active entitlements: ${customerInfo.entitlements.active}');
 
-      _isPro = customerInfo.entitlements.active.containsKey('foodAroundMe Pro');
-    } catch (e) {
-      _isPro = false;
-    } finally {
-      isLoading = false;
-      notifyListeners();
-    }
+  Future<void> _handlePostLogin(User user) async {
+    await Purchases.logIn(user.id);
+
+    final subscriptionVM = Provider.of<SubscriptionViewModel>(
+      navigatorKey.currentContext!,
+      listen: false,
+    );
+
+    await subscriptionVM.refreshAfterLogin();
   }
+
+
 
   // ✅ Only used in tests
   @visibleForTesting
