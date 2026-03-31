@@ -4,7 +4,7 @@ import 'package:foodaroundme/map/widgets/bottom_sheet_detail/photo_grid.dart';
 import 'package:foodaroundme/map/widgets/bottom_sheet_detail/social_links.dart';
 import 'package:provider/provider.dart';
 import '../../model/place.dart';
-import '../../viewmodel/mapViewModel.dart';
+import '../../viewmodel/map_viewmodel.dart';
 import 'drag_handle_line.dart';
 import 'action_row.dart';
 import 'header.dart';

@@ -6,7 +6,7 @@ import 'package:foodaroundme/map/ui/saved_places_screen.dart';
 import 'package:foodaroundme/map/ui/update_profile_screen.dart';
 import 'package:provider/provider.dart';
 
-import '../viewmodel/mapViewModel.dart';
+import '../viewmodel/map_viewmodel.dart';
 import '../widgets/logout_dialog.dart';
 
 class ProfileScreen extends StatelessWidget {

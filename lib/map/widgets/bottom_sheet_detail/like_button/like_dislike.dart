@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/app_root.dart';
 import 'package:foodaroundme/main.dart';
+import 'package:foodaroundme/map/widgets/needProfile_dialog.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../authentication/ui/sign_in_screen.dart';
@@ -40,7 +41,7 @@ class LikeButtonsState extends State<LikeButtons> {
         GestureDetector(
           onTap: () {
             if (user == null) {
-            _showLoginDialog(context);
+            showAccountDialog(context);
             }
             voteVm.vote(widget.providerPlaceId, 'like');
           },
@@ -76,7 +77,7 @@ class LikeButtonsState extends State<LikeButtons> {
         GestureDetector(
           onTap: () {
             if (user == null) {
-              _showLoginDialog(context);
+              showAccountDialog(context);
             }
             voteVm.vote(widget.providerPlaceId, 'dislike');
           },
@@ -123,7 +124,7 @@ void _showLoginDialog(BuildContext context) {
         'Account Required',
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
-      content: const Text('You need an account to like or dislike places.'),
+      content: const Text('You need an account to like or dislike places!'),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),

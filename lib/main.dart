@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:foodaroundme/app_root.dart';
 import 'package:foodaroundme/map/repositoryImp/geoapify_repo_impl.dart';
+import 'package:foodaroundme/service/subscription/subscription_viewmodel.dart';
 import 'package:provider/provider.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'authentication/viewmodel/authViewModel.dart';
 import 'map/local/app_database.dart';
 import 'map/repository/PlacesRepository.dart';
-import 'map/viewmodel/mapViewModel.dart';
+import 'map/viewmodel/map_viewmodel.dart';
 
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // RevenueCat
+  await Purchases.setLogLevel(LogLevel.debug);
+  await Purchases.configure(
+      PurchasesConfiguration('test_FgGjtcDHcSGCgniFhddvdYPPlss')
+  );
 
   await Supabase.initialize(
     url: 'https://llxhwworkafjuuokswbq.supabase.co',
@@ -34,6 +42,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => MapViewModel(
           placesRepository: context.read<PlacesRepository>())),
         ChangeNotifierProvider(create: (_) => AuthViewModel()),
+        ChangeNotifierProvider(create: (_) => SubscriptionViewModel()..init()),
 
       ],
       child: const MyApp(),

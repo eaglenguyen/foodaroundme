@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../viewmodel/mapViewModel.dart';
+import '../../resources/category_icon.dart';
+import '../../service/subscription/paywall_screen.dart';
+import '../../service/subscription/subscription_viewmodel.dart';
+import '../viewmodel/map_viewmodel.dart';
 import '../widgets/bottom_sheet_detail/bottom_sheet_details.dart';
 
 
@@ -26,15 +29,25 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<MapViewModel>();
+    final subVm = context.watch<SubscriptionViewModel>();
     final places = viewModel.filteredSearchPlaces;
     final itemCount = places.length > 10 ? 10 : places.length;
+
+    // ✅ show paywall if not subscribed
+    if (subVm.isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (!subVm.isPro) {
+      return PaywallScreen(onPurchase: subVm.purchase, onRestore: subVm.restore);
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text("")),
       body: Stack(
         children: [
-
-
           // 📍 Restaurant list
           ListView.builder(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 160),
@@ -43,11 +56,24 @@ class _SearchScreenState extends State<SearchScreen> {
               final place = viewModel.filteredSearchPlaces[index];
 
               return ListTile(
-                leading: const Icon(Icons.restaurant),
+                  leading: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      categoryIcon(place.categories ?? []), // ✅
+                      size: 20,
+                    ),
+                  ),
                 title: Text(place.name),
                 subtitle: Text(
-                  place.categories!.join(", "),
-                  ),
+                  formatCategories(place.categories ?? []),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis
+                ),
                 onTap: () async {
                   final details = await viewModel.getPlaceDetails(
                       place.id);

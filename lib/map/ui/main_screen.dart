@@ -3,7 +3,7 @@ import 'package:foodaroundme/map/ui/profile_screen.dart';
 import 'package:foodaroundme/map/ui/search_screen.dart';
 import 'package:foodaroundme/resources/place_filter.dart';
 import 'package:provider/provider.dart';
-import '../viewmodel/mapViewModel.dart';
+import '../viewmodel/map_viewmodel.dart';
 import '../widgets/action_button.dart';
 import '../widgets/expandable_fab.dart';
 import '../widgets/slider.dart';
@@ -80,7 +80,7 @@ class _MainScreenState extends State<MainScreen> {
           // ✅ Chips positioned to the left of the FAB
           Positioned(
             bottom: 130, // aligns vertically with FAB (90 padding + ~15 adjustment)
-            left: 80,   // sits just to the left of the FAB
+            left: 20,   // sits just to the left of the FAB
             child: AnimatedOpacity(
               opacity: viewModel.selectedIndex == 0 && viewModel.showFab && !isMenuOpen ? 1.0 : 0.0,
               duration: const Duration(milliseconds: 200),
