@@ -16,7 +16,6 @@ class RevenueCatService {
 
     _configured = true;
 
-
     supabase.auth.onAuthStateChange.listen((data) async {
       final user = data.session?.user;
 

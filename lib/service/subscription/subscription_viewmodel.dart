@@ -2,22 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 class SubscriptionViewModel extends ChangeNotifier {
-  bool _isPro = false;
-  bool isLoading = true;
+  bool _isSubbed = false;
+  bool isLoading = false;
 
-  bool get isPro => _isPro;
+  bool get isSubbed => _isSubbed;
 
   Future<void> init() async {
     await checkSubscription();
   }
 
-  Future<void> refreshAfterLogin() async {
+  Future<void> checkSubscription() async {
     isLoading = true;
     notifyListeners();
-    await checkSubscription();
-  }
-
-  Future<void> checkSubscription() async {
     try {
       final customerInfo = await Purchases.getCustomerInfo();
 
@@ -25,9 +21,9 @@ class SubscriptionViewModel extends ChangeNotifier {
       debugPrint('Aliases: ${customerInfo.allPurchasedProductIdentifiers}');
 
 
-      _isPro = customerInfo.entitlements.active.containsKey('foodAroundMe Pro');
+      _isSubbed = customerInfo.entitlements.active.containsKey('foodAroundMe Pro');
     } catch (e) {
-      _isPro = false;
+      _isSubbed = false;
     } finally {
       isLoading = false;
       notifyListeners();

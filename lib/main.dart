@@ -24,7 +24,7 @@ void main() async {
   );
 
   final rcService = RevenueCatService();
-  await rcService.init();
+  await rcService.init(); // SDK Service starts
   final user = supabase.auth.currentUser;
 
   // ✅ restore identity BEFORE UI starts
@@ -52,7 +52,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => MapViewModel(
           placesRepository: context.read<PlacesRepository>())),
         ChangeNotifierProvider(create: (_) => AuthViewModel()),
-        ChangeNotifierProvider(create: (_) => SubscriptionViewModel()..init()),
+        ChangeNotifierProvider(create: (_) => SubscriptionViewModel()),
 
       ],
       child: const MyApp(),

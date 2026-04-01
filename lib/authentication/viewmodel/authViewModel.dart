@@ -334,7 +334,7 @@ class AuthViewModel extends ChangeNotifier{
       listen: false,
     );
 
-    await subscriptionVM.refreshAfterLogin();
+    await subscriptionVM.checkSubscription();
   }
 
 

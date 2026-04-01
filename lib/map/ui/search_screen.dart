@@ -33,14 +33,14 @@ class _SearchScreenState extends State<SearchScreen> {
     final places = viewModel.filteredSearchPlaces;
     final itemCount = places.length > 10 ? 10 : places.length;
 
-    // ✅ show paywall if not subscribed
     if (subVm.isLoading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
-    if (!subVm.isPro) {
+    // ✅ show paywall if not subscribed
+    if (!subVm.isSubbed) {
       return PaywallScreen(onPurchase: subVm.purchase, onRestore: subVm.restore);
     }
 
